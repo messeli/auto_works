@@ -1,0 +1,66 @@
+
+#=========
+# Demo plp
+#=========
+
+print "\n***Compute stationary solutions***"
+plp = run(e='plp',c='plp.ss')
+#plot(plp) #|BN
+
+print "\n***Compute periodic solutions***"
+for hb in plp('HB'):
+    ps = run(hb,c='plp.ps')
+    plp = plp + ps
+    #plot(plp) #|BN
+    
+
+print "\n***Relabel and save the plp output files***"
+plp = rl(plp)
+save(plp, 'plp')
+plot(plp) #|BN
+
+
+print "\n***Follow Hopf bifurcation***"
+hbstart = load(plp("HB1"), c='plp.hb')
+loci = run(hbstart)
+loci = loci + run(hbstart, DS='-') #|BN Turn step direction to its opposite.
+#|:BN<Docum  Special values for DS are ’+’ (forwards) and ’-’ (backwards).
+#|...s = load(s,DS=’-’) changes s.c[’DS’] to -s.c[’DS’] 
+#plot(plp+loci) #|BN before merge
+loci = merge(loci)
+#plot(plp+loci) #|BN after  merge
+#|:BN So merge makes the two into one color. BN 
+
+print "\n***Follow periodic orbit folds: Starting data***"
+lpstart = run(plp('LP1'),c='plp.plp')  #|BN WHY IS IT NOT  load(plp('LP1'),c='plp.plp') ?? TRIED, NOT WORKING ?? WHY.
+
+print "\n***Follow periodic orbit folds***"
+loci = loci + merge(run(lpstart) + run(lpstart, DS='-')) #|BN Hopf contin + fold1 contin
+plot(plp+loci)  #|BN
+
+print "\n***Relabel and save the loci output files***"
+loci = rl(loci)
+save(loci, 'loci')
+
+print "\n***Compute an isola of periodic solutions***"
+for userPoint in loci('UZ'):  #| BN Added loop. 
+    isostart = load(userPoint, c='plp.iso')  #|BN Orig line was isostart = load(loci('UZ4'), c='plp.iso') |Also c.plp.plp modified See it. 
+    iso = merge(run(isostart) + run(isostart, DS='-'))  #|BN c.plp.iso modified See it. 
+    iso = relabel(iso)
+    try: observeIsola = observeIsola + iso
+    except: observeIsola = iso  #|BN 
+save(iso, 'iso')
+save(observeIsola,'observeIsola')
+p = plot(plp+loci+observeIsola)  #|BN
+p.config(color_list="black red green blue violet orange gray brown teal turquoise purple")
+
+print "\n***Clean the directory***"
+cl()
+
+
+
+
+
+
+
+

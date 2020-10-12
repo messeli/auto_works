@@ -1,5 +1,10 @@
-/07p
-*.o   ;|Ignore o files < fortran compilation
-*.exe ;|Ignore exe files < fortran compilation
-d.*   ;|Ignore diagnostic files < AUTO output
+#|gnore the auto original directory 
+07p/
+#| Ignore o files < fortran compilation
+*.o
+#| Ignore exe files < fortran compilation
+*.exe 
+#| Ignore diagnostic files < AUTO output
+d.*   
+#| Ignore temporary backups 
 *~

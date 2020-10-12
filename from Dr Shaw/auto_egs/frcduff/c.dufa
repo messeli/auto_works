@@ -1,0 +1,9 @@
+NDIM=   4, IRS =   0, ILP =   1, IPS=2
+ICP =  [3, 11]
+NTST=  50, NCOL=   4, IAD =   3, ISP = 3, ISW = 1, IPLT= 0, NBC= 0, NINT= 0
+NMX=  500, NPR=  100, MXBF=  -2, IID =   4, ITMX= 8, ITNW= 7, NWTN= 3, JAC= 0
+EPSL= 1e-07, EPSU = 1e-07, EPSS =0.0001
+DS  =  0.01, DSMIN=0.0001, DSMAX=   0.5, IADS=   1
+NPAR = 2, THL =  {}, THU =  {}
+UZR =  {3: 0.2, 11: [ 4.189 6.283 8.377 ]}
+

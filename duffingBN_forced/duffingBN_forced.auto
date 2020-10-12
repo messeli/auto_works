@@ -1,0 +1,21 @@
+
+#==============
+# AUTO Demo frc modified to duffingBN
+#==============
+
+pgm = "duffingBN"
+# duffingBN is started
+# duffingBN: first run : continuation to nonzero r-value
+r1 = run(e=pgm,c=pgm)
+save(r1,'0')
+# plot3(r1) 
+
+# duffingBN: second run : compute solution branch
+r2 = run(r1("UZ1"),ICP=[5,11],NMX=100,DS=0.5,DSMAX=5.0, UZR={5:[5, 10, 15]},UZSTOP={5:20})
+save(r2,'duffingBN')
+# plot(r2)  # PyPlaut dnt work from demofile(), but UNIX command @pp works.
+# plot3(r2) # PLAUT04    works from demofile(), but UNIX command @p  gives error: xterm !!!
+
+# ***Clean the directory***
+# cl()
+

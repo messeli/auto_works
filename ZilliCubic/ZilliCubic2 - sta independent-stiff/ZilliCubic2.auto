@@ -1,0 +1,92 @@
+# ZILLI CUBIC STA (Independent stiffness)
+
+# FORWARD: Cont mH, gamma, thetaP in order.
+r_mH = run("ZilliCubic2") # mH is PAR(3)
+r_gamma = run(r_mH("UZ1"),ICP=[1,11,9],NMX=1000,DS=0.001,DSMAX=0.05,UZSTOP={1:0.25})
+r_thetaP = run(r_gamma("UZ1"),ICP=[2,11,9],NMX=10000,DS=0.001,DSMAX=0.05,UZSTOP={2:2.0}) #,THL={11:0}
+save(r_thetaP,"r_thetaP")
+
+
+# PLOT FORWARD
+plot(r_thetaP)
+
+
+# BACKWARDS: Cont thetaP backwards.
+r_back = run(r_thetaP("UZ1"),ICP=[2,11,9],NMX=1000,DS=-0.005,DSMAX=0.5, UZR={2:[1,2,3,4,5]},UZSTOP={2:0.01})
+
+
+# SAVE BEFORE SPECIAL POINT CONTINUATION
+r_all = rl(r_thetaP + r_back)
+save(r_all,"r_all_ZC2")
+
+
+# PLOT FORWARD+BACKWARD
+plot(r_all) 
+
+
+# BRANCH POINT OF FORWARD
+for sol in r_thetaP("BP"):
+	r_thetaP_BP = run(sol,ISW=-1,ICP=[2,11,9],NMX=1000,DS=0.001,DSMAX=0.5, UZR={2:[1.1,1.2,1.3,1.4,1.5]},UZSTOP={2:[0.01,7.0]})
+	r_all = rl(r_all + r_thetaP_BP)
+	save(r_all,"r_all_ZC2")
+
+# try:  # If there is any BranchPoint
+# 	r_thetaP_BP1 = run(r_thetaP("BP1"),ISW=-1,ICP=[2,11,9],NMX=1000,DS=0.001,DSMAX=0.5, UZR={2:[1.1,1.2,1.3,1.4,1.5]},UZSTOP={2:[0.01,7.0]})
+# 	r_all = rl(r_all + r_thetaP_BP1)
+# except: 
+# 	print("!!! r_thetaP does not have ANY BranchPoint!")
+
+# try:  # If there is a SECOND BranchPoint
+# 	r_thetaP_BP2 = run(r_thetaP("BP2"),ISW=-1,ICP=[2,11,9],NMX=1000,DS=0.001,DSMAX=0.5, UZR={2:[1,2,3,4,5]},UZSTOP={2:7.0})
+# 	r_all = rl(r_all + r_thetaP_BP2)
+# except:
+# 	print("!!! r_thetaP does not have a SECOND BranchPoint!")	
+
+
+# BRANCH POINTS OF BACKWARD
+for sol in r_back("BP"):
+	r_thetaP_BP = run(sol,ISW=-1,ICP=[2,11,9],NMX=1000,DS=0.001,DSMAX=0.5, UZR={2:[1.1,1.2,1.3,1.4,1.5]},UZSTOP={2:[0.01,7.0]})
+	r_all = rl(r_all + r_thetaP_BP)
+	save(r_all,"r_all_ZC2")
+
+# try: 
+# 	r_back_BP1 = run(r_back("BP1"),ISW=-1,ICP=[2,11,9],NMX=1000,DS=0.001,DSMAX=0.5, UZR={2:[1.1,1.2,1.3,1.4,1.5]},UZSTOP={2:[0.01,7.0]})
+# 	r_all = rl(r_all + r_back_BP1)
+# except:
+# 	print("!!! r_back does not have ANY BranchPoint!")
+
+# try:
+# 	r_back_BP2 = run(r_back("BP2"),ISW=-1,ICP=[2,11,9],NMX=1000,DS=0.001,DSMAX=0.5, UZR={2:[1.1,1.2,1.3,1.4,1.5]},UZSTOP={2:[0.01,7.0]})
+# 	r_all = rl(r_all + r_back_BP2)
+# except:
+# 	print("!!! r_back does not have a SECOND BranchPoint!")
+
+# PLOT (FORWARD+BRANCH)+(BACWARD+BRANCH)
+plot(r_all)
+
+
+# TORUS
+for sol in r_thetaP("TR"):
+	r_thetaP_TR = run(sol,ISW=2,ICP=[2,4,11,9],THL={2:1,4:-1},NMX=1000,DS=0.001,DSMAX=0.5, UZSTOP={2:[0.01,7.0]})
+	r_all = rl(r_all + r_thetaP_TR)
+	save(r_all,"r_all_ZC2")
+
+# try:
+# 	r_tor1 = run(r_all("TR1"),ISW=2,ICP=[2,4,11,9],THL={2:1,4:-1},NMX=1000,DS=0.001,DSMAX=0.5, UZR={2:[1.1,1.2,1.3,1.4,1.5]},UZSTOP={2:[0.01,7.0]})
+# 	r_all = rl(r_all + r_tor1)
+# except: 
+# 	print("!!! r_all does not have ANY Torus!")
+
+# try:
+# 	r_tor2 = run(r_all("TR2"),ISW=2,ICP=[2,4,11,9],THL={2:1,4:-1},NMX=1000,DS=0.001,DSMAX=0.5, UZR={2:[1.1,1.2,1.3,1.4,1.5]},UZSTOP={2:[0.01,7.0]})
+# 	r_all = rl(r_all + r_tor2)
+# except:
+# 	print("!!! r_all does not have a SECOND Torus!")
+
+
+# PLOT ALL: (FORWARD+BRANCH)+(BACWARD+BRANCH)+TORUS
+r_all = rl(r_all)
+save(r_all,"r_all_ZC2")
+plot(r_all)
+#cl()
+

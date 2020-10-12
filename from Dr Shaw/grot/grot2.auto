@@ -1,0 +1,11 @@
+#==============
+# GRavity rotor
+#==============
+
+print "\n***Compute stationary solutions, going into negative slope of mu function***"
+st1=run(e='grot',c='grot.1')
+print "\n***Compute stationary solutions, going up in frequency to explore geometric friction reduction***"
+st2=run(e='grot',c='grot.1',DS=0.01,UZSTOP={4: 100},NMX=500)
+
+print "\n***Follow the Hopf bifurcation from om~3.6***"
+po = run( st1("HB1") , c='grot.2' )

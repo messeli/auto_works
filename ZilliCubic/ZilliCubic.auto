@@ -1,0 +1,16 @@
+r1 = run("ZilliCubic")
+save(r1,'r1')
+plot(r1)
+cl()
+
+# r1 = run("ZilliCubic1")
+# save(r1,'r1')
+# r2 = run(r1("UZ1"),ICP=[8,11,9],NMX=100,DS=0.05,DSMAX=5.0, UZR={8:[1,2,3,4,5]},UZSTOP={8:7})
+# r12 = r1+r2
+# plot(r12)
+#cl()
+
+
+
+#r2 = run(r1("UZ1"),ICP=[5,11],NMX=100,DS=0.5,DSMAX=5.0, UZR={5:[5, 10, 15]},UZSTOP={5:20})
+#save(r2,'duffingBN')

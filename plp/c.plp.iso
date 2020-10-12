@@ -1,0 +1,13 @@
+NDIM=   2, IPS =   2, IRS =   0 #|Was IRS = 9 , no change. 
+ILP =  1
+ICP =  [4, 11]
+NTST=  20, NCOL=   4, IAD =   3, ISP =   1, ISW = 1, IPLT= 0, NBC= 0, NINT= 0
+NMX=  200, NPR=  200, MXBF=  10, IID =   2, ITMX=  12, ITNW= 7, NWTN= 3, JAC= 1
+EPSL= 1e-08, EPSU = 1e-08, EPSS = 1e-06
+DS  =   0.1, 
+DSMIN=  0.001,  #|BN Original was  DSMIN=  0.01, 
+DSMAX=   0.5,   #|BN Original was  DSMAX=   2.0, 
+IADS=   1
+NPAR = 5, THL =  {}, THU =  {}
+UZR =  {4: 4.0}
+STOP = ['HB1'] #|BN Turns back just before reachJ d HB-continuation line. #|BN Worked  UZSTOP = [1:109] #|BN ORIG was  STOP = ['LP1']

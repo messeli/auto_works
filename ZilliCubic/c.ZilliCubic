@@ -1,0 +1,9 @@
+NDIM=   4, IPS =   1, IRS =   0, ILP =   1
+ICP =  [2,8] #8 is amplitude and defined under PVLS SUBROUTINE. It is not continued, but you make AUTO print the PAR(8) values in a separate column in fort.7 and b.xxx files. Thus, PAR(8) will appear in the PyPlaut tool, and can be selected as an axis. 
+NTST=  20, NCOL=   4, IAD =   3, ISP =   2, ISW = 1, IPLT= 9, NBC= 0, NINT= 0
+NMX=   1000, 
+NPR=  100, MXBF=   5, IID =   2, ITMX= 8, ITNW= 7, NWTN= 3, JAC= 0
+EPSL= 1e-07, EPSU = 1e-07, EPSS =0.0001
+DS  =  0.01, DSMIN= 0.001, DSMAX=   1.0, IADS=   1
+NPAR = 6, THL =  {}, THU =  {}
+UZSTOP =  {2: 7}

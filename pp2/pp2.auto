@@ -1,0 +1,25 @@
+
+#==============
+# AUTO Demo pp2
+#==============
+
+print "\n***Compute stationary solution families***"
+pp2 = run('pp2')
+save('pp2')
+
+print "\n***Compute periodic solution families***"
+# BN Restart from the hopfBifurcation point of stationary solutions@ run(pp2('HB1'),
+# BN use two continuation parameters: ICP=['quota','PERIOD'],
+# BN problem type is Periodic orbit: IPS=2,
+# BN Print and save restart data every 2 steps to the fort.8 file: NPR=2, 
+# BN Stop the solver when you encounter a quota value of 0 or 1, or a PERIOD value of 36 BN: UZSTOP={'quota': [0.0, 1.0], 'PERIOD': 36.0})
+run(pp2('HB1'), ICP=['quota','PERIOD'], IPS=2, NPR=2, #BN the qoute from the docum 2019 AUTO says "Then the script pp2.auto scans the first run for Hopf bifurcations, finds one, and computes the family of periodic solutions that emanates from the Hopf bifurcation." 
+    UZSTOP={'quota': [0.0, 1.0], 'PERIOD': 36.0})
+save('ps')
+append('pp2')
+    
+print "\n***Clean the directory***"
+# BN plot: 
+plot('pp2')  # BN PyPlaut freezes.
+plot3('pp2')  # BN Plaut04 works. 
+clean()

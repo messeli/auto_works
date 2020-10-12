@@ -1,0 +1,33 @@
+
+#=============
+# AUTO Demo ab
+#=============
+
+print "\n***Generate starting data***"
+start=run(e='ab',c='ab.1') # You can skip load command.
+	# BN This has computed the stationery solutions for 
+	# certain p2 parameter values. For each p2 value
+	# separate p1 continuation will be performed.
+
+
+print "\n***Compute stationary solution families***"
+ab = []
+for solution in start():
+    ab = ab + run(solution,c='ab.2')
+
+print "\n***Relabel and save the output files***"
+ab=rl(ab)
+sv(ab,'ab')
+plot3('ab') # BN
+
+print "\n***Compute periodic solution families***"
+for solution in ab("HB"): #BN For each HopfBifur point...
+    ab = ab + run(solution,c='ab.3')
+
+print "\n***Relabel and save the output files***"
+ab=rl(ab)
+sv(ab,'ab')
+plot3('ab') # BN
+
+print "\n***Clean the directory***"
+cl()

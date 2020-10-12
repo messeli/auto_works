@@ -1,0 +1,21 @@
+
+#==============
+# AUTO Demo frc
+#==============
+
+pgm = "frc"
+print "\nDemo %s is started"%pgm
+print "\n%s : first run : continuation to nonzero r-value"%pgm
+r1 = run(e=pgm,c=pgm)
+save(r1,'0')
+plot3(r1) #BN
+
+print "\n%s : second run : compute solution branch"%pgm
+r2 = run(r1("UZ1"),ICP=[5,11],NMX=20,DS=-0.5,DSMAX=5.0)
+save(r2,'frc')
+plot(r2) #BN
+plot3(r2) #BN
+
+print "\n***Clean the directory***"
+cl()
+

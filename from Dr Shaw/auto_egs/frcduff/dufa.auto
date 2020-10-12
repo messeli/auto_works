@@ -1,0 +1,18 @@
+
+#this is just a homotopy from the known (and trivial case ) P=0. to P=0.1
+homot=run(e='dufa',c='dufa')
+
+#continue upwards in frequency, starting from our requested force level point
+ru = run(homot("UZ1"),ICP=[4,11])
+
+#continue downwards in frequency
+rd = run(homot("UZ1"),ICP=[4,11],DS='-')
+
+#combine 
+r=rd+ru
+#give each solution point a uniquue label
+r=relabel(r)
+
+#output
+print r
+plot r

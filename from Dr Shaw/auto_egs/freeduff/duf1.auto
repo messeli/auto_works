@@ -1,0 +1,15 @@
+
+# gets the zero solutions plus the remote equilibria - 
+#   only the negative U1 sols are found, it is possible (but messy) 
+#   to get the positive sols but they can be implied through symmetry
+r1=run(c='duf1',e='duf1')
+ 
+save(r1, 'r1')
+plot(r1)
+
+#now for periodic sols
+r2=run(r1('EP'),IPS=2,ICP=[1,11],NMX=200,NPR=2,DS=0.1)
+save(rl(r1+r2),'r2')  # BN
+plot(r2)
+ 
+ 

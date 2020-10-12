@@ -1,0 +1,19 @@
+   0  -1.7976+308  1.7976+308 -1.7976+308  1.7976+308
+   0   EPSL= 1.0000E-07  EPSU = 1.0000E-07  EPSS = 1.0000E-04
+   0   DS  = 1.0000E-04  DSMIN= 1.0000E-15  DSMAX= 5.0000E-02
+   0   NDIM=   2   IPS =   2   IRS =   0   ILP =   1
+   0   NTST= 100   NCOL=   4   IAD =   3   ISP =   2
+   0   ISW =   1   IPLT=   0   NBC =   2   NINT=   1
+   0   NMX=10000   NPR=  100   MXBF=  10   IID =   4   IADS=   1
+   0   ITMX=   8   ITNW=   5   NWTN=   3   JAC =   0   NUZR=   1
+   0   NPAR=  36   THL = {}    THU = {}
+   0   UZSTOP = {2: 1}
+   0   e = 'duffingBN_backbone2' s = '/'
+   0   User-specified constants, where different from above:
+   0   NBC =   0   NINT=   0
+   0   User-specified parameters:         2   11   9
+   0   Active continuation parameters:    2   11
+   0
+   0    PT  TY  LAB    PAR(2)             L2-NORM            MAX U(1)           MAX U(2)            PERIOD            PAR(9)          
+  -1    -1   9    1  0.0000000000E+000  3.0000000000E+000  3.0000000000E+000  0.0000000000E+000  6.2831853072E+000  1.0000000000E+000
+  -1     2  -9    2  0.0000000000E+000  3.0000000000E+000  3.0000000000E+000  0.0000000000E+000  6.2831853072E+000  1.0000000000E+000

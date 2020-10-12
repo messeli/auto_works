@@ -1,0 +1,14 @@
+NDIM=   4, IPS =   2, IRS =   0, ILP =   1
+ICP =  [3, 11] # BN that means it will continue in parameter 3, 
+    # while it also requires to get the "period parameter", PAR(11), as ICP. 
+    	# See AUTO 2019 Docum Ch10.7.3:Periodic solutions and rotations.
+NTST=  20, NCOL=   4, IAD =   3, ISP =   2, ISW = 1, IPLT= 9, NBC= 0, NINT= 0
+NMX=   10, NPR=  100, MXBF=   5, IID =   2, ITMX= 8, ITNW= 7, NWTN= 3, JAC= 0
+EPSL= 1e-07, EPSU = 1e-07, EPSS =0.0001
+DS  =  0.05, DSMIN= 0.001, DSMAX=   1.0, IADS=   1
+NPAR = 6, THL =  {}, THU =  {}
+UZR =  {3: 0.2, 11: [1.0, 2.0, 3.0, 4.0, 5.0]}
+	# BN In the first run, although par11 is given several values, 
+		# the supplied beta value,100, in frc.f90 is used: par11 = 2*pi/beta = 6.28e-2. ??
+	# BN in the second run, par11 is continues for NMX=20 steps, 
+	 	# and no 4 or -4 (UZ) type points is generated for par11 (period) column. ?? 

@@ -1,0 +1,19 @@
+#==============
+# GRavity rotor
+#==============
+
+print "\n***Compute stationary solutions***"
+st=run(e='grot',c='grot.1')
+save(st,'st')
+
+print "\n***Follow the Hopf bifurcation from om~3.6***"
+po = run( st("HB1") , c='grot.2' )
+save(po,'po')
+
+
+sl = st+po
+save(sl,"sl") # BN added "sl"
+plot 'sl'
+
+clean()
+

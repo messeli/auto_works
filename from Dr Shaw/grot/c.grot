@@ -1,0 +1,9 @@
+# BN Not used in any .auto file
+NDIM=   2, IRS =   0, ILP =   1, IPS=2
+ICP =  [4,11 ]
+NTST=  50, NCOL=   4, IAD =   3, ISP = 3, ISW = 1, IPLT= 0, NBC= 0, NINT= 0
+NMX=  500, NPR=  100, IID =   4, ITMX= 8, ITNW= 7, NWTN= 3, JAC= 0
+EPSL= 1e-07, EPSU = 1e-07, EPSS =0.0001,IADS=   1 , DS=0.01
+NPAR = 4, THL =  {}, THU =  {}
+UZR =  {4: [ 10. 20. 30. ]}
+

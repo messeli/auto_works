@@ -1,0 +1,28 @@
+# dat = 'duffingBN_backbone' # BN for later...
+NDIM=2
+IPS=2, IRS=0 
+NPR=100
+ICP=[2,11,9]  
+# UZR={2:3.0} # BN THIS IS NEEDED FOR AUTO TO DETECT THE BRANCH POINT AT THE BOTTOM OF THE BACKBONE CURVE. Otherwise it misses the Branch Point.
+UZSTOP={2:1} # UZSTOP={11:2*pi/0.5}  # 12.566370614359173
+NMX=400
+DS=+1e-5, DSMIN=1e-15, DSMAX=0.001
+NTST=100
+NPAR=36, JAC=0
+NCOL=4, IAD=3
+EPSL=1e-6, EPSU=1e-6, EPSS=1e-3, ITMX=8, NWTN=10, ITNW=15 #3,5
+IADS=1, THL={2:1,11:1,9:0.0} #THU={1: 0.0, 2:0.0}
+ILP=1, SP=[], ISP=2, ISW=1, MXBF=10
+IBR=0, LAB=0, IIS=3, IID=3, IPLT=0
+NBC=0, NINT=0
+
+
+# RL0=-1.7976e+308, RL1=1.7976e+308, A0=-1.7976e+308, A1=1.7976e+308
+# e = '', sv='', 
+# s='', dat='', U={}, PAR={}, TY=''
+################################
+# HomCont settings
+################################
+
+#NUNSTAB = -1, NSTAB = -1, IEQUIB = 1, ITWIST = 0, ISTART = 5
+#IREV = [], IFIXED = [], IPSI = []

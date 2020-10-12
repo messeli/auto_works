@@ -1,0 +1,19 @@
+# ZILLI CUBIC ROT (AUTONOMOUS - ISOTROPIC STIFFNESS)
+unames={1: 'u', 2: 'u_dot',3:'v' , 4:'v_dot'}
+parnames={1:'gamma', 2:'thetaP',3:'mH',4:'gamma2',5:'epsH',6:'zeta',7:'JpH',8:'thetaPP',9:'Amplitude'}
+# Gamma2 is not used!!! REMOVE IT WHEN SAFE. 
+
+
+NDIM=   4, IPS =   1, IRS =   0, ILP =   1
+ICP =  [3,9]  # 11
+NTST=  200  # 1000   # 500
+NCOL= 4, IAD = 3, ISP = 2, ISW = 1, IPLT= 9, NBC= 0, NINT= 0
+NMX=  10000  # 100 
+NPR=  1000, MXBF=  5, IID = 2, ITMX= 8, ITNW= 7, NWTN= 5 # 3
+JAC= 0  # 1
+EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4  # 1e-4
+DS  =  0.01  # 0.001
+# ILP = Consider. 
+DSMIN= 1e-4, DSMAX=   0.05, IADS=   1
+NPAR = 36, THU =  {}, THL ={}  # {11:0.0}
+UZSTOP = {3:0.9}
