@@ -1,0 +1,5 @@
+/07p
+*.o   ;|Ignore o files < fortran compilation
+*.exe ;|Ignore exe files < fortran compilation
+d.*   ;|Ignore diagnostic files < AUTO output
+*~
