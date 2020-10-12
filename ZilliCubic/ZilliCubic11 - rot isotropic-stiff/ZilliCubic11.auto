@@ -16,7 +16,7 @@
 #| 14  shortHands  - d:the | s:is | t:to | b:be | r:are | f:of | u:you 
 #| 15                ds:this | dt:that | dn:then or than | cn:can | cld:could | fr:for 
 #| 17                dss:this is | dts:that is   
-#| 18                recomd:recommended | verbd: pastParticipleForm of a verb 
+#| 18                recomd:recommended | verbd: pastParticipleForm of a verb | verbJ,G: verbing
 #| 16                w/:with | w/o:without 
 #| 17                others...
 #|
