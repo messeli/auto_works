@@ -38,7 +38,7 @@
 r_mH = run("ZilliCubic11")  #|Continue PAR(3)=mH from 0 to 0.9
 #| Cont PAR(1)=gamma from 0 to 0.25
 r_gamma = run(r_mH("UZ1"),ICP=[1,9],NMX=1000,DS=0.001,DSMAX=0.5,UZSTOP={1:0.25}) 
-#| Cont PAR(2)=thetaP from 0 to 0.25
+#| Cont PAR(2)=thetaP from 0 to 7
 r_thetaP = run(r_gamma("UZ1"),ICP=[2,9],NMX=1000,DS=0.001,DSMAX=0.05,UZSTOP={2:7})
 #|1_AAA END
 
