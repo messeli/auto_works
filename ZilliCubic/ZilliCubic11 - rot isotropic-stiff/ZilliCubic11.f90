@@ -18,12 +18,11 @@
         GAMMA = PAR(1) 
         THETAP = PAR(2)
         MH = PAR(3) 
-        GAMMA2 = PAR(4) 
+        JPH = PAR(4) 
         EPSH = PAR(5)
         ZETA = PAR(6) 
-        JPH  = PAR(7)
-        THETAPP = PAR(8)
-
+        THETAPP = PAR(7)
+        
         Q1=U(1)
         Q2=U(2)
         Q3=U(3)
@@ -71,11 +70,10 @@
         PAR(1)=GAMMA 
         PAR(2)=THETAP 
         PAR(3)=MH 
-        PAR(4)=GAMMA2
+        PAR(4)=JPH
         PAR(5)=EPSH 
         PAR(6)=ZETA 
-        PAR(7)=JPH  
-        PAR(8)=THETAPP 
+        PAR(7)=THETAPP   
 
         U(1)=0
         U(2)=0
@@ -114,14 +112,14 @@
         !     UU(i,j) = GETU(i,j,U,NDX,NTST,NCOL)
         !   END DO
         ! END DO
-        ! R2(:) = UU(1,:)**2 + UU(3,:)**2  !El by El multip
+        ! R2(:) = UU(1,:)**2 + UU(2,:)**2  !El by El multip
         ! R(:) = R2**0.5 
         ! PAR(9) = MAXVAL(R)
         !|CCC END
 
         !|DDD DEFAULT METHOD - PHASED AMP
         !|:CORRECT AMPLITUDE FOR IPS=1
-        PAR(9) = (U(1)**2 + U(3)**2)**0.5 
+        PAR(9) = (U(1)**2 + U(2)**2)**0.5 
         !|:The state vector is directly used to calc amplitude.
         !|:See the qoute above.
         !|DDD END 
@@ -138,7 +136,7 @@
         !|AAA METHOD A
         M = 0.0
         DO p=0,NCOL*NTST
-          N = ( U(1,p)**2+U(3,p)**2 )**0.5
+          N = ( U(1,p)**2+U(2,p)**2 )**0.5
           if (N.GT.M) THEN
             M = N
           END IF 
@@ -148,7 +146,7 @@
         !|AAA END
 
         !|BBB METHOD B
-        ! R2(:) = U(1,:)**2 + U(3,:)**2  !
+        ! R2(:) = U(1,:)**2 + U(2,:)**2  !
         ! R(:) = R2**0.5 
         ! GETU = MAXVAL(R)
         !|BBB END

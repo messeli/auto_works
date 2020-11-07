@@ -112,11 +112,11 @@ for i in range(0,len(zetaList)):
 		r_dat_start = load(e=eqFileName[i],c="ZilliCubic11",dat=datFileName[i],
    					IPS=2,ICP=[2,11,9],DS=+0.01,DSMAX=0.02, UZSTOP={2:[0.01,7.01]},
    					EPSL= 1e-05, EPSU = 1e-05, EPSS =1e-2,NTST=100,ITNW=9,NWTN=7)
-		#|:See here the tolerance is much higer than the recomd (above).
+		#|:See here the tolerance is much higher(bad) than the recomd (above).
 		#|::CHANGE THIS: Decrease tolerance, decrease NTST (mesh interval count).
 	else:
 		r_dat_start = load(e=eqFileName[i],c="ZilliCubic11",dat=datFileName[i],
-   					IPS=2,ICP=[2,11,9],DS=+0.005,DSMAX=0.005, UZSTOP={2:[0.01,7.01]}, 
+   					IPS=2,ICP=[2,11,9],DS=+0.005,DSMAX=0.005, UZSTOP={2:[0.01,7.01]},UZR={2:3.47}, #|UZR={2:3.46610}
    					EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-3,NTST=200)
 		#|:So EPS_ are the highest in the recomd range (above).
 		#|...HOWEVER, if I ran ode45 fr aBit more fr lowerZeta orbits, 
