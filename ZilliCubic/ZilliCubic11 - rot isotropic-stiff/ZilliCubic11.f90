@@ -118,7 +118,7 @@
         !|CCC END
 
         !|DDD DEFAULT METHOD - PHASED AMP
-        !|:CORRECT AMPLITUDE FOR IPS=1
+        !|:CORRECT AMPLITUDE FOR IPS=1, which this .f90 is used for.
         PAR(9) = (U(1)**2 + U(2)**2)**0.5 
         !|:The state vector is directly used to calc amplitude.
         !|:See the qoute above.

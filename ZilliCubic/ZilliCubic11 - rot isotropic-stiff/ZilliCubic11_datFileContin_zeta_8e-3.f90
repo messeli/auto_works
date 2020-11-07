@@ -13,88 +13,41 @@
         DOUBLE PRECISION, INTENT(IN) :: U(NDIM), PAR(*)
         DOUBLE PRECISION, INTENT(OUT) :: F(NDIM)
         DOUBLE PRECISION, INTENT(INOUT) :: DFDU(NDIM,NDIM), DFDP(NDIM,*)
-        DOUBLE PRECISION ZETA,Q1,Q2,Q3,Q4,U5,S4,C4,R2,GAMMA,GAMMA2,THETA,THETAP,THETAPP,MH,EPSH,JPH,X,Y
+        DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,U5,S4,C4,R2,GAMMA,GAMMA2,THETA,THETAP,THETAPP,MH,EPSH,JPH,X,Y
       
         GAMMA = PAR(1) 
         THETAP = PAR(2)
         MH = PAR(3) 
-        GAMMA2 = PAR(4) 
+        JPH = PAR(4) 
         EPSH = PAR(5)
         ZETA = PAR(6) 
-        JPH  = PAR(7)
-        THETAPP = PAR(8)
+        THETAPP = PAR(7)
 
         Q1=U(1)
         Q2=U(2)
         Q3=U(3)
         Q4=U(4)
  
-        R2 = (Q1**2)+(Q3**2)
+        R2 = (Q1**2)+(Q2**2)
   
-        F(1) = Q2
-        F(2) = -THETAP*(JPH-2)*Q4          &
-               -2*ZETA*Q2                  &
+        F(1) = Q3
+        F(2) = Q4
+        F(3) = -THETAP*(JPH-2)*Q4          &
+               -2*ZETA*Q3                  &
                +((THETAP**2)*(1-JPH)-1)*Q1 &
-               +2*ZETA*THETAP*Q3           &
+               +2*ZETA*THETAP*Q2           &
                +MH*EPSH*(THETAP**2)        &
-               -GAMMA*R2*Q1 !!!-GAMMA*Q1**3 - GAMMA2*Q3**2*Q1
-               ! -GAMMA/4*( 3*Q1*R2 + C4*Q1*(R2-4*(Q3**2)) + S4*Q3*(R2-4*(Q1**2)) ) 
-        F(3) = Q4
-        F(4) = +THETAP*(JPH-2)*Q2          &
+               -GAMMA*R2*Q1 
+        F(4) = +THETAP*(JPH-2)*Q3          &
                -2*ZETA*Q4                  &
-               +((THETAP**2)*(1-JPH)-1)*Q3 &
+               +((THETAP**2)*(1-JPH)-1)*Q2 &
                -2*ZETA*THETAP*Q1           &
                -MH*EPSH*THETAPP            &
-               -GAMMA*R2*Q3  !!!-GAMMA*Q3**3 - GAMMA2*Q1**2*Q3
-               ! -GAMMA/4*( 3*Q3*R2 + C4*Q3*(R2-4*(Q1**2)) - S4*Q1*(R2-4*(Q3**2)) ) 
-        
+               -GAMMA*R2*Q2          
 
       ! IF (IJAC.EQ.1) RETURN
       !   DFDU(1,1)=0
-      !   DFDU(1,2)=1
-      !   DFDU(1,3)=0
-      !   DFDU(1,4)=0
-      !   DFDU(1,5)=0
-      !   DFDU(1,6)=0
-
-      !   DFDU(2,1)=+((THETAP**2)*(1-JPH)-1) &
-      !             -GAMMA/4*( 3*R2 + 6*Q1**2 + C4*(R2-4*Q3**2) + 2*C4*Q1**2 - 6*S4*Q3*Q1 )
-      !   DFDU(2,2)=-2*ZETA
-      !   DFDU(2,3)=+2*ZETA*THETAP + &
-      !             -GAMMA/4*( +6*Q1*Q3 - 6*C4*Q1*Q3 + S4*(R2-4*Q1**2) + 2*S4*Q3**2  )
-      !   DFDU(2,4)=-THETAP*(JPH-2)
-      !   DFDU(2,5)=-GAMMA/4*Q3*(R2-4*Q1**2) 
-      !   DFDU(2,6)=-GAMMA/4*Q1*(R2-4*Q3**2)  
-
-      !   DFDU(3,1)=0
-      !   DFDU(3,2)=0
-      !   DFDU(3,3)=0
-      !   DFDU(3,4)=1
-      !   DFDU(3,5)=0
-      !   DFDU(3,6)=0
-
-      !   DFDU(4,1)=-2*ZETA*THETAP &
-      !             -GAMMA/4*( 6*Q3*Q1 - 6*C4*Q3*Q1 - S4*(R2-4*Q3**2) - 2*S4*Q1**2 )
-      !   DFDU(4,2)=+THETAP*(JPH-2)
-      !   DFDU(4,3)=+((THETAP**2)*(1-JPH)-1) &
-      !             -GAMMA/4*( 3*R2 + 6*Q3**2 + C4*(R2-4*Q1**2) + 2*C4*Q3**2 +6*S4*Q1*Q3 )
-      !   DFDU(4,4)=-2*ZETA
-      !   DFDU(4,5)=+GAMMA/4*Q1*(R2-4*Q3**2)  
-      !   DFDU(4,6)=-GAMMA/4*Q3*(R2-4*Q1**2) 
-
-      !   DFDU(5,1)=0
-      !   DFDU(5,2)=0
-      !   DFDU(5,3)=0
-      !   DFDU(5,4)=0
-      !   DFDU(5,5)=1- ( 1*(X**2 + Y**2) + X*(2*X) )    
-      !   DFDU(5,6)=4*THETAP-X*(2*Y)    
-
-      !   DFDU(6,1)=0
-      !   DFDU(6,2)=0
-      !   DFDU(6,3)=0
-      !   DFDU(6,4)=0
-      !   DFDU(6,5)=-4*THETAP-Y*(2*X)
-      !   DFDU(6,6)=1- ( 1*(X**2 + Y**2) + Y*(2*Y))
+      ! ...
       END SUBROUTINE FUNC
 
       SUBROUTINE STPNT(NDIM,U,PAR,T)  
@@ -102,7 +55,7 @@
         INTEGER, INTENT(IN) :: NDIM
         DOUBLE PRECISION, INTENT(INOUT) :: U(NDIM),PAR(*)
         DOUBLE PRECISION, INTENT(IN) :: T
-        DOUBLE PRECISION ZETA,Q1,Q2,Q3,Q4,S4,C4,R2,GAMMA,GAMMA2,THETA,THETAP,THETAPP,MH,EPSH,JPH,X,Y,TPI!WN,F_M,K3_M,OMEG,
+        DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,S4,C4,R2,GAMMA,GAMMA2,THETA,THETAP,THETAPP,MH,EPSH,JPH,X,Y,TPI!WN,F_M,K3_M,OMEG,
 
         ! GIVEN BACKWARDS (MATLAB LOWER AMPLITUDE END DIMENSIONS)
         GAMMA = 0.25 !2nd continue gamma from 0 to 0.25
@@ -117,11 +70,10 @@
         PAR(1)=GAMMA 
         PAR(2)=THETAP 
         PAR(3)=MH 
-        PAR(4)=GAMMA2
+        PAR(4)=JPH
         PAR(5)=EPSH 
         PAR(6)=ZETA 
-        PAR(7)=JPH  
-        PAR(8)=THETAPP 
+        PAR(7)=THETAPP  
 
       END SUBROUTINE STPNT
 
@@ -131,15 +83,15 @@
       ! INTEGER, INTENT(IN) :: NDIM
       ! DOUBLE PRECISION, INTENT(IN) :: U(NDIM)
       ! DOUBLE PRECISION, INTENT(INOUT) :: PAR(*)
-      ! DOUBLE PRECISION R2,Q1,Q3
+      ! DOUBLE PRECISION R2,Q1,Q2
       !   Q1 = U(1)
-      !   Q3 = U(3)
+      !   Q2 = U(2)
 
       !   ! R2 = max(U(1)**2 + U(2)**2)  #|!WORKj
-      !   R2 = Q1**2 + Q3**2 
+      !   R2 = Q1**2 + Q2**2 
       !   ! Which one is this?
-      !   ! ?? max( U(1) )^2 + max( U(3) )^2
-      !   ! ?? max( U(1)^2 + U(3)^2 )
+      !   ! ?? max( U(1) )^2 + max( U(2) )^2
+      !   ! ?? max( U(1)^2 + U(2)^2 )
 
       !   PAR(9) = R2**(0.5)
       ! END SUBROUTINE PVLS
@@ -175,13 +127,13 @@
         !     UU(i,j) = GETU(i,j,U,NDX,NTST,NCOL)
         !   END DO
         ! END DO
-        ! R2(:) = UU(1,:)**2 + UU(3,:)**2  !El by El multip
+        ! R2(:) = UU(1,:)**2 + UU(2,:)**2  !El by El multip
         ! R(:) = R2**0.5 
         ! PAR(9) = MAXVAL(R)
         !|CCC END
 
         !|DDD DEFAULT METHOD - PHASED AMP
-        ! PAR(9) = (U(1)**2 + U(3)**2)**0.5 
+        ! PAR(9) = (U(1)**2 + U(2)**2)**0.5 
         !|:The initial data of one period is sampled for amplitude.
         !|:See the qoute above.
         !|DDD END 
@@ -199,7 +151,7 @@
         !|AAA METHOD A
         M = 0.0
         DO p=0,NCOL*NTST
-          N = ( U(1,p)**2+U(3,p)**2 )**0.5
+          N = ( U(1,p)**2+U(2,p)**2 )**0.5
           if (N.GT.M) THEN
             M = N
           END IF 
@@ -209,7 +161,7 @@
         !|AAA END
 
         !|BBB METHOD B
-        ! R2(:) = U(1,:)**2 + U(3,:)**2  !
+        ! R2(:) = U(1,:)**2 + U(2,:)**2  !
         ! R(:) = R2**0.5 
         ! GETU = MAXVAL(R)
         !|BBB END
