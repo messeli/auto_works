@@ -178,6 +178,7 @@ for i in range(0,len(zetaList)):
 r_all = rl( r_IPS1 + r_IPS2 )
 p=plot(r_all,stability=True,bifurcation_x="thetaP",bifurcation_y="Amplitude")
 p.config(color_list="black red green blue violet orange gray brown teal turquoise purple")
+p.config(solution_x="u",solution_y="v")
 save(r_all,"r_all")
 #|HHH END WHOLE DIAGRAM
 
