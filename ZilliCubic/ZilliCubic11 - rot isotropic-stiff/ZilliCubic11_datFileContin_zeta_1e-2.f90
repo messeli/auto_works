@@ -103,6 +103,7 @@
         DOUBLE PRECISION, INTENT(INOUT) :: PAR(*)
         DOUBLE PRECISION, ALLOCATABLE :: UU(:,:),R2(:),R(:)
         DOUBLE PRECISION, EXTERNAL :: GETP, GETU
+        DOUBLE PRECISION :: DUMM
         INTEGER :: NDX,NCOL,NTST,i,j,k
         !|SEE the explanation of demo pvl.f90 : 
         !|:"For algebraic problems the argument U is, as usual, the state vector.
@@ -118,7 +119,8 @@
 
         !|AAA/BBB METHOD A/B  
         !|:CORRECT AMPLITUDE FOR IPS=2
-        PAR(9) = GETU(i,j,U,NDX,NTST,NCOL)
+        DUMM = GETU(i,j,U,NDX,NTST,NCOL,PAR(2))
+        PAR(9) = DUMM 
         !|AAA/BBB END
         
         !|CCC METHOD C
@@ -141,23 +143,30 @@
       END SUBROUTINE PVLS
 
 
-      DOUBLE PRECISION FUNCTION GETU(i,j,U,NDX,NTST,NCOL)
+      DOUBLE PRECISION FUNCTION GETU(i,j,U,NDX,NTST,NCOL,MYPAR)
         INTEGER, INTENT(IN) :: NDX,NCOL,NTST,i,j
-        INTEGER :: p
-        DOUBLE PRECISION, INTENT(IN) :: U(NDX,0:NCOL*NTST) !
+        INTEGER :: p, I_MAX
+        DOUBLE PRECISION, INTENT(IN) :: U(NDX,0:NCOL*NTST)
         DOUBLE PRECISION, ALLOCATABLE :: R2(:),R(:)
-        DOUBLE PRECISION :: M,N
+        DOUBLE PRECISION :: M,N , MYPAR
 
         !|AAA METHOD A
-        M = 0.0
+        M = 0.D0
         DO p=0,NCOL*NTST
-          N = ( U(1,p)**2+U(2,p)**2 )**0.5
+          N = ( U(1,p)**2+U(2,p)**2 )**0.5D0
           if (N.GT.M) THEN
             M = N
+            I_MAX = p
           END IF 
         END DO 
 
+
+        OPEN (unit = 10, file = "dummy_write_file.txt",access = "append")
+        WRITE(10,*) MYPAR,U(1,I_MAX),U(2,I_MAX),U(3,I_MAX),U(4,I_MAX),M
+        CLOSE(10)
+
         GETU = M
+        
         !|AAA END
 
         !|BBB METHOD B
@@ -181,4 +190,3 @@
 
       SUBROUTINE FOPT
       END SUBROUTINE FOPT
-
