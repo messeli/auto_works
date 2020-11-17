@@ -6,10 +6,10 @@
 #| 04  "#| :"      - indentation of ":" suggests dt this is the explanation of "#| " (see 01 above)
 #| 05  "#|::"      - explanation of an explanation of sort "#|:"; extend this w/ the idea in 04.
 #| 06  "#|Nt:"     - a note not strictly related to the immediate preciding line, cld b deductions
-#| 07  "#|XXX"     - a block of code starts here 
-#| 08  "#|X_YYY"   - a block of code under the block "XXX"
-#| 09  "#|XY_ZZZ"  - a block of code under the block "X_YYY", d reference to d X block cn be omitd
-#| 10  "#|XXX END" - a block of code ends here
+#| 07  "#|XXX>"    - a block of code starts here, old versions dont have ">"
+#| 08  "#|X_YYY>"  - a block of code under the block "XXX" 
+#| 09  "#|XY_ZZZ>" - a block of code under the block "X_YYY", d reference to d X block cn be omitd
+#| 10  "#|XXX."    - a block of code ends here, old versions:"XXX END"
 #| 11  "#|..."     - continued line from either "#|:" or "#|::" or "#|XXX" or "#|Nt:" or "#|..." 
 #| 12  "#| ..."    - continued line to the 1 above (also see 04 above for another case) 
 #| 13  "xxxYyyZzz" - a term generated on the spot, could save space; could be a variable name, too
@@ -20,12 +20,12 @@
 #| 16                w/:with | w/o:without 
 #| 17                others...
 #|
-#|EEE Examples
+#|EEE> Examples
 #| See some examples 
 #| ...on 09.
 #| :As dss a self-explained legend
 #| ::Self-explained here means it has its examples in it.
-#|EEE END Examples
+#|EEE. Examples
 #|==================================================================================================
 
 #| ZILLI CUBIC ROT (AUTONOMOUS - ISOTROPIC STIFFNESS) 
@@ -33,17 +33,17 @@
 #| parnames={1:'gamma',2:'thetaP',3:'mH',4:'gamma2',5:'epsH',6:'zeta',7:'JpH',8:'thetaPP',9:'Amplitude'}
 
 
-#|111 IPS=1 , zeta=0.01
-#|1_AAA FORWARD : Cont mH, gamma, thetaP in order.
+#|111> IPS=1 , zeta=0.01
+#|1_AAA> FORWARD : Cont mH, gamma, thetaP in order.
 r_mH = run("ZilliCubic11")  #|Continue PAR(3)=mH from 0 to 0.9
 #| Cont PAR(1)=gamma from 0 to 0.25
 r_gamma = run(r_mH("UZ1"),ICP=[1,9],NMX=1000,DS=0.001,DSMAX=0.5,UZSTOP={1:0.25}) 
 #| Cont PAR(2)=thetaP from 0 to 7
 r_thetaP = run(r_gamma("UZ1"),ICP=[2,9],NMX=1000,DS=0.001,DSMAX=0.05,UZSTOP={2:7})
-#|1_AAA END
+#|1_AAA.
 
-#|1_BBB BACKWARDS (:lowAmp family) , W/ DIFFERENT ZETA
-#|1B_RRR METHOD A : ~PURE AUTO
+#|1_BBB> BACKWARDS (:lowAmp family) , W/ DIFFERENT ZETA
+#|1B_RRR> METHOD A : ~PURE AUTO
 #| Run once backward w/ Matlab-generated lowAmplitude datum at 7.00 with zeta=0.01 .
 r_back = run(e="ZilliCubic11_givenBackwards_zeta_1e-2",c="ZilliCubic11",
 		     ICP=[2,9],NTST=50,DS=-0.01,DSMAX=0.05, UZSTOP={2:[0.01,7.01]})
@@ -58,9 +58,9 @@ plot(r_back_zeta)
 #| For each zetaPoint generated right above, run another simulation.
 for zetaPoint in r_back_zeta('UZ'):
 	r_back = r_back + run(zetaPoint,ICP=[2,9],NTST=50,DS=-0.01,DSMAX=0.05,UZSTOP={2:[0.01,7.01]})
-#|1B_RRR END METHOD A
+#|1B_RRR. METHOD A
 
-#|1B_EEE METHOD B : All-MATLAB STARTING POINTS (ONLY for smaller zeta for now)
+#|1B_EEE> METHOD B : All-MATLAB STARTING POINTS (ONLY for smaller zeta for now)
 # #| :Check if Matlab-generated lowAmplitude datum at 7.00 with other zeta than default 0.01 .
 # zetaList    = ["1e-2","8e-3","5e-3","1e-3","1e-4","1e-5"]
 # eqFileName  = ["ZilliCubic11_givenBackwards_zeta_"+x for x in zetaList]
@@ -71,59 +71,64 @@ for zetaPoint in r_back_zeta('UZ'):
 # 	except: 
 # 		r_back =          run(e=eqFileName[i],c="ZilliCubic11",
 #          ICP=[2,9],NTST=50,DS=-0.01,DSMAX=0.05, UZSTOP={2:[0.01,7.01]}) 
-#|1B_EEE END METHOD B
-#|1_BBB END BACKWARDS IPS1
+#|1B_EEE. METHOD B
+#|1_BBB. BACKWARDS IPS1
 
 r_IPS1 = merge(r_thetaP + r_back)
 # plot(r_IPS1,stability=True,bifurcation_x="thetaP",bifurcation_y="Amplitude")
-#|111 END IPS1
+#|111. IPS1
 
 
-#|222 IPS=2 
-#|2_LLL METHOD A : ~PURE AUTO 
-# #| Use Matlab-generated orbit at thetaP=4.05 once.
-# r_dat_start = load(e="ZilliCubic11_datFileContin_zeta_1e-2",c="ZilliCubic11",
-# 	               dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
-#    			       IPS=2,ICP=[2,11,9],DS=+0.005,DSMAX=0.005, UZSTOP={2:[0.01,7.01]}, 
-#    				   EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-3,NTST=200)
-# #|: Recommd [EPSL,EPSU,EPSS] range is [1e-7,1e-7,1e-5] to [1e-6,1e-6,1e-3].
-# r_IPS2 = merge( run(r_dat_start) + run(r_dat_start,DS="-") )
+#|222> IPS=2 
+#|2_LLL> METHOD A : ~PURE AUTO 
+#| Use Matlab-generated orbit at thetaP=4.05 once.
+r_dat_start = load(e="ZilliCubic11_datFileContin_zeta_1e-2",c="ZilliCubic11",
+	               dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
+   			       IPS=2,ICP=[2,11,9],DS=+0.005,DSMAX=0.005, UZSTOP={2:[0.01,7.01]}, 
+   				   EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-3,NTST=200)
+#|:RecommD [EPSL,EPSU,EPSS] range is [1e-7,1e-7,1e-5] to [1e-6,1e-6,1e-3].
+r_IPS2 = merge( run(r_dat_start) + run(r_dat_start,DS="-") )
 
-# #| Vary zeta at one of the tips of the periodic orbit.
-# r_dat_varyZeta = load(r_IPS2('UZ1'),  
-# 		         IPS=2, ICP=[6,11,9],NTST=600,DS=+0.001,DSMAX=0.001,
-# 		         UZR={6:[8e-3,5e-3,1e-3,1e-4,1e-5, 0.00, 0.05,0.075,0.082,0.10,0.15]}) 
-# 		         #|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??.
-# #| Obtain different zeta orbits at requested zeta values. 
-# r_dat_zeta = merge( run(r_dat_varyZeta) + run(r_dat_varyZeta,DS="-") )
-# plot(r_dat_zeta,stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude")
-# #| Run all different zetaOrbits made right above.
-# for zetaOrbit in r_dat_zeta('UZ'):
-# 	r_IPS2 = r_IPS2 + run(zetaOrbit,IPS=2,ICP=[2,11,9],DS=-0.005,DSMAX=0.005,UZSTOP={2:[0.01,7.01]})
-#|2_LLL END METHOD A
+#| Vary zeta at one of the tips of the periodic orbit.
+r_dat_varyZeta = load(r_IPS2('UZ1'),  
+		         IPS=2, ICP=[6,11,9],NTST=600,DS=+0.001,DSMAX=0.001, #|Continuation in zeta !!!
+		         UZR={6:[8e-3,5e-3,1e-3,1e-4,1e-5, 0.00, 0.05,0.075,0.082,0.10,0.15]}) 
+		         #|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??.
+#| Obtain different zeta orbits at requested zeta values. 
+r_dat_zeta = merge( run(r_dat_varyZeta) + run(r_dat_varyZeta,DS="-") )
+plot(r_dat_zeta,stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude")
+#| Run all different zetaOrbits made right above.
+for zetaOrbit in r_dat_zeta('UZ'):
+	r_IPS2 = r_IPS2 + run(zetaOrbit,IPS=2,ICP=[2,11,9],DS=-0.005,DSMAX=0.005,UZSTOP={2:[0.01,7.01]})
 
-#|2_MMM METHOD B : All-MATLAB STARTING ORBITS (ONLY for smaller zeta for now)
+
+
+#|2_LLL. METHOD A
+
+#|2_MMM> METHOD B : All-MATLAB STARTING ORBITS (ONLY for smaller zeta for now)
 zetaList    = ["1e-2","8e-3","5e-3","1e-3","1e-4","1e-5"]
 datFileName = ["onePeriodCycle_ISO_rot_4p05_zeta_"+x for x in zetaList]
+datFileName = datFileName + ["onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop"]
 eqFileName  = ["ZilliCubic11_datFileContin_zeta_" +x for x in zetaList]
+eqFileName  = eqFileName + ["ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop"]
 #| Loop different zeta Matlab Orbits..
-for i in range(0,len(zetaList)):
-	if i == len(zetaList)-1 : #|zeta=1e-5 , the most difficult one to converge, treat specially.
+for i in range(0,len(datFileName)):
+	if i < len(zetaList)-1 or i > len(zetaList)-1:
 		r_dat_start = load(e=eqFileName[i],c="ZilliCubic11",dat=datFileName[i],
-   					IPS=2,ICP=[2,11,9],DS=+0.01,DSMAX=0.02, UZSTOP={2:[0.01,7.01]},
-   					EPSL= 1e-05, EPSU = 1e-05, EPSS =1e-2,NTST=100,ITNW=9,NWTN=7)
-		#|:See here the tolerance is much higher(bad) than the recomd (above).
-		#|::CHANGE THIS: Decrease tolerance, decrease NTST (mesh interval count).
-	else:
-		r_dat_start = load(e=eqFileName[i],c="ZilliCubic11",dat=datFileName[i],
-   					IPS=2,ICP=[2,11,9],DS=+0.005,DSMAX=0.005, UZSTOP={2:[0.01,7.01]},UZR={2:3.47}, #|UZR={2:3.46610}
-   					EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-3,NTST=200)
+   					IPS=2,ICP=[2,11,9],DS=+0.005,DSMAX=0.005, UZSTOP={2:[0.01,7.01]}, #|UZR={2:3.47}
+   					EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-3,NTST=100)
 		#|:So EPS_ are the highest in the recomd range (above).
 		#|...HOWEVER, if I ran ode45 fr aBit more fr lowerZeta orbits, 
 		#|...then I cdHv got easier convergence - FOR SOME, 
 		#|...because I ran tend=1e6 for zeta=1e-5, but I still had t increase tol
 		#|...to [1e-5,1e-5,1e-2], which is higher than the recomd range.
 		#|::CHANGE THIS: Decrease tolerance, decrease NTST (mesh interval count).
+	elif i == len(zetaList)-1 : #|zeta=1e-5 , the most difficult one to converge, treat specially.
+		r_dat_start = load(e=eqFileName[i],c="ZilliCubic11",dat=datFileName[i],
+   					IPS=2,ICP=[2,11,9],DS=+0.01,DSMAX=0.02, UZSTOP={2:[0.01,7.01]},
+   					EPSL= 1e-05, EPSU = 1e-05, EPSS =1e-2,NTST=100,ITNW=9,NWTN=7)
+		#|:See here the tolerance is much higher(bad) than the recomd (above).
+		#|::CHANGE THIS: Decrease tolerance, decrease NTST (mesh interval count). 
 	
 	#| Notes on Convergence.
 	#|Nt: Increasing the 1st step size (DS) helps with DS="-"_but_continues_to_DS=+ problem .
@@ -138,16 +143,17 @@ for i in range(0,len(zetaList)):
 
 	try: #| Pupose of try-except is to make sure that r_IPS2 is created if it hasnt. 
 		r_IPS2 = r_IPS2 + merge( run(r_dat_start) + run(r_dat_start,DS="-") )
+
 	except: #|If r_IPS2 is not defined.
 		r_IPS2 =          merge( run(r_dat_start) + run(r_dat_start,DS="-") )
-#|2_MMM END METHOD B
+#|2_MMM. METHOD B
 
-#|2_000 SUM AND PLOT OF IPS=1 & IPS=2 WITH zeta=0.01
+#|2_000> SUM AND PLOT OF IPS=1 & IPS=2 WITH zeta=0.01
 # plot(r_IPS1+r_IPS2,stability=True,bifurcation_x="thetaP",bifurcation_y="Amplitude")  #r_all
 #|:No foldCon data here. Relatively clean yet.
-#|2_000 END SUM AND PLOT
+#|2_000.
 
-#|2_NNN METHOD C : FOLD-CONTINUATION-IN-ZETA OF PERIODIC_SOLUTIONS' FOLD-IN-thetaP (could not generate higher zeta ??)
+#|2_NNN> METHOD C : FOLD-CONTINUATION-IN-ZETA OF PERIODIC_SOLUTIONS' FOLD-IN-thetaP (could not generate higher zeta ??)
 # #|:SEE plp demo for fold and hopfB continuation. 
 # #| Use Matlab-generated orbit at thetaP=4.05 once.
 # r_dat_start = load(e="ZilliCubic11_datFileContin_zeta_1e-2",c="ZilliCubic11",dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
@@ -171,8 +177,8 @@ for i in range(0,len(zetaList)):
 # 	r_IPS2_further = load(differentZetaPoint,c='ZilliCubic11',
 # 			 IPS=2,ICP= [2,11,9],DS=+0.001,DSMAX=0.005, UZSTOP={2:[0.01,7.01]})
 # 	r_IPS2 = r_IPS2 + rl( merge( run(r_IPS2_further)+run(r_IPS2_further,DS="-") ) )
-#|2_NNN END METHOD C
-#|222 END IPS2
+#|2_NNN.METHOD C
+#|222. IPS2
 
 #|HHH WHOLE DIAGRAM 
 r_all = rl( r_IPS1 + r_IPS2 )
