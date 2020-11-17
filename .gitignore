@@ -6,9 +6,11 @@
 *.exe 
 #| Ignore diagnostic files < AUTO output
 d.*   
+s.*
+b.*
 #| Ignore temporary backups 
 *~
 #| Ignore 
 fort.~
-#| 
+#| Ignore 
 dummy_write_file.txt
