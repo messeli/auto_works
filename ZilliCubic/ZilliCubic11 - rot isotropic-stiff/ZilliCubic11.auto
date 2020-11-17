@@ -86,66 +86,77 @@ r_dat_start = load(e="ZilliCubic11_datFileContin_zeta_1e-2",c="ZilliCubic11",
 	               dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
    			       IPS=2,ICP=[2,11,9],DS=+0.005,DSMAX=0.005, UZSTOP={2:[0.01,7.01]}, 
    				   EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-3,NTST=200)
+r_dat_start_doubleLoop = load(e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",c="ZilliCubic11",
+	               dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
+   			       IPS=2,ICP=[2,11,9],DS=+0.005,DSMAX=0.005, UZSTOP={2:[0.01,7.01]},UZR={2:3.0}, 
+   				   EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-3,NTST=100)
 #|:RecommD [EPSL,EPSU,EPSS] range is [1e-7,1e-7,1e-5] to [1e-6,1e-6,1e-3].
 r_IPS2 = merge( run(r_dat_start) + run(r_dat_start,DS="-") )
+r_IPS2_doubleLoop = merge( run(r_dat_start_doubleLoop) + run(r_dat_start_doubleLoop,DS="-") )
 
 #| Vary zeta at one of the tips of the periodic orbit.
 r_dat_varyZeta = load(r_IPS2('UZ1'),  
 		         IPS=2, ICP=[6,11,9],NTST=600,DS=+0.001,DSMAX=0.001, #|Continuation in zeta !!!
 		         UZR={6:[8e-3,5e-3,1e-3,1e-4,1e-5, 0.00, 0.05,0.075,0.082,0.10,0.15]}) 
 		         #|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??.
+r_dat_varyZeta_doubleLoop = load(r_IPS2_doubleLoop('UZ1'),  
+		         IPS=2, ICP=[6,11,9],NTST=600,DS=+0.001,DSMAX=0.001, #|Continuation in zeta !!!
+		         UZR={6:[8e-3,5e-3,1e-3,1e-4,1e-5, 0.00, 0.05,0.075,0.082,0.10,0.15]}) 
+		         #|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??.
 #| Obtain different zeta orbits at requested zeta values. 
 r_dat_zeta = merge( run(r_dat_varyZeta) + run(r_dat_varyZeta,DS="-") )
+r_dat_zeta_doubleLoop = merge( run(r_dat_varyZeta_doubleLoop) + run(r_dat_varyZeta_doubleLoop,DS="-") )
 plot(r_dat_zeta,stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude")
+plot(r_dat_zeta_doubleLoop,stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude")
+
 #| Run all different zetaOrbits made right above.
 for zetaOrbit in r_dat_zeta('UZ'):
 	r_IPS2 = r_IPS2 + run(zetaOrbit,IPS=2,ICP=[2,11,9],DS=-0.005,DSMAX=0.005,UZSTOP={2:[0.01,7.01]})
-
-
-
+for zetaOrbit_doubleLoop in r_dat_zeta_doubleLoop('UZ'):
+	r_IPS2 = r_IPS2 + run(zetaOrbit_doubleLoop,IPS=2,ICP=[2,11,9],DS=-0.005,DSMAX=0.005,UZSTOP={2:[0.01,7.01]})
 #|2_LLL. METHOD A
 
 #|2_MMM> METHOD B : All-MATLAB STARTING ORBITS (ONLY for smaller zeta for now)
-zetaList    = ["1e-2","8e-3","5e-3","1e-3","1e-4","1e-5"]
-datFileName = ["onePeriodCycle_ISO_rot_4p05_zeta_"+x for x in zetaList]
-datFileName = datFileName + ["onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop"]
-eqFileName  = ["ZilliCubic11_datFileContin_zeta_" +x for x in zetaList]
-eqFileName  = eqFileName + ["ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop"]
-#| Loop different zeta Matlab Orbits..
-for i in range(0,len(datFileName)):
-	if i < len(zetaList)-1 or i > len(zetaList)-1:
-		r_dat_start = load(e=eqFileName[i],c="ZilliCubic11",dat=datFileName[i],
-   					IPS=2,ICP=[2,11,9],DS=+0.005,DSMAX=0.005, UZSTOP={2:[0.01,7.01]}, #|UZR={2:3.47}
-   					EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-3,NTST=100)
-		#|:So EPS_ are the highest in the recomd range (above).
-		#|...HOWEVER, if I ran ode45 fr aBit more fr lowerZeta orbits, 
-		#|...then I cdHv got easier convergence - FOR SOME, 
-		#|...because I ran tend=1e6 for zeta=1e-5, but I still had t increase tol
-		#|...to [1e-5,1e-5,1e-2], which is higher than the recomd range.
-		#|::CHANGE THIS: Decrease tolerance, decrease NTST (mesh interval count).
-	elif i == len(zetaList)-1 : #|zeta=1e-5 , the most difficult one to converge, treat specially.
-		r_dat_start = load(e=eqFileName[i],c="ZilliCubic11",dat=datFileName[i],
-   					IPS=2,ICP=[2,11,9],DS=+0.01,DSMAX=0.02, UZSTOP={2:[0.01,7.01]},
-   					EPSL= 1e-05, EPSU = 1e-05, EPSS =1e-2,NTST=100,ITNW=9,NWTN=7)
-		#|:See here the tolerance is much higher(bad) than the recomd (above).
-		#|::CHANGE THIS: Decrease tolerance, decrease NTST (mesh interval count). 
+# zetaList    = ["1e-2","8e-3","5e-3","1e-3","1e-4","1e-5"]
+# datFileName = ["onePeriodCycle_ISO_rot_4p05_zeta_"+x for x in zetaList]
+# datFileName = datFileName + ["onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop"]
+# eqFileName  = ["ZilliCubic11_datFileContin_zeta_" +x for x in zetaList]
+# eqFileName  = eqFileName + ["ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop"]
+# #| Loop different zeta Matlab Orbits..
+# for i in range(0,len(datFileName)):
+# 	if i < len(zetaList)-1 or i > len(zetaList)-1:
+# 		r_dat_start = load(e=eqFileName[i],c="ZilliCubic11",dat=datFileName[i],
+#    					IPS=2,ICP=[2,11,9],DS=+0.005,DSMAX=0.005, UZSTOP={2:[0.01,7.01]}, #|UZR={2:3.47}
+#    					EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-3,NTST=100)
+# 		#|:So EPS_ are the highest in the recomd range (above).
+# 		#|...HOWEVER, if I ran ode45 fr aBit more fr lowerZeta orbits, 
+# 		#|...then I cdHv got easier convergence - FOR SOME, 
+# 		#|...because I ran tend=1e6 for zeta=1e-5, but I still had t increase tol
+# 		#|...to [1e-5,1e-5,1e-2], which is higher than the recomd range.
+# 		#|::CHANGE THIS: Decrease tolerance, decrease NTST (mesh interval count).
+# 	elif i == len(zetaList)-1 : #|zeta=1e-5 , the most difficult one to converge, treat specially.
+# 		r_dat_start = load(e=eqFileName[i],c="ZilliCubic11",dat=datFileName[i],
+#    					IPS=2,ICP=[2,11,9],DS=+0.01,DSMAX=0.02, UZSTOP={2:[0.01,7.01]},
+#    					EPSL= 1e-05, EPSU = 1e-05, EPSS =1e-2,NTST=100,ITNW=9,NWTN=7)
+# 		#|:See here the tolerance is much higher(bad) than the recomd (above).
+# 		#|::CHANGE THIS: Decrease tolerance, decrease NTST (mesh interval count). 
 	
-	#| Notes on Convergence.
-	#|Nt: Increasing the 1st step size (DS) helps with DS="-"_but_continues_to_DS=+ problem .
-	#|...Changing the EPSU,EPSL,EPSS,NTST did not help with this.
-	#|...Still, zeta=1e-5 solution gives MX!!
-	#|Nt: For MX-type solutions(:error-nonconvergence), try decreasing NTST(ie decrease accuracy)
-	#|...or try decreasing EPS_ constants. Particularly, if there is a possible specialPoint, 
-	#|...decrease the EPSS by 10 fold. But then u may miss the special point. 
-	#|Nt:Also increasing DSMAX can help pass the difficult-specialPoint.
-	#|NT:For difficult-convergence(MX), also increasing ITNW and NWTN can help. 
-	#| :All these deductions are subject modification as I learn the theory more from lecNote Doedel.
+# 	#| Notes on Convergence.
+# 	#|Nt: Increasing the 1st step size (DS) helps with DS="-"_but_continues_to_DS=+ problem .
+# 	#|...Changing the EPSU,EPSL,EPSS,NTST did not help with this.
+# 	#|...Still, zeta=1e-5 solution gives MX!!
+# 	#|Nt: For MX-type solutions(:error-nonconvergence), try decreasing NTST(ie decrease accuracy)
+# 	#|...or try decreasing EPS_ constants. Particularly, if there is a possible specialPoint, 
+# 	#|...decrease the EPSS by 10 fold. But then u may miss the special point. 
+# 	#|Nt:Also increasing DSMAX can help pass the difficult-specialPoint.
+# 	#|NT:For difficult-convergence(MX), also increasing ITNW and NWTN can help. 
+# 	#| :All these deductions are subject modification as I learn the theory more from lecNote Doedel.
 
-	try: #| Pupose of try-except is to make sure that r_IPS2 is created if it hasnt. 
-		r_IPS2 = r_IPS2 + merge( run(r_dat_start) + run(r_dat_start,DS="-") )
+# 	try: #| Pupose of try-except is to make sure that r_IPS2 is created if it hasnt. 
+# 		r_IPS2 = r_IPS2 + merge( run(r_dat_start) + run(r_dat_start,DS="-") )
 
-	except: #|If r_IPS2 is not defined.
-		r_IPS2 =          merge( run(r_dat_start) + run(r_dat_start,DS="-") )
+# 	except: #|If r_IPS2 is not defined.
+# 		r_IPS2 =          merge( run(r_dat_start) + run(r_dat_start,DS="-") )
 #|2_MMM. METHOD B
 
 #|2_000> SUM AND PLOT OF IPS=1 & IPS=2 WITH zeta=0.01

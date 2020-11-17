@@ -1,4 +1,4 @@
-#|gnore the auto original directory 
+#|Ignore the auto original directory 
 07p/
 #| Ignore o files < fortran compilation
 *.o
@@ -8,3 +8,7 @@
 d.*   
 #| Ignore temporary backups 
 *~
+#| Ignore 
+fort.~
+#| 
+dummy_write_file.txt
