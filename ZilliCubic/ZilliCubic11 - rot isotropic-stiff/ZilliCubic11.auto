@@ -31,36 +31,54 @@
 #| ZILLI CUBIC ROT (AUTONOMOUS - ISOTROPIC STIFFNESS) 
 #| unames={1: 'u', 2: 'u_dot',3:'v' , 4:'v_dot'}
 #| parnames={1:'gamma',2:'thetaP',3:'mH',4:'gamma2',5:'epsH',6:'zeta',7:'JpH',8:'thetaPP',9:'Amplitude'}
+import time
+startTime = time.time()
 
 
 #|111> IPS=1 , zeta=0.01
-#|1_AAA> FORWARD : Cont mH, gamma, thetaP in order.
+########################
+print("NOW=======111===IPS1")
+
+#|1_FFF> FORWARD : Cont mH, gamma, thetaP in order.
+print("NOW=======1_FFF===FORWARD_SYNCH")
+print("NOW=======1_FFF===CONTINUE_mH")
 r_mH = run("ZilliCubic11")  #|Continue PAR(3)=mH from 0 to 0.9
 #| Cont PAR(1)=gamma from 0 to 0.25
+print("NOW=======1_FFF===CONTINUE_gamma")
 r_gamma = run(r_mH("UZ1"),ICP=[1,9],NMX=1000,DS=0.001,DSMAX=0.5,UZSTOP={1:0.25}) 
 #| Cont PAR(2)=thetaP from 0 to 7
+print("NOW=======1_FFF===CONTINUE_thetaP_FORWARD")
 r_thetaP = run(r_gamma("UZ1"),ICP=[2,9],NMX=1000,DS=0.001,DSMAX=0.05,UZSTOP={2:7})
-#|1_AAA.
+#|1_FFF.
+
 
 #|1_BBB> BACKWARDS (:lowAmp family) , W/ DIFFERENT ZETA
-#|1B_RRR> METHOD A : ~PURE AUTO
+print("NOW=======1_BBB===BACKWARD_SYNCH")
+#|1B_AAA> METHOD A : ~PURE AUTO
+print("NOW=======1B_AAA===METHOD_A")
 #| Run once backward w/ Matlab-generated lowAmplitude datum at 7.00 with zeta=0.01 .
+print("NOW=======1B_AAA===FIRST_RUN_W/_MATLAB_DATUM")
 r_back = run(e="ZilliCubic11_givenBackwards_zeta_1e-2",c="ZilliCubic11",
 		     ICP=[2,9],NTST=50,DS=-0.01,DSMAX=0.05, UZSTOP={2:[0.01,7.01]})
 #| Vary zeta ; sample various zeta higher and lower than 0.01 (the default)
+print("NOW=======1B_AAA===CHANGE_ZETA")
 r_back_varyZeta = load(e="ZilliCubic11_givenBackwards_zeta_1e-2",c="ZilliCubic11",
 		               ICP=[6,9],NMX=500,NTST=150,DS=+0.001,DSMAX=0.001,
 		               UZR={6:[8e-3,5e-3,1e-3,1e-4, 0.02,0.03,0.05,0.7,0.10,0.15]},
-		               UZSTOP={6:[1e-5,0.20]}) #|Does not sample all the requested zeta ??
+		               UZSTOP={6:[1e-5,0.20]},RL0=-0.001) #|Does not sample all the requested zeta ??
 r_back_zeta = merge( run(r_back_varyZeta) + run(r_back_varyZeta,DS="-"))
-plot(r_back_zeta)
+save(r_back_zeta,"r_back_zeta")
+plot(r_back_zeta,stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude",height=600)
 
 #| For each zetaPoint generated right above, run another simulation.
+print("NOW=======1B_AAA===ZETA_RUNS_STARTED")
 for zetaPoint in r_back_zeta('UZ'):
 	r_back = r_back + run(zetaPoint,ICP=[2,9],NTST=50,DS=-0.01,DSMAX=0.05,UZSTOP={2:[0.01,7.01]})
-#|1B_RRR. METHOD A
+#|1B_AAA. METHOD A
 
-#|1B_EEE> METHOD B : All-MATLAB STARTING POINTS (ONLY for smaller zeta for now)
+
+#|1B_BBB> METHOD B : All-MATLAB STARTING POINTS (ONLY for smaller zeta for now)
+# print("NOW=======1B_BBB===METHOD_B")
 # #| :Check if Matlab-generated lowAmplitude datum at 7.00 with other zeta than default 0.01 .
 # zetaList    = ["1e-2","8e-3","5e-3","1e-3","1e-4","1e-5"]
 # eqFileName  = ["ZilliCubic11_givenBackwards_zeta_"+x for x in zetaList]
@@ -71,52 +89,85 @@ for zetaPoint in r_back_zeta('UZ'):
 # 	except: 
 # 		r_back =          run(e=eqFileName[i],c="ZilliCubic11",
 #          ICP=[2,9],NTST=50,DS=-0.01,DSMAX=0.05, UZSTOP={2:[0.01,7.01]}) 
-#|1B_EEE. METHOD B
+#|1B_BBB. METHOD B
 #|1_BBB. BACKWARDS IPS1
-
+print("NOW=======MERGE_FORW_&_BACK")
 r_IPS1 = merge(r_thetaP + r_back)
 # plot(r_IPS1,stability=True,bifurcation_x="thetaP",bifurcation_y="Amplitude")
 #|111. IPS1
 
 
+
 #|222> IPS=2 
-#|2_LLL> METHOD A : ~PURE AUTO 
+############
+print("\n\nNOW=======222===IPS2")
+#|2_AAA> METHOD A : ~PURE AUTO 
+#|2A_SSS> SingleLoop periodic solutions
+print("NOW=======2A_SSS")
 #| Use Matlab-generated orbit at thetaP=4.05 once.
+print("NOW=======2A_SSS===CONTINUE_MATLAB_ORBIT")
 r_dat_start = load(e="ZilliCubic11_datFileContin_zeta_1e-2",c="ZilliCubic11",
 	               dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
    			       IPS=2,ICP=[2,11,9],DS=+0.005,DSMAX=0.005, UZSTOP={2:[0.01,7.01]}, 
    				   EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-3,NTST=200)
+#|:RecommD [EPSL,EPSU,EPSS] range is [1e-7,1e-7,1e-5] to [1e-6,1e-6,1e-3].
+r_IPS2 = merge( run(r_dat_start) + run(r_dat_start,DS="-") )
+
+#| Vary zeta at one of the tips of the periodic orbit.
+print("NOW=======2A_SSS===CHANGE_ZETA")
+r_dat_varyZeta = load(r_IPS2('UZ1'),NMX=20000,  
+		         IPS=2, ICP=[6,11,9],NTST=600,DS=+0.001,DSMAX=0.001, #|Continuation in zeta !!!
+		         UZR={6:[8e-3,5e-3,1e-3,1e-4,1e-5, 0.00, 0.05,0.075,0.082,0.10,0.15]},RL0=-0.001) 
+		         #|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??.
+r_dat_zeta = merge( run(r_dat_varyZeta) + run(r_dat_varyZeta,DS="-") )
+save(r_dat_zeta,"r_dat_zeta")
+plot(r_dat_zeta,stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude",height=600)
+
+
+#| Run all different zetaOrbits made right above.
+print("NOW=======2A_DDD===DIFFERENT_ZETA_RUNS_STARTED")
+counter = 0
+for zetaOrbit in r_dat_zeta('UZ'):
+	counter+=1
+	print("NOW=======2A_DDD===ZETA_RUN:",counter,"/",len(r_dat_zeta('UZ')))
+	r_IPS2 = r_IPS2 + run(zetaOrbit,IPS=2,ICP=[2,11,9],DS=-0.005,DSMAX=0.005,UZSTOP={2:[0.01,7.01]})
+#|2A_SSS.
+
+
+#|2A_DDD> DoubleLoop periodic solutions
+print("NOW=======2A_DDD")
+#| Use Matlab-generated orbit at thetaP=4.05 once.
+print("NOW=======2A_DDD===CONTINUE_MATLAB_ORBIT")
 r_dat_start_doubleLoop = load(e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",c="ZilliCubic11",
 	               dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
    			       IPS=2,ICP=[2,11,9],DS=+0.005,DSMAX=0.005, UZSTOP={2:[0.01,7.01]},UZR={2:3.0}, 
    				   EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-3,NTST=100)
 #|:RecommD [EPSL,EPSU,EPSS] range is [1e-7,1e-7,1e-5] to [1e-6,1e-6,1e-3].
-r_IPS2 = merge( run(r_dat_start) + run(r_dat_start,DS="-") )
 r_IPS2_doubleLoop = merge( run(r_dat_start_doubleLoop) + run(r_dat_start_doubleLoop,DS="-") )
 
 #| Vary zeta at one of the tips of the periodic orbit.
-r_dat_varyZeta = load(r_IPS2('UZ1'),  
-		         IPS=2, ICP=[6,11,9],NTST=600,DS=+0.001,DSMAX=0.001, #|Continuation in zeta !!!
-		         UZR={6:[8e-3,5e-3,1e-3,1e-4,1e-5, 0.00, 0.05,0.075,0.082,0.10,0.15]}) 
-		         #|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??.
+print("NOW=======2A_DDD===CHANGE_ZETA")
 r_dat_varyZeta_doubleLoop = load(r_IPS2_doubleLoop('UZ1'),  
 		         IPS=2, ICP=[6,11,9],NTST=600,DS=+0.001,DSMAX=0.001, #|Continuation in zeta !!!
-		         UZR={6:[8e-3,5e-3,1e-3,1e-4,1e-5, 0.00, 0.05,0.075,0.082,0.10,0.15]}) 
+		         UZR={6:[8e-3,5e-3,1e-3,1e-4,1e-5, 0.00, 0.011,0.0116]},RL0=-0.001) 
 		         #|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??.
-#| Obtain different zeta orbits at requested zeta values. 
-r_dat_zeta = merge( run(r_dat_varyZeta) + run(r_dat_varyZeta,DS="-") )
 r_dat_zeta_doubleLoop = merge( run(r_dat_varyZeta_doubleLoop) + run(r_dat_varyZeta_doubleLoop,DS="-") )
-plot(r_dat_zeta,stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude")
-plot(r_dat_zeta_doubleLoop,stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude")
+save(r_dat_zeta_doubleLoop,"r_dat_zeta_doubleLoop")
+plot(r_dat_zeta_doubleLoop,stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude",height=600)
 
 #| Run all different zetaOrbits made right above.
-for zetaOrbit in r_dat_zeta('UZ'):
-	r_IPS2 = r_IPS2 + run(zetaOrbit,IPS=2,ICP=[2,11,9],DS=-0.005,DSMAX=0.005,UZSTOP={2:[0.01,7.01]})
+print("NOW=======2A_DDD===DIFFERENT_ZETA_RUNS_STARTED")
+counter = 0
 for zetaOrbit_doubleLoop in r_dat_zeta_doubleLoop('UZ'):
+	counter+=1
+	print("NOW=======2A_DDD===ZETA_RUN:",counter,"/",len(r_dat_zeta_doubleLoop('UZ')))
 	r_IPS2 = r_IPS2 + run(zetaOrbit_doubleLoop,IPS=2,ICP=[2,11,9],DS=-0.005,DSMAX=0.005,UZSTOP={2:[0.01,7.01]})
-#|2_LLL. METHOD A
+#|2A_DDD.
+#|2_AAA. METHOD A
 
-#|2_MMM> METHOD B : All-MATLAB STARTING ORBITS (ONLY for smaller zeta for now)
+
+#|2_BBB> METHOD B : All-MATLAB STARTING ORBITS (ONLY for smaller zeta for now)
+# print("NOW=======2_BBB===METHOD_B")
 # zetaList    = ["1e-2","8e-3","5e-3","1e-3","1e-4","1e-5"]
 # datFileName = ["onePeriodCycle_ISO_rot_4p05_zeta_"+x for x in zetaList]
 # datFileName = datFileName + ["onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop"]
@@ -157,14 +208,17 @@ for zetaOrbit_doubleLoop in r_dat_zeta_doubleLoop('UZ'):
 
 # 	except: #|If r_IPS2 is not defined.
 # 		r_IPS2 =          merge( run(r_dat_start) + run(r_dat_start,DS="-") )
-#|2_MMM. METHOD B
+#|2_BBB. METHOD B
+
 
 #|2_000> SUM AND PLOT OF IPS=1 & IPS=2 WITH zeta=0.01
 # plot(r_IPS1+r_IPS2,stability=True,bifurcation_x="thetaP",bifurcation_y="Amplitude")  #r_all
 #|:No foldCon data here. Relatively clean yet.
 #|2_000.
 
-#|2_NNN> METHOD C : FOLD-CONTINUATION-IN-ZETA OF PERIODIC_SOLUTIONS' FOLD-IN-thetaP (could not generate higher zeta ??)
+
+#|2_CCC> METHOD C : FOLD-CONTINUATION-IN-ZETA OF PERIODIC_SOLUTIONS' FOLD-IN-thetaP (could not generate higher zeta ??)
+# print("NOW=======2_CCC===METHOD_C")
 # #|:SEE plp demo for fold and hopfB continuation. 
 # #| Use Matlab-generated orbit at thetaP=4.05 once.
 # r_dat_start = load(e="ZilliCubic11_datFileContin_zeta_1e-2",c="ZilliCubic11",dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
@@ -188,20 +242,25 @@ for zetaOrbit_doubleLoop in r_dat_zeta_doubleLoop('UZ'):
 # 	r_IPS2_further = load(differentZetaPoint,c='ZilliCubic11',
 # 			 IPS=2,ICP= [2,11,9],DS=+0.001,DSMAX=0.005, UZSTOP={2:[0.01,7.01]})
 # 	r_IPS2 = r_IPS2 + rl( merge( run(r_IPS2_further)+run(r_IPS2_further,DS="-") ) )
-#|2_NNN.METHOD C
+#|2_CCC.METHOD C
 #|222. IPS2
 
+
 #|HHH WHOLE DIAGRAM 
+print("NOW=======HHH===RELABEL===PLOT===SAVE")
 r_all = rl( r_IPS1 + r_IPS2 )
-p=plot(r_all,stability=True,bifurcation_x="thetaP",bifurcation_y="Amplitude")
+p=plot(r_all,stability=True,bifurcation_x="thetaP",bifurcation_y="Amplitude",height=600)
 p.config(color_list="black red green blue violet orange gray brown teal turquoise purple")
 p.config(solution_x="u",solution_y="v")
 save(r_all,"r_all")
+
+endTime = time.time()
+elapsedTime = endTime-startTime
+print("NOW=======FINISH===elapsedTime: ",elapsedTime," secs"," = ", elapsedTime/60, " mins")
 #|HHH END WHOLE DIAGRAM
 
 
-
-#|TTT NOTES===========================================================
+#|TTT> NOTES===========================================================
 #| NOTE : RegEx search for lable XXX in b.xxx:\n.{16}XXX
 #| :Check frequency,PAR(2), and amplitude,PAR(9), to locate whereabouts of the label XXX ::: for label 14 "XXX"=" 14"
 #| :Besides, the point PT number has a NEGATIVE if it is a STABLE solution. 
@@ -209,4 +268,4 @@ save(r_all,"r_all")
 #| 
 #| NOTE : RegEx search for lable XXX in d.xxx:LAB.+\n.{16}XXX 
 #| :BUT DOES NOT FIND MOST OF THE LABLES IN d.xxx file ?? I suppose rl() relabeling function does not apply to d.xxx files ??
-#|TTT END NOTES
+#|TTT. NOTES
