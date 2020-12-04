@@ -11,6 +11,6 @@ b.*
 #| Ignore temporary backups 
 *~
 #| Ignore 
-fort.~
+fort.*
 #| Ignore 
 dummy_write_file.txt

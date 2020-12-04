@@ -12,6 +12,6 @@ JAC= 0  # 1
 EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4  # 1e-4
 DS  =  0.01  # 0.001
 # ILP = Consider. 
-DSMIN= 1e-4, DSMAX=   0.05, IADS=   1
+DSMIN= 1e-4 DSMAX=   0.05, IADS=   1
 NPAR = 36, THU =  {}, THL ={}  # {11:0.0}
 UZSTOP = {3:0.9}
