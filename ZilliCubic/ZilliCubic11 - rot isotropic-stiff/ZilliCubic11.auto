@@ -96,7 +96,7 @@ print("NOW=======MERGE_FORW_&_BACK")
 r_IPS1 = merge(r_thetaP + r_back)
 # plot(r_IPS1,stability=True,bifurcation_x="thetaP",bifurcation_y="Amplitude")
 #|111. IPS1
-
+###########
 
 
 #|222> IPS=2 
@@ -259,7 +259,7 @@ for differentZetaPoint in r_foldCon('UZ'):
 	r_IPS2 = r_IPS2 + rl( merge( run(r_IPS2_further)+run(r_IPS2_further,DS="-") ) )
 #|2_CCC.METHOD C
 #|222. IPS2
-
+###########
 
 #|HHH WHOLE DIAGRAM 
 print("NOW=======HHH===RELABEL===PLOT===SAVE")
