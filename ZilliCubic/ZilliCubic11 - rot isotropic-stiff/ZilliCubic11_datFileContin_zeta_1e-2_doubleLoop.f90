@@ -13,15 +13,15 @@
         DOUBLE PRECISION, INTENT(IN) :: U(NDIM), PAR(*)
         DOUBLE PRECISION, INTENT(OUT) :: F(NDIM)
         DOUBLE PRECISION, INTENT(INOUT) :: DFDU(NDIM,NDIM), DFDP(NDIM,*)
-        DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,U5,S4,C4,R2,GAMMA,GAMMA2,THETA,THETAP,THETAPP,MH,EPSH,JPH,X,Y
+        DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,U5,S4,C4,R2,GAMMA,GAMMA2,THETA,OMEG,OMEGP,MH,EPSH,JPH,X,Y
       
         GAMMA = PAR(1) 
-        THETAP = PAR(2)
+        OMEG = PAR(2) !|Rotor speed
         MH = PAR(3) 
         JPH = PAR(4) 
-        EPSH = PAR(5)
+        EPSH = PAR(5) !|Eccentricity
         ZETA = PAR(6) 
-        THETAPP = PAR(7)
+        OMEGP = PAR(7) !|Rotor acceletation
 
         Q1=U(1)
         Q2=U(2)
@@ -32,17 +32,17 @@
   
         F(1) = Q3
         F(2) = Q4
-        F(3) = -THETAP*(JPH-2)*Q4          &
+        F(3) = -OMEG*(JPH-2)*Q4          &
                -2*ZETA*Q3                  &
-               +((THETAP**2)*(1-JPH)-1)*Q1 &
-               +2*ZETA*THETAP*Q2           &
-               +MH*EPSH*(THETAP**2)        &
+               +((OMEG**2)*(1-JPH)-1)*Q1 &
+               +2*ZETA*OMEG*Q2           &
+               +MH*EPSH*(OMEG**2)        &
                -GAMMA*R2*Q1 
-        F(4) = +THETAP*(JPH-2)*Q3          &
+        F(4) = +OMEG*(JPH-2)*Q3          &
                -2*ZETA*Q4                  &
-               +((THETAP**2)*(1-JPH)-1)*Q2 &
-               -2*ZETA*THETAP*Q1           &
-               -MH*EPSH*THETAPP            &
+               +((OMEG**2)*(1-JPH)-1)*Q2 &
+               -2*ZETA*OMEG*Q1           &
+               -MH*EPSH*OMEGP            &
                -GAMMA*R2*Q2         
 
       ! IF (IJAC.EQ.1) RETURN
@@ -55,25 +55,25 @@
         INTEGER, INTENT(IN) :: NDIM
         DOUBLE PRECISION, INTENT(INOUT) :: U(NDIM),PAR(*)
         DOUBLE PRECISION, INTENT(IN) :: T
-        DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,S4,C4,R2,GAMMA,GAMMA2,THETA,THETAP,THETAPP,MH,EPSH,JPH,X,Y,TPI!WN,F_M,K3_M,OMEG,
+        DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,S4,C4,R2,GAMMA,GAMMA2,THETA,OMEG,OMEGP,MH,EPSH,JPH,X,Y,TPI!WN,F_M,K3_M,OMEG,
 
         ! GIVEN BACKWARDS (MATLAB LOWER AMPLITUDE END DIMENSIONS)
         GAMMA = 0.25 !2nd continue gamma from 0 to 0.25
-        THETAP = 2.91 !The speed the .dat file is generated at, in Matlab ode45
+        OMEG = 2.91 !The speed the .dat file is generated at, in Matlab ode45
         MH = 0.9 !1st continue MH from 0 to 0.9
   
         EPSH =0.353
         ZETA = 1e-2 !1e-2 8e-3 5e-3 1e-3 1e-4 1e-5
         JPH  = 0.143
-        THETAPP = 0.0
+        OMEGP = 0.0
 
         PAR(1)=GAMMA 
-        PAR(2)=THETAP 
+        PAR(2)=OMEG 
         PAR(3)=MH 
         PAR(4)=JPH
         PAR(5)=EPSH 
         PAR(6)=ZETA 
-        PAR(7)=THETAPP   
+        PAR(7)=OMEGP   
 
       END SUBROUTINE STPNT
 

@@ -137,7 +137,7 @@ for zetaOrbit in r_dat_zeta('UZ'):
 
 #|2A_DDD> DoubleLoop periodic solutions
 print("NOW=======2A_DDD")
-#| Use Matlab-generated orbit at thetaP=4.05 once.
+#| Use Matlab-generated orbit at thetaP=2.91 once.
 print("NOW=======2A_DDD===CONTINUE_MATLAB_ORBIT")
 r_dat_load_doubleLoop = load(e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",c="ZilliCubic11",
 	               dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
@@ -234,7 +234,7 @@ print("NOW=======2_CCC===METHOD_C")
 r_dat_load = load(e="ZilliCubic11_datFileContin_zeta_1e-2",c="ZilliCubic11",dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
    					IPS=2, ILP=1, ICP=[2,11,9],DS=+0.005,DSMAX=0.005, UZSTOP={2:[0.01,7.01]}, #|ILP=1 did not change nothing.??
    					EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4,NTST=200) # 6 6 4
-#|: Recommd [EPSL,EPSU,EPSS] range is [1e-7,1e-7,1e-5] to [1e-6,1e-6,1e-3].
+#|: RecommD [EPSL,EPSU,EPSS] = [1e-7,1e-7,1e-5]-to-[1e-6,1e-6,1e-3]
 try:
 	r_IPS2 = r_IPS2 + merge( run(r_dat_load) + run(r_dat_load,DS="-") )
 except:
@@ -243,7 +243,7 @@ except:
 #| Continue the fold of periodic solution family.
 r_foldCon_load = run(r_IPS2('LP1'),c='ZilliCubic11', #|Fold continuation is loaded with run(), instead of load(), and ISW=2 to be used.
 			 IPS=2,ISW=2,ICP= [6,2,11,9],NTST=100,NMX=5000,DS=+0.001,DSMAX=0.005, #|THL={6:1,2:0.5}  does not make zeta increase !!! ??
-			 UZR={6:[8e-3,5e-3,1e-3,1e-4,1e-5, 0.02,0.05,0.08,0.082]},UZSTOP={6:[1e-5,0.2]},RL0=1.01e-3,RL1=0.2,ITNW=7,NWTN=3)  #,EPSS=1e-5 #|The 0.0 not sampled ??.
+			 UZR={6:[8e-3,5e-3,1e-3,1e-4,1e-5, 0.02,0.05,0.075,0.082]},UZSTOP={6:[1e-5,0.2]},RL0=1.01e-3,RL1=0.2,ITNW=7,NWTN=3)  #,EPSS=1e-5 #|The 0.0 not sampled ??.
 r_foldCon = rl( run(r_foldCon_load) + run(r_foldCon_load,DS='-') ) #|This causes double stitch, see "inspect plot" right below.  
 save(r_foldCon,"r_foldCon")
 #| Inspect zeta-continuation of thetaP-fold
@@ -284,3 +284,4 @@ print("NOW=======FINISH===elapsedTime: ",elapsedTime," secs"," = ", elapsedTime/
 #| NOTE : RegEx search for lable XXX in d.xxx:LAB.+\n.{16}XXX 
 #| :BUT DOES NOT FIND MOST OF THE LABLES IN d.xxx file ?? I suppose rl() relabeling function does not apply to d.xxx files ??
 #|TTT. NOTES
+
