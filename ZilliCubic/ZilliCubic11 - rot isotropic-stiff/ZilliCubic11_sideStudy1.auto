@@ -8,23 +8,29 @@ print("\n\nNOW=======222===IPS2")
 print("NOW=======2A_DDD")
 #| Use Matlab-generated orbit at thetaP=2.91 once.
 print("NOW=======2A_DDD===CONTINUE_MATLAB_ORBIT")
-r_dat_load_doubleLoop = load(e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",c="ZilliCubic11",
-	               dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
-   			       IPS=2,ICP=[2,11,9],DS=+0.005,DSMAX=0.005, UZSTOP={2:[0.01,7.01]},UZR={2:3.0}, 
-   				   EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4,NTST=100)
-#|:RecommD [EPSL,EPSU,EPSS] range is [1e-7,1e-7,1e-5] to [1e-6,1e-6,1e-3].
-r_IPS2_doubleLoop = merge( run(r_dat_load_doubleLoop) + run(r_dat_load_doubleLoop,DS="-") )
+r_dat_load_doubleLoop = load(e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
+	c="ZilliCubic11",
+	dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
+	IPS=2, ICP=[2,11,9],
+	UZSTOP={2:[0.01,7.01]}, UZR={2:3.0}, 
+	DS=+0.005, DSMAX=0.005, NTST=50,
+	EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4)
+r_dat_run_doubleLoop = merge( run(r_dat_load_doubleLoop) + run(r_dat_load_doubleLoop,DS="-") )
 
 #| Vary zeta at one of the tips of the periodic orbit.
 print("NOW=======2A_DDD===CHANGE_ZETA")
-r_dat_varyZeta_doubleLoop = load(r_IPS2_doubleLoop('UZ1'),  
-		         IPS=2, ICP=[6,11,9],NTST=100,DS=+0.001,DSMAX=0.001, #|Continuation in zeta !!!
-		         UZR={6:[1e-5,0.0]},RL0=-0.001) 
-		         #|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??.
+r_dat_varyZeta_doubleLoop = load(r_dat_run_doubleLoop('UZ1'),
+	IPS=2, ICP=[6,11,9],
+	UZR={6:[1e-5,0.0]}, RL0=-0.001, 
+	NTST=200, DS=+0.001, DSMAX=0.001) 
+	#|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??.
+
 r_dat_zeta_doubleLoop = merge( run(r_dat_varyZeta_doubleLoop) + run(r_dat_varyZeta_doubleLoop,DS="-") )
-save(r_dat_zeta_doubleLoop,"r_dat_zeta_doubleLoop")
+
+# save(r_dat_zeta_doubleLoop,"r_dat_zeta_doubleLoop")
 # plot(r_dat_zeta_doubleLoop,stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude",height=600)
 
+r_dat_zeta_doubleLoop 
 #| Run all different zetaOrbits made right above.
 print("NOW=======2A_DDD===DIFFERENT_ZETA_RUNS_STARTED")
 counter = 0
@@ -34,28 +40,44 @@ for zetaOrbit_doubleLoop in r_dat_zeta_doubleLoop('UZ'):
 	try:
 		r_IPS2 = r_IPS2 + run(zetaOrbit_doubleLoop,IPS=2,ICP=[2,11,9],DS=-0.005,DSMAX=0.005,UZR={2:[2.3045]},UZSTOP={2:[0.01,7.01]})
 	except:
-		r_IPS2 =          run(zetaOrbit_doubleLoop,IPS=2,ICP=[2,11,9],DS=-0.005,DSMAX=0.005,UZR={2:[2.3045]},UZSTOP={2:[0.01,7.01]})
+		r_IPS2 = run(zetaOrbit_doubleLoop,IPS=2,ICP=[2,11,9],DS=-0.005,DSMAX=0.005,UZR={2:[2.3045]},UZSTOP={2:[0.01,7.01]})
 
 
+#|||E> eH-foldContinuation
+print("|||E> eH-foldContinuation")
+x = run(r_IPS2("LP1"),
+	ICP=[5,2,11,9],
+	ISW=2,
+	NMX=2000,NTST=500, 
+	RL0=0.01,RL1=1.0,
+	UZR={5:[0.11,0.4]})
 
-# eccentricityModification = run(r_IPS2("UZ1"),NMX=1000,ICP=[5,2,9],UZR={5:[0.018]}) #UZR={5:[0.3,0.2,0.1,0.05,0.01,0.0]})
-# plot(eccentricityModification,stability=True)
+eH_fold = run(x) + run(x,DS="-")
+plot(eH_fold,stability=True)
+#|||EF Family of sol form user point on eH-foldContinuation
+print("#|||EF Family of sol form user point on eH-foldContinuation")
+y = load(eH_fold("UZ1"), 	
+	c='ZilliCubic11',
+	IPS=2,ICP=[2,11,9],
+	NTST=200,
+	UZR={2:[1,2]},UZSTOP={2:[0.01,7.01]})
 
-# x = load(eccentricityModification("UZ1"),ICP=[2,11,9],)
-# xx = run(x) + run(x,DS="-")
-# r_IPS2 = r_IPS2 + xx
+r_IPS2_eH_new = run(y)+run(y,DS="-")
+plot(r_IPS2_eH_new,stability=True)
+save(r_IPS2_eH_new,"r_IPS2_eH_new")
+r_IPS2 = r_IPS2 + r_IPS2_eH_new
+#|||E.
 
+# print("NOW=======2A_DDD===MH_CONTINUATION_FROM_EH")
+# k = load(eH_fold("UZ1"), 
+# 	c='ZilliCubic11',
+# 	IPS=2,ICP=[3,2,11,9],
+# 	NMX=2000,NTST=200,
+# 	RL0=0.0, RL1=1.0,
+# 	UZR={5:[0.11,0.4]})
 
-
-eH_fold_start = run(r_IPS2("LP1"),NMX=500,NTST=400, ISW=2,ICP=[5,2,11,9],RL0=0.0,RL1=1.0,UZR={5:0.11})
-eH_fold_cont = run(eH_fold_start) + run(eH_fold_start,DS="-")
-plot(eH_fold_cont,stability=True)
-
-y = load(eH_fold_cont("UZ1"),c='ZilliCubic11',NTST=200,IPS=2,ICP=[2,11,9],  
-	     UZR={2:[1,2]},UZSTOP={2:[0.01,7.01]},RL0=0,RL1=2.0)
-eccentricityModification = run(y)+run(y,DS="-")
-save(eccentricityModification,"eccentricityModification")
-
+# mH_cont = run(k)+run(k,DS="-")
+# plot(mH_cont,stability=True)
 
 #|2A_DDD.
 #|2_AAA. METHOD A
@@ -64,8 +86,8 @@ save(eccentricityModification,"eccentricityModification")
 
 #|HHH WHOLE DIAGRAM 
 print("NOW=======HHH===RELABEL===PLOT===SAVE")
-r_all = rl( eH_fold_cont+ eccentricityModification +        r_IPS2 )
-p=plot(r_all,stability=True,bifurcation_x="thetaP",bifurcation_y="Amplitude",height=600)
+r_all = rl( eH_fold +  r_IPS2 )  # rl( eH_fold + mH_cont+  r_IPS2 )
+p=plot(r_all,stability=True,bifurcation_x="Omeg",bifurcation_y="Amplitude",height=600)
 p.config(color_list="black red green blue violet orange gray brown teal turquoise purple")
 p.config(solution_x="u",solution_y="v")
 save(r_all,"r_all")
@@ -74,15 +96,3 @@ endTime = time.time()
 elapsedTime = endTime-startTime
 print("NOW=======FINISH===elapsedTime: ",elapsedTime," secs"," = ", elapsedTime/60, " mins")
 #|HHH END WHOLE DIAGRAM
-
-
-#|TTT> NOTES===========================================================
-#| NOTE : RegEx search for lable XXX in b.xxx:\n.{16}XXX
-#| :Check frequency,PAR(2), and amplitude,PAR(9), to locate whereabouts of the label XXX ::: for label 14 "XXX"=" 14"
-#| :Besides, the point PT number has a NEGATIVE if it is a STABLE solution. 
-#| ...(negative for stable solution points!!, opposite to documentation ??)
-#| 
-#| NOTE : RegEx search for lable XXX in d.xxx:LAB.+\n.{16}XXX 
-#| :BUT DOES NOT FIND MOST OF THE LABLES IN d.xxx file ?? I suppose rl() relabeling function does not apply to d.xxx files ??
-#|TTT. NOTES
-
