@@ -73,7 +73,7 @@ r_back_zeta = merge( run(r_back_varyZeta) + run(r_back_varyZeta,DS="-"))
 #| For each zetaPoint generated right above, run another simulation.
 print("NOW=======1B_AAA===ZETA_RUNS_STARTED")
 for zetaPoint in r_back_zeta('UZ'):
-	r_back = r_back + run(zetaPoint,ICP=[2,9],NTST=50,DS=-0.01,DSMAX=0.05,UZSTOP={2:[0.01,7.01]},ITNT=9,NWTN=5)
+	r_back = r_back + run(zetaPoint,ICP=[2,9],NTST=50,DS=-0.01,DSMAX=0.05,UZSTOP={2:[0.01,7.01]},ITNW=9,NWTN=5)
 #|1B_AAA. METHOD A
 
 

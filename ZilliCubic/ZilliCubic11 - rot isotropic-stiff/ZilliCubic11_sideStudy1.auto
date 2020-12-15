@@ -86,11 +86,11 @@ r_IPS2 = r_IPS2 + r_IPS2_eH_new
 
 #|HHH WHOLE DIAGRAM 
 print("NOW=======HHH===RELABEL===PLOT===SAVE")
-r_all = rl( eH_fold +  r_IPS2 )  # rl( eH_fold + mH_cont+  r_IPS2 )
-p=plot(r_all,stability=True,bifurcation_x="Omeg",bifurcation_y="Amplitude",height=600)
+r_all_sideStudy1 = rl( eH_fold +  r_IPS2 )  # rl( eH_fold + mH_cont+  r_IPS2 )
+p=plot(r_all_sideStudy1,stability=True,bifurcation_x="Omeg",bifurcation_y="Amplitude",height=600)
 p.config(color_list="black red green blue violet orange gray brown teal turquoise purple")
 p.config(solution_x="u",solution_y="v")
-save(r_all,"r_all")
+save(r_all_sideStudy1,"r_all_sideStudy1")
 
 endTime = time.time()
 elapsedTime = endTime-startTime
