@@ -35,11 +35,11 @@ import time
 startTime = time.time()
 
 
-#|111> IPS=1 , zeta=0.01
+#{_1_> IPS=1 , zeta=0.01
 ########################
 print("NOW=======111===IPS1")
 
-#|1_FFF> FORWARD : Cont mH, gamma, thetaP in order.
+#{1_F> FORWARD : Cont mH, gamma, thetaP in order.
 print("NOW=======1_FFF===FORWARD_SYNCH")
 print("NOW=======1_FFF===CONTINUE_mH")
 r_mH = run("ZilliCubic11")  #|Continue PAR(3)=mH from 0 to 0.9
@@ -49,12 +49,12 @@ r_gamma = run(r_mH("UZ1"),ICP=[1,9],NMX=1000,DS=0.001,DSMAX=0.5,UZSTOP={1:0.25})
 #| Cont PAR(2)=thetaP from 0 to 7
 print("NOW=======1_FFF===CONTINUE_thetaP_FORWARD")
 r_thetaP = run(r_gamma("UZ1"),ICP=[2,9],NMX=1000,DS=0.001,DSMAX=0.05,UZSTOP={2:7})
-#|1_FFF.
+#}1_F.
 
 
-#|1_BBB> BACKWARDS (:lowAmp family) , W/ DIFFERENT ZETA
+#{1_B> BACKWARDS (:lowAmp family) , W/ DIFFERENT ZETA
 print("NOW=======1_BBB===BACKWARD_SYNCH")
-#|1B_AAA> METHOD A : ~PURE AUTO
+#{1_B_A> METHOD A : ~PURE AUTO
 print("NOW=======1B_AAA===METHOD_A")
 #| Run once backward w/ Matlab-generated lowAmplitude datum at 7.00 with zeta=0.01 .
 print("NOW=======1B_AAA===FIRST_RUN_W/_MATLAB_DATUM")
@@ -74,10 +74,10 @@ r_back_zeta = merge( run(r_back_varyZeta) + run(r_back_varyZeta,DS="-"))
 print("NOW=======1B_AAA===ZETA_RUNS_STARTED")
 for zetaPoint in r_back_zeta('UZ'):
 	r_back = r_back + run(zetaPoint,ICP=[2,9],NTST=50,DS=-0.01,DSMAX=0.05,UZSTOP={2:[0.01,7.01]},ITNW=9,NWTN=5)
-#|1B_AAA. METHOD A
+#}1_B_A. METHOD A
 
 
-#|1B_BBB> METHOD B : All-MATLAB STARTING POINTS (ONLY for smaller zeta for now)
+#{1_B_B> METHOD B : All-MATLAB STARTING POINTS (ONLY for smaller zeta for now)
 print("NOW=======1B_BBB===METHOD_B")
 #| :Check if Matlab-generated lowAmplitude datum at 7.00 with other zeta than default 0.01 .
 zetaList    = ["1e-2","8e-3","5e-3","1e-3","1e-4","1e-5"]
@@ -89,13 +89,13 @@ for i in range(0,len(zetaList)):
 	except: 
 		r_back =          run(e=eqFileName[i],c="ZilliCubic11",
          ICP=[2,9],NTST=50,DS=-0.01,DSMAX=0.05, UZSTOP={2:[0.01,7.01]}) 
-#|1B_BBB. METHOD B
-#|1_BBB. BACKWARDS IPS1
+#}1_B_B. METHOD B
+#}1_B. BACKWARDS IPS1
 
 print("NOW=======MERGE_FORW_&_BACK")
 r_IPS1 = merge(r_thetaP + r_back)
 # plot(r_IPS1,stability=True,bifurcation_x="thetaP",bifurcation_y="Amplitude")
-#|111. IPS1
+#}1_. IPS1
 ###########
 
 
@@ -110,7 +110,7 @@ print("NOW=======2A_SSS===CONTINUE_MATLAB_ORBIT")
 r_dat_load = load(e="ZilliCubic11_datFileContin_zeta_1e-2",c="ZilliCubic11",
 	               dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
    			       IPS=2,ICP=[2,11,9],DS=+0.005,DSMAX=0.005, UZSTOP={2:[0.01,7.01]}, 
-   				   EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4,NTST=200) # 6 6 3
+   				     EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4,NTST=200) # 6 6 3
 #|:RecommD [EPSL,EPSU,EPSS] range is [1e-7,1e-7,1e-5] to [1e-6,1e-6,1e-3].
 r_IPS2 = merge( run(r_dat_load) + run(r_dat_load,DS="-") )
 
@@ -285,3 +285,9 @@ print("NOW=======FINISH===elapsedTime: ",elapsedTime," secs"," = ", elapsedTime/
 #| :BUT DOES NOT FIND MOST OF THE LABLES IN d.xxx file ?? I suppose rl() relabeling function does not apply to d.xxx files ??
 #|TTT. NOTES
 
+#|JJJ> TEMPORARY NOTES:
+#|Nt:singleLoop zetas on the AUTO bifur plot: 
+#|...1e-2,8e-3,5e-3,1e-3,1e-4,1e-5, 0.01, 0.02,0.05,0.075,0.080,0.082
+#|Nt:doubleLoop zetas on the AUTO bifur plot: 
+#|...1e-2,8e-3,5e-3,1e-3,1e-4,1e-5, 0.01, 0.011,0.0116
+#|JJJ.
