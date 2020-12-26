@@ -1,11 +1,8 @@
 import time
 startTime = time.time()
-#|222> IPS=2 
-############
-print("\n\nNOW=======222===IPS2")
-#|2_AAA> METHOD A : ~PURE AUTO 
-#|2A_DDD> DoubleLoop periodic solutions
-print("NOW=======2A_DDD")
+#|___222> IPS=2 
+#|___2_AAA> METHOD A : ~PURE AUTO 
+#|___2A_DDD> DoubleLoop periodic solutions
 #| Use Matlab-generated orbit at thetaP=2.91 once.
 print("NOW=======2A_DDD===CONTINUE_MATLAB_ORBIT")
 r_dat_load_doubleLoop = load(e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
@@ -32,19 +29,19 @@ r_dat_zeta_doubleLoop = merge( run(r_dat_varyZeta_doubleLoop) + run(r_dat_varyZe
 
 r_dat_zeta_doubleLoop 
 #| Run all different zetaOrbits made right above.
-print("NOW=======2A_DDD===DIFFERENT_ZETA_RUNS_STARTED")
+print("=======2A_DDD===DIFFERENT_ZETA_RUNS_STARTED")
 counter = 0
 for zetaOrbit_doubleLoop in r_dat_zeta_doubleLoop('UZ'):
 	counter+=1
-	print("NOW=======2A_DDD===ZETA_RUN:",counter,"/",len(r_dat_zeta_doubleLoop('UZ')))
+	print("=======2A_DDD===ZETA_RUN:",counter,"/",len(r_dat_zeta_doubleLoop('UZ')))
 	try:
 		r_IPS2 = r_IPS2 + run(zetaOrbit_doubleLoop,IPS=2,ICP=[2,11,9],DS=-0.005,DSMAX=0.005,UZR={2:[2.3045]},UZSTOP={2:[0.01,7.01]})
 	except:
 		r_IPS2 = run(zetaOrbit_doubleLoop,IPS=2,ICP=[2,11,9],DS=-0.005,DSMAX=0.005,UZR={2:[2.3045]},UZSTOP={2:[0.01,7.01]})
 
 
-#|||E> eH-foldContinuation
-print("|||E> eH-foldContinuation")
+#|___EEE> eH-foldContinuation
+print("=======EEE===eH-foldContinuation")
 x = run(r_IPS2("LP1"),
 	ICP=[5,2,11,9],
 	ISW=2,
@@ -54,21 +51,21 @@ x = run(r_IPS2("LP1"),
 
 eH_fold = run(x) + run(x,DS="-")
 plot(eH_fold,stability=True)
-#|||EF Family of sol form user point on eH-foldContinuation
-print("#|||EF Family of sol form user point on eH-foldContinuation")
+#| Family of sol form user point on eH-foldContinuation
+print("=======EEE===Family of sol from user point on eH-foldContinuation")
 y = load(eH_fold("UZ1"), 	
 	c='ZilliCubic11',
 	IPS=2,ICP=[2,11,9],
 	NTST=200,
 	UZR={2:[1,2]},UZSTOP={2:[0.01,7.01]})
 
-r_IPS2_eH_new = run(y)+run(y,DS="-")
+r_IPS2_eH_new = run(y) + run(y,DS="-")
 plot(r_IPS2_eH_new,stability=True)
 save(r_IPS2_eH_new,"r_IPS2_eH_new")
 r_IPS2 = r_IPS2 + r_IPS2_eH_new
-#|||E.
+#|___EEE.
 
-# print("NOW=======2A_DDD===MH_CONTINUATION_FROM_EH")
+# print("NOW=======2A_DDD___MH_CONTINUATION_FROM_EH")
 # k = load(eH_fold("UZ1"), 
 # 	c='ZilliCubic11',
 # 	IPS=2,ICP=[3,2,11,9],
@@ -79,13 +76,13 @@ r_IPS2 = r_IPS2 + r_IPS2_eH_new
 # mH_cont = run(k)+run(k,DS="-")
 # plot(mH_cont,stability=True)
 
-#|2A_DDD.
-#|2_AAA. METHOD A
-#|222. IPS2
+#|___2A_DDD.
+#|___2_AAA. METHOD A
+#|___222. IPS2
 ###########
 
-#|HHH WHOLE DIAGRAM 
-print("NOW=======HHH===RELABEL===PLOT===SAVE")
+#|___HHH WHOLE DIAGRAM 
+print("NOW=======HHH___RELABEL___PLOT___SAVE")
 r_all_sideStudy1 = rl( eH_fold +  r_IPS2 )  # rl( eH_fold + mH_cont+  r_IPS2 )
 p=plot(r_all_sideStudy1,stability=True,bifurcation_x="Omeg",bifurcation_y="Amplitude",height=600)
 p.config(color_list="black red green blue violet orange gray brown teal turquoise purple")
@@ -94,5 +91,5 @@ save(r_all_sideStudy1,"r_all_sideStudy1")
 
 endTime = time.time()
 elapsedTime = endTime-startTime
-print("NOW=======FINISH===elapsedTime: ",elapsedTime," secs"," = ", elapsedTime/60, " mins")
-#|HHH END WHOLE DIAGRAM
+print("NOW=======FINISH___elapsedTime: ",elapsedTime," secs"," = ", elapsedTime/60, " mins")
+#|___HHH END WHOLE DIAGRAM
