@@ -34,6 +34,11 @@ dLoop_zeta = merge( run(l_dLoop_zeta) +
 dLoop_zeta.writeRawFilename("myASCIIoutputFile") #|Fail
 myArray = dLoop_zeta.toArray()
 print("!!!!!!!!!!!size of myArray is, ", len(myArray[0]), len(myArray) )
+with open("myDummFile.txt","utf-8","w"):
+  for r in myArray:
+    for q in r:
+      print(r)
+    print()
 
 #| Run all different zetaOrbits made right above.
 print("=====2A_DDD===DIFFERENT_ZETA_RUNS_STARTED")
