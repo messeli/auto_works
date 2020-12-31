@@ -6,37 +6,36 @@ The Auto demo files contain annotations, as well as the pdf's.
 The code mostly contains comments of the folowing format.
 
 #| EXTREME COMMENTING LEGEND - self explained: 
-#| 00  "# "        - a commented out line, either as a depot or as an option of code
-#| 01  "#| "       - comment for the following lines
-#| 02  "#|"        - comment at the end of a line
-#| 03  "#|:"       - the above line/calculation is explained 
-#| 04  "#| :"      - indentation of ":" suggests dt this is the explanation of "#| " (see 01 above)
-#| 05  "#|::"      - explanation of an explanation of sort "#|:"; extend this w/ the idea in 04.
-#| 06  "#|Nt:"     - a note not strictly related to the immediate preciding line, cld b deductions
-#| 07  "#|XXX"     - a block of code starts here 
-#| 08  "#|X_YYY"   - a block of code under the block "XXX"
-#| 09  "#|XY_ZZZ"  - a block of code under the block "X_YYY", d reference to d X block cn be omitd
-#| 10  "#|XXX END" - a block of code ends here
-#| 11  "#|..."     - continued line from either "#|:" or "#|::" or "#|XXX" or "#|Nt:" or "#|..." 
-#| 12  "#| ..."    - continued line to the 1 above (also see 04 above for another case) 
-#| 13  "xxxYyyZzz" - a term generated on the spot, could save space; could be a variable name, too
+#| 00  "# "        - commentD line, as depot or an option of code
+#| 01  "#| "       - comment describJ d followJ lines
+#| 02  "#|"        - comment at d end f a line
+#| 03  "#|:"       - comment fr d above line
+#| 04  "#| :"      - indentaTn f ":" says dt dss d explanaTn f "#| "
+#| 05  "#|::"      - explanaTn f an explanaTn f sort "#|:"
+#| 06  "#|Nt:"     - note nt strictly relatD t precidJ line; deducTn
+#| 07  "#|:Nt:"    - note strictly relatD t precidJ line: cd b deducTn
+#| 08  "#|XXX>"    - block f code starts, also cl b "#|___XXX>"
+#| 09  "#|X_YYY>"  - block f code under d block "XXX" 
+#| 10  "#|XY_ZZZ>" - block f code under d block "X_YYY"
+#| 11  "#|XXX."    - block f code ends here, old versions:"XXX END"
+#| 12  "#|..."     - continD frm ["#|:","#|::","#|Nt:","#|..."] or other
+#| 13  "xxxYyyZzz" - term generatD onDspot, cd save space; cd b a var
 #| 14  shortHands  - d:the | s:is | t:to | b:be | r:are | f:of | u:you 
-#| 15                ds:this | dt:that | dn:then or than | cn:can | cld:could | fr:for 
-#| 16                dss:this is | dts:that is   
-#| 17                recomd:recommended | verbd: pastParticipleForm of a verb 
-#| 18                J or G: -ing
-#| 19                w/:with | w/o:without 
-#| 20                others...
+#|                   ur:your | dnt: don't | dsnt: doesn't
+#|                   ds:this | dt:that | dn:then or than
+#|                   cn:can | cd:could | fr:for 
+#|                   dss:this is | dts:that is   
+#|                   verbD: verb3 | verbJ,G: -ing | Tn,Sn: -tion,-sion 
+#|                   w/:with | w/o:without 
+#|                   others...
 #|
-#|EEE Examples
+#|___EEE> Examples
 #| See some examples 
-#| ...on 09.
-#| :As dss a self-explained legend
-some code = some more code 
-#|:dss some code here. 
-#| ::Self-explained here means it has its examples in it.
-#|EEE END Examples
-#|==================================================================================================
+#|...on 09.
+#| :As dss a self-explainD legend
+#| ::Self-explainD here means it has its examples in it.
+#|___EEE. Examples
+#|======================================================================
 
 
 Git repo start guide:

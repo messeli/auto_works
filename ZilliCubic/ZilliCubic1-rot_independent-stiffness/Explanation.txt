@@ -1,0 +1,3 @@
+The .f90 equations file is not complete. 
+Eg. the X and Y coordiantes of the extra oscillators are not needed (?)
+

@@ -1,9 +1,0 @@
-
-#==============
-# AUTO Demo frc
-#==============
-
-# ***Clean the directory***
-dl('0')
-dl('duffingBN')
-cl()
