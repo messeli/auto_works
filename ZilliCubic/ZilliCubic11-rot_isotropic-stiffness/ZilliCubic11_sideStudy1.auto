@@ -31,29 +31,28 @@ l_dLoop_zeta = load(dLoop_dat('UZ1'),
 dLoop_zeta = merge( run(l_dLoop_zeta) +
                     run(l_dLoop_zeta,DS="-") )
 
+#| To plot externally, export the data (Refer to AUTO doc), FAIL YET
 dLoop_zeta.writeRawFilename("myASCIIoutputFile") #|Fail
 myArray = dLoop_zeta.toArray()
 print("!!!!!!!!!!!size of myArray is, ", len(myArray[0]), len(myArray) )
-with open("myDummFile.txt","utf-8","w"):
+with open("myDummFile.txt","w",encoding="utf-8") as f:
   for r in myArray:
     for q in r:
-      print(r)
-    print()
+      f.write(str(r)+"\n")
 
 #| Run all different zetaOrbits made right above.
 print("=====2A_DDD===DIFFERENT_ZETA_RUNS_STARTED")
 counter = 0
 for Z in dLoop_zeta('UZ'):
     counter+=1
-    print( "=====2A_DDD===ZETA_RUN:",counter,"/",
-           len(dLoop_zeta('UZ')) )
-    try:
+    print( "=====2A_DDD===ZETA_RUN:",counter,"/",len(dLoop_zeta('UZ')) )
+    try: 
         IPS2 = IPS2 + run(Z,
             IPS=2,ICP=[2,11,9],
             DS=-0.005,DSMAX=0.005,
             UZR={2:[2.3045]},
             UZSTOP={2:[0.01,7.01]})
-    except:
+    except: 
         IPS2 = run(Z,
             IPS=2,ICP=[2,11,9],
             DS=-0.005,DSMAX=0.005,
@@ -80,15 +79,16 @@ y = load(eH_fold("UZ1"),
     c='ZilliCubic11',
     IPS=2,ICP=[2,11,9],
     NTST=200,
-    UZR={2:[1,2]},UZSTOP={2:[0.01,7.01]})
+    UZR={2:[1,2]},
+    UZSTOP={2:[0.01,7.01]})
 
-IPS2_new_eH = run(y) + run(y,DS="-")
+IPS2_new_eH = merge( run(y) + run(y,DS="-") )
 IPS2 = IPS2 + IPS2_new_eH
 #|___2AD_EEE.
 #|___2A_DDD.
 #|___2_AAA. METHOD A
 #|___222. IPS2
-###########
+
 
 #|___HHH WHOLE DIAGRAM 
 print("=====HHH___RELABEL___PLOT___SAVE")
