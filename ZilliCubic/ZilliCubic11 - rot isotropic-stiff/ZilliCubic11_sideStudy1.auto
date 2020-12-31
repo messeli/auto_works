@@ -19,17 +19,17 @@ dLoop_dat = merge( run(l_dLoop_dat) +
                    run(l_dLoop_dat,DS="-") )
 
 #| Vary zeta at one of the tips of the periodic orbit.
-print("=====2A_DDD===CHANGE_ZETA")
+print("=====2A_DDD===SAMPLE_ZETA")
 l_dLoop_zeta = load(dLoop_dat('UZ1'),
     IPS=2, ICP=[6,11,9],
-    UZR={6:[1e-5,0.0]}, 
-    RL0=-0.001, 
-    NTST=200, 
+    UZR={6:[1e-5,0.0]},
+    RL0=-0.001,
+    NTST=200,
     DS=+0.001, DSMAX=0.001) 
     #|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??.
 
 dLoop_zeta = merge( run(l_dLoop_zeta) +
-                               run(l_dLoop_zeta,DS="-") )
+                    run(l_dLoop_zeta,DS="-") )
 
 dLoop_zeta.writeRawFilename("myASCIIoutputFile") #|Fail
 myArray = dLoop_zeta.toArray()
@@ -72,11 +72,11 @@ x = run(IPS2("LP1"),
     UZR={5:[0.092,0.4]})  # UZR={5:[0.11,0.4]}) 
 
 eH_fold = run(x)  # + run(x,DS="-")
-plot(eH_fold,stability=True)
+plot(eH_fold,stability=True,height=600)
 
 #| Family of sol form user point on eH-foldContinuation
-print("=======EEE===Family of sol from user point on eH-foldContin")
-y = load(eH_fold("UZ1"),    
+print("=====EEE===Family of sol from user point on eH-foldContin")
+y = load(eH_fold("UZ1"),     
     c='ZilliCubic11',
     IPS=2,ICP=[2,11,9],
     NTST=200,
@@ -91,7 +91,7 @@ IPS2 = IPS2 + IPS2_new_eH
 ###########
 
 #|___HHH WHOLE DIAGRAM 
-print("NOW=======HHH___RELABEL___PLOT___SAVE")
+print("=====HHH___RELABEL___PLOT___SAVE")
 all_sideStudy1 = rl( eH_fold + IPS2 )
 p=plot(all_sideStudy1,
     stability=True,
@@ -102,11 +102,11 @@ p=plot(all_sideStudy1,
     height=600)
 p.config(color_list="black red green blue \
                      violet orange gray brown teal turquoise purple")
-save(all_sideStudy1,"r_all_sideStudy1")
+save(all_sideStudy1,"all_sideStudy1")
 
 endTime = time.time()
 elapsedTime = endTime-startTime
 print( "=====FINISH___elapsedTime: ",
-    elapsedTime," secs"," = ",
-    elapsedTime/60, " mins" )
+    elapsedTime,    " sec"," | ",
+    elapsedTime/60, " min" )
 #|___HHH END WHOLE DIAGRAM
