@@ -1,0 +1,96 @@
+import time
+import numpy as np
+startTime = time.time()
+#|___222> IPS2 
+#|___2_AAA> METHOD A : ~PURE AUTO 
+#|___2A_DDD> DoubleLoop periodic solutions
+#| Use Matlab-generated orbit at thetaP=2.91 once.
+print("=====2A_DDD===CONTINUE_MATLAB_ORBIT")
+l_dLoop_dat = load(
+    e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
+    c="ZilliCubic11",
+    dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
+    IPS=2, ICP=[2,11,9],
+    UZSTOP={2:[0.01,7.01]}, 
+    UZR={2:4.5}, #UZR={2:np.arange(2,7,0.25)}, #UZR={2:
+    DS=+0.005, DSMAX=0.05, 
+    NTST=50,
+    EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4)
+dLoop_dat = merge( run(l_dLoop_dat) +
+                   run(l_dLoop_dat,DS="-") )
+dLoop_cubic = dLoop_dat #|Change name for clarity
+IPS2 = dLoop_cubic
+#| Homotopy KAPPA at one of the tips of the periodic orbit.
+print("=====2A_DDD===KAPPA_HOMOTOPY")
+for Z in dLoop_cubic("UZ"):
+    l_dLoop_kappa = load(Z,
+        IPS=2, ICP=[8,11,9],
+        NTST=200,
+        NMX=30000, #RL0=-0.1,RL1=1.1,
+        ###~~~}###££''#~zzzzzzz
+        UZSTOP={8:[1.0]},
+        DS=-0.001, DSMAX=0.001) 
+        #|:Contin par8: kappa  from 0 to 1 (cubic to contact)
+    try:
+        dLoop_kappa = dLoop_kappa + merge( run(l_dLoop_kappa) +
+                                           run(l_dLoop_kappa,DS="-") )
+    except:
+        dLoop_kappa =  merge( run(l_dLoop_kappa) +
+                              run(l_dLoop_kappa,DS="-") )
+
+plot(dLoop_kappa,
+    stability=True,
+    bifurcation_x="kappa",
+    bifurcation_y="Amplitude",
+    solution_x="u",
+    solution_y="v",
+    height=600 )
+
+# #| Run with Contact Nonlinearity
+# print("=====2A_DDD===CONTACT_NONLINEARITY_RUN")
+# l_dLoop_contact = load(dLoop_kappa("UZ1"),
+#     IPS=2,ICP=[2,11,9],
+#     DS = -0.005,DSMAX=0.005,
+#     UZSTOP={2:[0.01,7.01]} )
+
+# dLoop_contact = merge(run(l_dLoop_contact) + 
+#                       run(l_dLoop_contact,DS="-"))
+
+# IPS2 = IPS2 + dLoop_contact
+# #|___2A_DDD.
+# #|___2_AAA. METHOD A
+# #|___222. IPS2
+
+
+# #|___HHH WHOLE DIAGRAM 
+# print("=====HHH___RELABEL___PLOT___SAVE")
+# all_sideStudy2 = rl( IPS2 )
+# p=plot(all_sideStudy2,
+#     stability=True,
+#     bifurcation_x="Omeg",
+#     bifurcation_y="Amplitude",
+#     solution_x="u",
+#     solution_y="v",
+#     height=600)
+# p.config(color_list="black red green blue \
+#                      violet orange gray brown teal turquoise purple")
+# save(all_sideStudy2,"all_sideStudy1")
+
+# endTime = time.time()
+# elapsedTime = endTime-startTime
+# print( "=====FINISH___elapsedTime: ",
+#     elapsedTime,    " sec"," | ",
+#     elapsedTime/60, " min" )
+# #|___HHH END WHOLE DIAGRAM
+
+
+
+#| DEPOT
+# #| To plot externally, export the data (Refer to AUTO doc), FAIL YET
+# dLoop_zeta.writeRawFilename("myASCIIoutputFile") #|Fail
+# myArray = dLoop_zeta.toArray()
+# print("!!!!!!!!!!!size of myArray is, ", len(myArray[0]), len(myArray) )
+# with open("myDummFile.txt","w",encoding="utf-8") as f:
+#   for r in myArray:
+#     for q in r:
+#       f.write(str(r)+"\n")

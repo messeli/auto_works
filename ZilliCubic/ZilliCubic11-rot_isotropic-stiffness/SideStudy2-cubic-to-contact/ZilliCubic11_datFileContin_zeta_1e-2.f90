@@ -22,14 +22,14 @@
         EPSH = PAR(5)
         ZETA = PAR(6) 
         THETAPP = PAR(7)
-        
+
         Q1=U(1)
         Q2=U(2)
         Q3=U(3)
         Q4=U(4)
-
-        R2 = (Q1**2)+(Q2**2)
  
+        R2 = (Q1**2)+(Q2**2)
+  
         F(1) = Q3
         F(2) = Q4
         F(3) = -THETAP*(JPH-2)*Q4          &
@@ -43,13 +43,11 @@
                +((THETAP**2)*(1-JPH)-1)*Q2 &
                -2*ZETA*THETAP*Q1           &
                -MH*EPSH*THETAPP            &
-               -GAMMA*R2*Q2 
-
-        ! FORCING : Kappa* + (1-Kappa)*(GAMMA*R2*Q2)
+               -GAMMA*R2*Q2         
 
       ! IF (IJAC.EQ.1) RETURN
       !   DFDU(1,1)=0
-      !   ...
+      ! ... 
       END SUBROUTINE FUNC
 
       SUBROUTINE STPNT(NDIM,U,PAR,T)  
@@ -59,13 +57,13 @@
         DOUBLE PRECISION, INTENT(IN) :: T
         DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,S4,C4,R2,GAMMA,GAMMA2,THETA,THETAP,THETAPP,MH,EPSH,JPH,X,Y,TPI!WN,F_M,K3_M,OMEG,
 
-        ! FORWARDS (MATLAB SINE SWEEP GIVES THIS TOO)
-        GAMMA = 0.0 !2nd continue gamma from 0 to 0.25
-        THETAP = 0.1 ! Continue THETAP from 0 to 7. 
-        MH = 0.0 !1st continue MH from 0 to 0.9
-
+        ! GIVEN BACKWARDS (MATLAB LOWER AMPLITUDE END DIMENSIONS)
+        GAMMA = 0.25 !2nd continue gamma from 0 to 0.25
+        THETAP = 4.05 !The speed the .dat file is generated at, in Matlab ode45
+        MH = 0.9 !1st continue MH from 0 to 0.9
+  
         EPSH =0.353
-        ZETA = 0.01 !0.1
+        ZETA = 1e-2 !1e-2 8e-3 5e-3 1e-3 1e-4 1e-5
         JPH  = 0.143
         THETAPP = 0.0
 
@@ -77,12 +75,26 @@
         PAR(6)=ZETA 
         PAR(7)=THETAPP   
 
-        U(1)=0
-        U(2)=0
-        U(3)=0
-        U(4)=0         
       END SUBROUTINE STPNT
 
+
+      ! SUBROUTINE PVLS(NDIM,U,PAR)
+      ! IMPLICIT NONE
+      ! INTEGER, INTENT(IN) :: NDIM
+      ! DOUBLE PRECISION, INTENT(IN) :: U(NDIM)
+      ! DOUBLE PRECISION, INTENT(INOUT) :: PAR(*)
+      ! DOUBLE PRECISION R2,Q1,Q2
+      !   Q1 = U(1)
+      !   Q2 = U(2)
+
+      !   ! R2 = max(U(1)**2 + U(2)**2)  #|!WORKj
+      !   R2 = Q1**2 + Q2**2 
+      !   ! Which one is this?
+      !   ! ?? max( U(1) )^2 + max( U(2) )^2
+      !   ! ?? max( U(1)^2 + U(2)^2 )
+
+      !   PAR(9) = R2**(0.5)
+      ! END SUBROUTINE PVLS
 
       SUBROUTINE PVLS(NDIM,U,PAR)
         IMPLICIT NONE
@@ -91,21 +103,24 @@
         DOUBLE PRECISION, INTENT(INOUT) :: PAR(*)
         DOUBLE PRECISION, ALLOCATABLE :: UU(:,:),R2(:),R(:)
         DOUBLE PRECISION, EXTERNAL :: GETP, GETU
+        DOUBLE PRECISION :: DUMM
         INTEGER :: NDX,NCOL,NTST,i,j,k
-        !|:SEE the explanation of demo pvl.f90 : 
-        !|::"For algebraic problems the argument U is, as usual, the state vector.
-        !|::For differential equations the argument U represents the approximate 
-        !|::solution on the entire interval [0,1]. In this case its values can
-        !|::be accessed indirectly by calls to GETP, as illustrated below, or
-        !|::by obtaining NDIM, NCOL, NTST via GETP and then dimensioning U as
-        !|::U(NDIM,0:NCOL*NTST) in a seperate subroutine that is called by PVLS. "
+        !|SEE the explanation of demo pvl.f90 : 
+        !|:"For algebraic problems the argument U is, as usual, the state vector.
+        !|:For differential equations the argument U represents the approximate 
+        !|:solution on the entire interval [0,1]. In this case its values can
+        !|:be accessed indirectly by calls to GETP, as illustrated below, or
+        !|:by obtaining NDIM, NCOL, NTST via GETP and then dimensioning U as
+        !|:U(NDIM,0:NCOL*NTST) in a seperate subroutine that is called by PVLS. "
 
-        ! NDX  = NINT(GETP('NDX',0,U))
-        ! NTST = NINT(GETP('NTST',0,U))
-        ! NCOL = NINT(GETP('NCOL',0,U))
+        NDX  = NINT(GETP('NDX',0,U))
+        NTST = NINT(GETP('NTST',0,U))
+        NCOL = NINT(GETP('NCOL',0,U))
 
-        !|AAA/BBB METHOD A/B
-        ! PAR(9) = GETU(i,j,U,NDX,NTST,NCOL)
+        !|AAA/BBB METHOD A/B  
+        !|:CORRECT AMPLITUDE FOR IPS=2
+        DUMM = GETU(i,j,U,NDX,NTST,NCOL,PAR(2))
+        PAR(9) = DUMM 
         !|AAA/BBB END
         
         !|CCC METHOD C
@@ -120,31 +135,38 @@
         !|CCC END
 
         !|DDD DEFAULT METHOD - PHASED AMP
-        !|:CORRECT AMPLITUDE FOR IPS=1, which this .f90 is used for.
-        PAR(9) = (U(1)**2 + U(2)**2)**0.5 
-        !|:The state vector is directly used to calc amplitude.
+        ! PAR(9) = (U(1)**2 + U(2)**2)**0.5 
+        !|:The initial data of one period is sampled for amplitude.
         !|:See the qoute above.
         !|DDD END 
+
       END SUBROUTINE PVLS
 
 
-      DOUBLE PRECISION FUNCTION GETU(i,j,U,NDX,NTST,NCOL)
+      DOUBLE PRECISION FUNCTION GETU(i,j,U,NDX,NTST,NCOL,MYPAR)
         INTEGER, INTENT(IN) :: NDX,NCOL,NTST,i,j
-        INTEGER :: p
+        INTEGER :: p, I_MAX
         DOUBLE PRECISION, INTENT(IN) :: U(NDX,0:NCOL*NTST)
         DOUBLE PRECISION, ALLOCATABLE :: R2(:),R(:)
-        DOUBLE PRECISION :: M,N
+        DOUBLE PRECISION :: M,N , MYPAR
 
         !|AAA METHOD A
-        M = 0.0
+        M = 0.D0
         DO p=0,NCOL*NTST
-          N = ( U(1,p)**2+U(2,p)**2 )**0.5
+          N = ( U(1,p)**2+U(2,p)**2 )**0.5D0
           if (N.GT.M) THEN
             M = N
+            I_MAX = p
           END IF 
         END DO 
 
+        !| Write Omeg and amp, fr diag (I dnt rememb why I did ds indeed)  
+        OPEN (unit = 10, file = "dummy_write_file.txt",access = "append")
+        WRITE(10,*) MYPAR,U(1,I_MAX),U(2,I_MAX),U(3,I_MAX),U(4,I_MAX),M
+        CLOSE(10)
+
         GETU = M
+        
         !|AAA END
 
         !|BBB METHOD B
@@ -159,14 +181,12 @@
       END FUNCTION GETU
 
 
+
       SUBROUTINE BCND
       END SUBROUTINE BCND
-
 
       SUBROUTINE ICND
       END SUBROUTINE ICND
 
-
       SUBROUTINE FOPT
       END SUBROUTINE FOPT
-
