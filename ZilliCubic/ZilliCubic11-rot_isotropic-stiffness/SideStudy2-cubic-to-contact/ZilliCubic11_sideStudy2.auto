@@ -9,18 +9,18 @@ print("=====1_FFF===CONTINUE_mH")
 mH = run("ZilliCubic11") 
 
 print("=====1_FFF===CONTINUE_gamma")
-# gam = run(mH("UZ1"),
+# gam = run(mH("UZ1"), 
 #     ICP=[1,9],
 #     NMX=1000,
 #     DS=0.001,DSMAX=0.5,
 #     UZSTOP={1:0.25}) 
 
-kap = run(mH("UZ1"),
+kappa = run(mH("UZ1"),
     ICP=[8,9],
     NMX=3000,
     DS=0.001,DSMAX=0.5,
-    UZSTOP={8:10.0}) 
-beta = run(kap("UZ1"),
+    UZSTOP={8:1.0}) 
+beta = run(kappa("UZ1"),
     ICP=[10,9],
     NMX=1000,
     DS=0.001,DSMAX=0.5,
@@ -29,14 +29,14 @@ K = run(beta("UZ1"),
     ICP=[13,9],
     NMX=1000,
     DS=0.001,DSMAX=0.5,
-    UZSTOP={13:1}) 
+    UZSTOP={13:100}) 
 print("=====1_FFF===CONTINUE_Omeg_FORWARD")
 forward = run(K("UZ1"),
     ICP=[2,9],
-    NMX=1000,
-    NTST=300,
-    DS=0.001,DSMAX=0.005,
-    EPSL= 1e-04, EPSU = 1e-04, EPSS =1e-3,
+    NMX=10000,
+    NTST=200,
+    DS=0.01,DSMAX=0.05,
+    EPSL= 1e-05, EPSU = 1e-05, EPSS =1e-4,
     ITMX= 8, ITNW= 7, NWTN = 6, # 3
     UZSTOP={2:7})
 save(forward,"forward") 
@@ -52,118 +52,120 @@ for i in range(0,len(zetaList)):
         c="ZilliCubic11",
         ICP=[2,9],
         NTST=200,
-        DS=-0.01,DSMAX=0.05, 
+        NMX=1000000,
+        DS=-0.00001,DSMAX=0.00001, 
+        EPSL= 1e-04, EPSU = 1e-04, EPSS =1e-3,
         UZSTOP={2:[0.01,7.01]} ) 
 #|___1B_BBB. METHOD B
 #|___1_BBB. BACKWARDS IPS1
 
 IPS1= forward+back
 plot(IPS1,bifurcation_x="Omeg",bifurcation_y="Amplitude",
-     solution_x="u",solution_y="v",height=600) 
+     solution_x="u",solution_y="v",height=600,stability=True) 
 
 
 #| Kappa Homotopy
-A = load(back,ICP=[8,9],NTST=50,DS=0.01,DSMAX=0.05, 
-    RL0=-0.01,RL1=1.01,UZSTOP={8:[0,1]} )
-B = run(A)+run(A,DS='-')
-plot(B,bifurcation_x="kappa",bifurcation_y="Amplitude",
-     solution_x="u",solution_y="v",height=600)
+# A = load(back,ICP=[8,9],NTST=50,DS=0.01,DSMAX=0.05, 
+#     RL0=-0.01,RL1=1.01,UZSTOP={8:[0,1]} )
+# B = run(A)+run(A,DS='-')
+# plot(B,bifurcation_x="kappa",bifurcation_y="Amplitude",
+#      solution_x="u",solution_y="v",height=600,stability=True)
 #|___111.
 
 #|___222> IPS2 
 #|___2_AAA> METHOD A : ~PURE AUTO 
 #|___2A_DDD> DoubleLoop periodic solutions
-# #| Use Matlab-generated orbit at thetaP=2.91 once.
-# print("=====2A_DDD===CONTINUE_MATLAB_ORBIT")
-# l_Loop_dat = load(
-#     e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
-#     dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
-#     # e="ZilliCubic11_datFileContin_zeta_1e-2",
-#     # dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
-#     c="ZilliCubic11",
-#     NMX=500,
-#     IPS=2, ICP=[2,11,9],
-#     UZSTOP={2:[0.01,7.01]}, 
-#     UZR={2:3.5},    #UZR={2:np.arange(2,7,0.25)},
-#     DS=+0.005, DSMAX=0.05, 
-#     NTST=50,
-#     EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4)
-# Loop_dat = merge( run(l_Loop_dat) +
-#                   run(l_Loop_dat,DS="-") )
-# Loop_cubic = Loop_dat #|Change name for clarity
-# IPS2 = Loop_cubic #Start Populating the bifurcation plot.
-# plot(Loop_cubic,
-#     stability=True,
-#     bifurcation_x="Omeg",
-#     bifurcation_y="Amplitude",
-#     solution_x="u",
-#     solution_y="v",
-#     height=600 )
-# #| kappa homotopy at one of the tips of the periodic orbit.
-# print("=====2A_DDD===KAPPA_HOMOTOPY")
-# count = 0
-# size = len(Loop_cubic("UZ"))
-# for Z in Loop_cubic("UZ"):
-#     count+=1
-#     print("===========",count,"/",size,"=========")
-#     l_Loop_kappa = load(Z,
-#         IPS=2, ICP=[8,11,9],
-#         NTST=200,
-#         NMX=10000, #RL0=-0.1,RL1=1.1,
-#         UZSTOP={8:[1.0]},
-#         DS=-0.001, DSMAX=0.001) 
-#         #|:Contin par8: kappa  from 0 to 1 (cubic to contact)
-#     try:
-#         Loop_kappa = Loop_kappa + merge( run(l_Loop_kappa) +
-#                                          run(l_Loop_kappa,DS="-") )
-#     except:
-#         Loop_kappa =  merge( run(l_Loop_kappa) +
-#                              run(l_Loop_kappa,DS="-") )
+#| Use Matlab-generated orbit at thetaP=2.91 once.
+print("=====2A_DDD===CONTINUE_MATLAB_ORBIT")
+l_Loop_dat = load(
+    e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
+    dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
+    # e="ZilliCubic11_datFileContin_zeta_1e-2",
+    # dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
+    c="ZilliCubic11",
+    NMX=500,
+    IPS=2, ICP=[2,11,9],
+    UZSTOP={2:[0.01,7.01]}, 
+    UZR={2:3.5},    #UZR={2:np.arange(2,7,0.25)},
+    DS=+0.005, DSMAX=0.05, 
+    NTST=50,
+    EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4)
+Loop_dat = merge( run(l_Loop_dat) +
+                  run(l_Loop_dat,DS="-") )
+Loop_cubic = Loop_dat #|Change name for clarity
+IPS2 = Loop_cubic #Start Populating the bifurcation plot.
+plot(Loop_cubic,
+    stability=True,
+    bifurcation_x="Omeg",
+    bifurcation_y="Amplitude",
+    solution_x="u",
+    solution_y="v",
+    height=600 )
+#| kappa homotopy at one of the tips of the periodic orbit.
+print("=====2A_DDD===KAPPA_HOMOTOPY")
+count = 0
+size = len(Loop_cubic("UZ"))
+for Z in Loop_cubic("UZ"):
+    count+=1
+    print("===========",count,"/",size,"=========")
+    l_Loop_kappa = load(Z,
+        IPS=2, ICP=[8,11,9],
+        NTST=200,
+        NMX=10000, #RL0=-0.1,RL1=1.1,
+        UZSTOP={8:[1.0]},
+        DS=-0.001, DSMAX=0.001) 
+        #|:Contin par8: kappa  from 0 to 1 (cubic to contact)
+    try:
+        Loop_kappa = Loop_kappa + merge( run(l_Loop_kappa) +
+                                         run(l_Loop_kappa,DS="-") )
+    except:
+        Loop_kappa =  merge( run(l_Loop_kappa) +
+                             run(l_Loop_kappa,DS="-") )
 
-# plot(Loop_kappa,
-#     stability=True,
-#     bifurcation_x="kappa",
-#     bifurcation_y="Amplitude",
-#     solution_x="u",
-#     solution_y="v",
-#     height=600 )
+plot(Loop_kappa,
+    stability=True,
+    bifurcation_x="kappa",
+    bifurcation_y="Amplitude",
+    solution_x="u",
+    solution_y="v",
+    height=600 )
 
-# #| Run with Contact Nonlinearity
-# print("=====2A_DDD===CONTACT_NONLINEARITY_RUN")
-# l_dLoop_contact = load(dLoop_kappa("UZ1"),
-#     IPS=2,ICP=[2,11,9],
-#     DS = -0.005,DSMAX=0.005,
-#     UZSTOP={2:[0.01,7.01]} )
+#| Run with Contact Nonlinearity
+print("=====2A_DDD===CONTACT_NONLINEARITY_RUN")
+l_dLoop_contact = load(dLoop_kappa("UZ1"),
+    IPS=2,ICP=[2,11,9],
+    DS = -0.005,DSMAX=0.005,
+    UZSTOP={2:[0.01,7.01]} )
 
-# dLoop_contact = merge(run(l_dLoop_contact) + 
-#                       run(l_dLoop_contact,DS="-"))
+dLoop_contact = merge(run(l_dLoop_contact) + 
+                      run(l_dLoop_contact,DS="-"))
 
-# IPS2 = IPS2 + dLoop_contact
+IPS2 = IPS2 + dLoop_contact
 #|___2A_DDD.
 #|___2_AAA. METHOD A
 #|___222. IPS2
 
 
-# #|___HHH WHOLE DIAGRAM 
-# print("=====HHH___RELABEL___PLOT___SAVE")
-# all_sideStudy2 = rl( IPS2 )
-# p=plot(all_sideStudy2,
-#     stability=True,
-#     bifurcation_x="Omeg",
-#     bifurcation_y="Amplitude",
-#     solution_x="u",
-#     solution_y="v",
-#     height=600)
-# p.config(color_list="black red green blue \
-#                      violet orange gray brown teal turquoise purple")
-# save(all_sideStudy2,"all_sideStudy1")
+#|___HHH WHOLE DIAGRAM 
+print("=====HHH___RELABEL___PLOT___SAVE")
+all_sideStudy2 = rl( IPS2 )
+p=plot(all_sideStudy2,
+    stability=True,
+    bifurcation_x="Omeg",
+    bifurcation_y="Amplitude",
+    solution_x="u",
+    solution_y="v",
+    height=600)
+p.config(color_list="black red green blue \
+                     violet orange gray brown teal turquoise purple")
+save(all_sideStudy2,"all_sideStudy1")
 
-# endTime = time.time()
-# elapsedTime = endTime-startTime
-# print( "=====FINISH___elapsedTime: ",
-#     elapsedTime,    " sec"," | ",
-#     elapsedTime/60, " min" )
-# #|___HHH END WHOLE DIAGRAM
+endTime = time.time()
+elapsedTime = endTime-startTime
+print( "=====FINISH___elapsedTime: ",
+    elapsedTime,    " sec"," | ",
+    elapsedTime/60, " min" )
+#|___HHH END WHOLE DIAGRAM
 
 
 

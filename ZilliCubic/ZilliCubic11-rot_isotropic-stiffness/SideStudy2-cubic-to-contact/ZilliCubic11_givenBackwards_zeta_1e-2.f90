@@ -31,12 +31,12 @@
         Q3=U(3)
         Q4=U(4)
  
-        R2 = (Q1**2)+(Q3**2)
+        R2 = (Q1**2)+(Q2**2)
         R = R2**0.5D0
         C = 3  
-        
-        FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*BETA*Q1  ! FSNUB_u = ( 1/(Q1**2+Q2**2)**0.5D0 - 1 ) * BETA * Q1 
-        FSNUB_v = -0.5D0*(tanh(K*(R-C))+1)*BETA*Q2  ! FSNUB_v = ( 1/(Q1**2+Q2**2)**0.5D0 - 1 ) * BETA * Q2
+
+        FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*ABS(R-C)*BETA*Q1  ! FSNUB_u = ( 1/(Q1**2+Q2**2)**0.5D0 - 1 ) * BETA * Q1 
+        FSNUB_v = -0.5D0*(tanh(K*(R-C))+1)*ABS(R-C)*BETA*Q2  ! FSNUB_v = ( 1/(Q1**2+Q2**2)**0.5D0 - 1 ) * BETA * Q2
         FCUBIC_u = -GAMMA*R2*Q1
         FCUBIC_v = -GAMMA*R2*Q2
   
@@ -57,50 +57,8 @@
 
       ! IF (IJAC.EQ.1) RETURN
       !   DFDU(1,1)=0
-      !   DFDU(1,2)=1
-      !   DFDU(1,3)=0
-      !   DFDU(1,4)=0
-      !   DFDU(1,5)=0
-      !   DFDU(1,6)=0
-
-      !   DFDU(2,1)=+((OMEG**2)*(1-JPH)-1) &
-      !             -GAMMA/4*( 3*R2 + 6*Q1**2 + C4*(R2-4*Q3**2) + 2*C4*Q1**2 - 6*S4*Q3*Q1 )
-      !   DFDU(2,2)=-2*ZETA
-      !   DFDU(2,3)=+2*ZETA*OMEG + &
-      !             -GAMMA/4*( +6*Q1*Q3 - 6*C4*Q1*Q3 + S4*(R2-4*Q1**2) + 2*S4*Q3**2  )
-      !   DFDU(2,4)=-OMEG*(JPH-2)
-      !   DFDU(2,5)=-GAMMA/4*Q3*(R2-4*Q1**2) 
-      !   DFDU(2,6)=-GAMMA/4*Q1*(R2-4*Q3**2)  
-
-      !   DFDU(3,1)=0
-      !   DFDU(3,2)=0
-      !   DFDU(3,3)=0
-      !   DFDU(3,4)=1
-      !   DFDU(3,5)=0
-      !   DFDU(3,6)=0
-
-      !   DFDU(4,1)=-2*ZETA*OMEG &
-      !             -GAMMA/4*( 6*Q3*Q1 - 6*C4*Q3*Q1 - S4*(R2-4*Q3**2) - 2*S4*Q1**2 )
-      !   DFDU(4,2)=+OMEG*(JPH-2)
-      !   DFDU(4,3)=+((OMEG**2)*(1-JPH)-1) &
-      !             -GAMMA/4*( 3*R2 + 6*Q3**2 + C4*(R2-4*Q1**2) + 2*C4*Q3**2 +6*S4*Q1*Q3 )
-      !   DFDU(4,4)=-2*ZETA
-      !   DFDU(4,5)=+GAMMA/4*Q1*(R2-4*Q3**2)  
-      !   DFDU(4,6)=-GAMMA/4*Q3*(R2-4*Q1**2) 
-
-      !   DFDU(5,1)=0
-      !   DFDU(5,2)=0
-      !   DFDU(5,3)=0
-      !   DFDU(5,4)=0
-      !   DFDU(5,5)=1- ( 1*(X**2 + Y**2) + X*(2*X) )    
-      !   DFDU(5,6)=4*OMEG-X*(2*Y)    
-
-      !   DFDU(6,1)=0
-      !   DFDU(6,2)=0
-      !   DFDU(6,3)=0
-      !   DFDU(6,4)=0
-      !   DFDU(6,5)=-4*OMEG-Y*(2*X)
-      !   DFDU(6,6)=1- ( 1*(X**2 + Y**2) + Y*(2*Y))
+      ! ...
+   
       END SUBROUTINE FUNC
 
       SUBROUTINE STPNT(NDIM,U,PAR,T)  
@@ -111,17 +69,17 @@
         DOUBLE PRECISION ZETA,BETA,Q1,Q2,Q3,Q4,S4,C4,R2,GAMMA,KAPPA,K,OMEG,OMEGP,MH,EPSH,JPH 
 
         ! GIVEN BACKWARDS (MATLAB LOWER AMPLITUDE END DIMENSIONS)
-        GAMMA = 0.25 !2nd continue gamma from 0 to 0.25
+        GAMMA = 0 !0.25 !2nd continue gamma from 0 to 0.25
         OMEG = 7.0 ! Continue OMEG from 0 to 7. 
         MH = 0.9 !1st continue MH from 0 to 0.9
   
         EPSH =0.353
-        ZETA = 1e-2  ! 0.05 to try for avoiding backward continuation from simulation datum
+        ZETA = 0.02  !TRUE ONE IS 1e-2;BUT, TRY 0.05 for avoiding backward continuation from simulation datum
         JPH  = 0.143
         OMEGP = 0.0
-        KAPPA = 0.0  ! 1.D0
-        BETA = 0.D0  ! 10.D0
-        K = 0.D0     ! 10.D0
+        KAPPA = 1.0  ! 1.D0
+        BETA = 0.5D0  ! 10.D0 
+        K = 100.D0     ! 10.D0
 
         PAR(1)=GAMMA 
         PAR(2)=OMEG 
@@ -134,18 +92,23 @@
         PAR(10)=BETA
         PAR(13)=K
 
-        !| Orig one used for orig givenBackwards, where it was zeta=0.01 
-        ! U(1)=-0.380009000620448
-        ! U(2)= 0.000022150720618
-        ! U(3)=-0.001297860009550
-        ! U(4)= 0.000206860716715
+        ! !| Orig one used for orig givenBackwards, where it was zeta=0.01 
+        ! ! U(1)=-0.380009000620448
+        ! ! U(2)= 0.000022150720618
+        ! ! U(3)=-0.001297860009550
+        ! ! U(4)= 0.000206860716715
 
-        !| New ones from "Google Drive\PhD\Zilli ISO cubic stiffness\Resutls ISO cubic\
-        !| ...7p0 end lowAmp datum, differentZeta for AUTO givenBackwards.txt"
-        U(1)=-0.380085547357884
-        U(2)=0.000000023340008
-        U(3)=-0.001299216246013
-        U(4)=0.000000244301170
+        ! !| New ones from "Google Drive\PhD\Zilli ISO cubic stiffness\Resutls ISO cubic\
+        ! !| ...7p0 end lowAmp datum, differentZeta for AUTO givenBackwards.txt"
+        ! U(1)=-0.380085547357884
+        ! U(2)=0.000000023340008
+        ! U(3)=-0.001299216246013
+        ! U(4)=0.000000244301170
+                  
+        U(1) = -3.79737E-01
+        u(2) = -2.59377E-03
+        U(3) = 0.00000E+00
+        U(4) = 0.00000E+00
 
       END SUBROUTINE STPNT
 
@@ -204,7 +167,7 @@
 
         !|DDD DEFAULT METHOD - PHASED AMP
         !|:CORRECT AMPLITUDE FOR IPS=1
-        PAR(9) = (U(1)**2 + U(3)**2)**0.5 
+        PAR(9) = (U(1)**2 + U(2)**2)**0.5 
         !|:The state vector is directly used to calc amplitude.
         !|:See the qoute above.
         !|DDD END 

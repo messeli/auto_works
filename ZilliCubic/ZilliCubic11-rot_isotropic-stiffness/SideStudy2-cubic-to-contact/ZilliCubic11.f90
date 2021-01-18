@@ -13,7 +13,7 @@
         DOUBLE PRECISION, INTENT(IN) :: U(NDIM), PAR(*)
         DOUBLE PRECISION, INTENT(OUT) :: F(NDIM)
         DOUBLE PRECISION, INTENT(INOUT) :: DFDU(NDIM,NDIM), DFDP(NDIM,*)
-        DOUBLE PRECISION ZETA,BETA,Q1,Q3,Q2,Q4,R2,R,C,GAMMA,KAPPA,K,THETA,OMEG,OMEGP,MH,EPSH,JPH,FSNUB_u,FSNUB_v,FCUBIC_v,FCUBIC_u
+        DOUBLE PRECISION ZETA,BETA,Q1,Q3,Q2,Q4,R2,R,C,GAMMA,KAPPA,K,OMEG,OMEGP,MH,EPSH,JPH,FSNUB_u,FSNUB_v,FCUBIC_v,FCUBIC_u
       
         GAMMA = PAR(1) 
         OMEG = PAR(2)
@@ -34,7 +34,7 @@
         R2 = (Q1**2)+(Q2**2)
         R = R2**0.5D0
         C = 3
-
+ 
         FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*ABS(R-C)*BETA*Q1  ! FSNUB_u = ( 1/(Q1**2+Q2**2)**0.5D0 - 1 ) * BETA * Q1 
         FSNUB_v = -0.5D0*(tanh(K*(R-c))+1)*ABS(R-C)*BETA*Q2  ! FSNUB_v = ( 1/(Q1**2+Q2**2)**0.5D0 - 1 ) * BETA * Q2
         FCUBIC_u = -GAMMA*R2*Q1
@@ -48,7 +48,6 @@
                +2*ZETA*OMEG*Q2           &
                +MH*EPSH*(OMEG**2)        &
                +KAPPA*FSNUB_u+(1-KAPPA)*FCUBIC_u !|NONLINEARITY HOMOTOPY
-
         F(4) = +OMEG*(JPH-2)*Q3          &
                -2*ZETA*Q4                &
                +((OMEG**2)*(1-JPH)-1)*Q2 &
@@ -56,11 +55,10 @@
                -MH*EPSH*OMEGP            &
                +KAPPA*FSNUB_v+(1-KAPPA)*FCUBIC_v !|NONLINEARITY HOMOTOPY
 
-        ! FORCING : Kappa* + (1-Kappa)*(GAMMA*R2*Q2)
-
       ! IF (IJAC.EQ.1) RETURN
       !   DFDU(1,1)=0
       !   ...
+      
       END SUBROUTINE FUNC
 
       SUBROUTINE STPNT(NDIM,U,PAR,T)  
@@ -76,7 +74,7 @@
         MH = 0.0 !1st continue MH from 0 to 0.9
 
         EPSH =0.353
-        ZETA = 0.01 !0.1
+        ZETA = 0.02 !0.01
         JPH  = 0.143
         OMEGP = 0.0
         KAPPA = 0.0  ! 1.D0
