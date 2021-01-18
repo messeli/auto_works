@@ -13,7 +13,7 @@
         DOUBLE PRECISION, INTENT(IN) :: U(NDIM), PAR(*)
         DOUBLE PRECISION, INTENT(OUT) :: F(NDIM)
         DOUBLE PRECISION, INTENT(INOUT) :: DFDU(NDIM,NDIM), DFDP(NDIM,*)
-        DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,R2,R,GAMMA,BETA,KAPPA,K, OMEG,OMEGP,MH,EPSH,JPH,FSNUB_u,FSNUB_v,FCUBIC_u,FCUBIC_v
+        DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,R2,C,R,GAMMA,BETA,KAPPA,K, OMEG,OMEGP,MH,EPSH,JPH,FSNUB_u,FSNUB_v,FCUBIC_u,FCUBIC_v
       
         GAMMA = PAR(1) 
         OMEG = PAR(2) !|Rotor speed
@@ -34,10 +34,17 @@
         R2 = (Q1**2)+(Q2**2)
         R = R2**0.5D0
 
-        FSNUB_u = -0.5D0*(tanh(K*(R-0.1))+1) * BETA * Q1  ! FSNUB_u = ( 1/(Q1**2+Q2**2)**0.5D0 - 1 ) * BETA * Q1 
-        FSNUB_v = -0.5D0*(tanh(K*(R-0.1))+1) * BETA * Q2  ! FSNUB_v = ( 1/(Q1**2+Q2**2)**0.5D0 - 1 ) * BETA * Q2
+        C = 3
+        FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*BETA*Q1  ! FSNUB_u = ( 1/(Q1**2+Q2**2)**0.5D0 - 1 ) * BETA * Q1 
+        FSNUB_v = -0.5D0*(tanh(K*(R-C))+1)*BETA*Q2  ! FSNUB_v = ( 1/(Q1**2+Q2**2)**0.5D0 - 1 ) * BETA * Q2
         FCUBIC_u = -GAMMA*R2*Q1
         FCUBIC_v = -GAMMA*R2*Q2
+
+        ! MATLAB Snub force generator
+        ! r = 0:0.01:5;
+        ! K=1;c=3;f= 0.5*(tanh(K*(r-c))+1);
+        ! plot(r,f)
+        
 
         F(1) = Q3
         F(2) = Q4
@@ -52,7 +59,7 @@
                +((OMEG**2)*(1-JPH)-1)*Q2 &
                -2*ZETA*OMEG*Q1           &
                -MH*EPSH*OMEGP            &
-               +KAPPA*FSNUB_v+(1-KAPPA)*FCUBIC_v   !|NONLINEARITY HOMOTOPY
+               +KAPPA*FSNUB_v+(1-KAPPA)*FCUBIC_v !|NONLINEARITY HOMOTOPY
 
       ! IF (IJAC.EQ.1) RETURN
       !   DFDU(1,1)=0
@@ -75,9 +82,9 @@
         ZETA = 1e-2 !1e-2 8e-3 5e-3 1e-3 1e-4 1e-5
         JPH  = 0.143
         OMEGP = 0.0
-        KAPPA = 0.0
-        BETA = 10.D0
-        K = 1.D0
+        KAPPA = 0.0  ! 1.D0
+        BETA = 0.D0  ! 10.D0
+        K = 0.D0     ! 10.D0
 
         PAR(1)=GAMMA 
         PAR(2)=OMEG 

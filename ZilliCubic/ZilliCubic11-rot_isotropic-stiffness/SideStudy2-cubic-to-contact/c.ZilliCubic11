@@ -1,6 +1,6 @@
 # ZILLI CUBIC ROT (AUTONOMOUS - ISOTROPIC STIFFNESS)
 unames={1: 'u', 2: 'v',3:'u_dot' , 4:'v_dot'}
-parnames={1:'gamma', 2:'Omeg',3:'mH',4:'JpH',5:'epsH',6:'zeta',7:'OmegP',8:'kappa',9:'Amplitude'}
+parnames={1:'gamma', 2:'Omeg',3:'mH',4:'JpH',5:'epsH',6:'zeta',7:'OmegP',8:'kappa',9:'Amplitude',10:"beta",13:'K'}
 
 NDIM= 4,
 
