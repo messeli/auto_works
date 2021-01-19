@@ -13,7 +13,7 @@
         DOUBLE PRECISION, INTENT(IN) :: U(NDIM), PAR(*)
         DOUBLE PRECISION, INTENT(OUT) :: F(NDIM)
         DOUBLE PRECISION, INTENT(INOUT) :: DFDU(NDIM,NDIM), DFDP(NDIM,*)
-        DOUBLE PRECISION ZETA,BETA,Q1,Q2,Q3,Q4,C,R2,R,GAMMA,KAPPA,K,OMEG,OMEGP,MH,EPSH,JPH,FSNUB_v,FSNUB_u,FCUBIC_u,FCUBIC_v
+        DOUBLE PRECISION ZETA,A,BETA,Q1,Q2,Q3,Q4,C,R2,R,GAMMA,KAPPA,K,OMEG,OMEGP,MH,EPSH,JPH,FSNUB_v,FSNUB_u,FCUBIC_u,FCUBIC_v
       
         GAMMA = PAR(1) 
         OMEG = PAR(2) !|Rotor speed
@@ -33,10 +33,13 @@
  
         R2 = (Q1**2)+(Q2**2)
         R = R2**0.5D0
-        C = 3  
+        C = 1 ! e-3  
+        A = 1
 
-        FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*ABS(R-C)*BETA*Q1  ! FSNUB_u = ( 1/(Q1**2+Q2**2)**0.5D0 - 1 ) * BETA * Q1 
-        FSNUB_v = -0.5D0*(tanh(K*(R-C))+1)*ABS(R-C)*BETA*Q2  ! FSNUB_v = ( 1/(Q1**2+Q2**2)**0.5D0 - 1 ) * BETA * Q2
+        FSNUB_u = -0.5D0*(tanh(K*(R-C/A))+1)*ABS((R-C/A)/R)*BETA*Q1  
+        FSNUB_v = -0.5D0*(tanh(K*(R-C/A))+1)*ABS((R-C/A)/R)*BETA*Q2  
+        ! FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*ABS(R-1)*BETA*Q1  
+        ! FSNUB_v = -0.5D0*(tanh(K*(R-C))+1)*ABS(R-1)*BETA*Q2  
         FCUBIC_u = -GAMMA*R2*Q1
         FCUBIC_v = -GAMMA*R2*Q2
   
@@ -78,7 +81,7 @@
         JPH  = 0.143
         OMEGP = 0.0
         KAPPA = 1.0  ! 1.D0
-        BETA = 0.5D0  ! 10.D0 
+        BETA = 1.5D0  ! 10.D0 
         K = 100.D0     ! 10.D0
 
         PAR(1)=GAMMA 

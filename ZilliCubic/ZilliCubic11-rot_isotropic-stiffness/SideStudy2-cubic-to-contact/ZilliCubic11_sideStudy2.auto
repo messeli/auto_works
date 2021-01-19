@@ -4,42 +4,48 @@ startTime = time.time()
 #|___111>IPS1
 print("=====111===IPS1")
 #|___1_FFF> FORWARD: Cont mH:0-0.9>gamma:0-0.25>Omeg:0-7.0
-print("=====1_FFF===FORWARD_SYNCH")
-print("=====1_FFF===CONTINUE_mH")
-mH = run("ZilliCubic11") 
+# print("=====1_FFF===FORWARD_SYNCH")
+# print("=====1_FFF===CONTINUE_mH")
+# mH = run("ZilliCubic11") 
 
-print("=====1_FFF===CONTINUE_gamma")
-# gam = run(mH("UZ1"), 
-#     ICP=[1,9],
+# print("=====1_FFF===CONTINUE_gamma")
+# # gam = run(mH("UZ1"), 
+# #     ICP=[1,9],
+# #     NMX=1000,
+# #     DS=0.001,DSMAX=0.5,
+# #     UZSTOP={1:0.25}) 
+
+# forward1 = run(mH("UZ1"),
+#     ICP=[2,9],
+#     NMX=3000,
+#     DS=0.001,DSMAX=0.5,
+#     UZSTOP={2:0.5}) 
+
+# kappa = run(forward1("UZ1"),
+#     ICP=[8,9],
+#     NMX=3000,
+#     DS=0.001,DSMAX=0.5,
+#     UZSTOP={8:1.0}) 
+# beta = run(kappa("UZ1"),
+#     ICP=[10,9],
 #     NMX=1000,
 #     DS=0.001,DSMAX=0.5,
-#     UZSTOP={1:0.25}) 
-
-kappa = run(mH("UZ1"),
-    ICP=[8,9],
-    NMX=3000,
-    DS=0.001,DSMAX=0.5,
-    UZSTOP={8:1.0}) 
-beta = run(kappa("UZ1"),
-    ICP=[10,9],
-    NMX=1000,
-    DS=0.001,DSMAX=0.5,
-    UZSTOP={10:0.5}) 
-K = run(beta("UZ1"),
-    ICP=[13,9],
-    NMX=1000,
-    DS=0.001,DSMAX=0.5,
-    UZSTOP={13:100}) 
-print("=====1_FFF===CONTINUE_Omeg_FORWARD")
-forward = run(K("UZ1"),
-    ICP=[2,9],
-    NMX=10000,
-    NTST=200,
-    DS=0.01,DSMAX=0.05,
-    EPSL= 1e-05, EPSU = 1e-05, EPSS =1e-4,
-    ITMX= 8, ITNW= 7, NWTN = 6, # 3
-    UZSTOP={2:7})
-save(forward,"forward") 
+#     UZSTOP={10:0.5}) 
+# K = run(beta("UZ1"),
+#     ICP=[13,9],
+#     NMX=1000,
+#     DS=0.001,DSMAX=0.5,
+#     UZSTOP={13:100}) 
+# print("=====1_FFF===CONTINUE_Omeg_FORWARD")
+# forward = run(K("UZ1"),
+#     ICP=[2,9],
+#     NMX=10000,
+#     NTST=200,
+#     DS=0.01,DSMAX=0.05,
+#     EPSL= 1e-05, EPSU = 1e-05, EPSS =1e-4,
+#     ITMX= 8, ITNW= 7, NWTN = 6, # 3
+#     UZSTOP={2:7})
+# save(forward,"forward") 
 #|___1_FFF.
 
 #|___1B_BBB> METHOD B: All-MATLAB startPoints (ONLY for smaller zeta)
@@ -53,13 +59,14 @@ for i in range(0,len(zetaList)):
         ICP=[2,9],
         NTST=200,
         NMX=1000000,
-        DS=-0.00001,DSMAX=0.00001, 
+        DS=-0.01,DSMAX=0.01,  #DSMAX=0.00001, 
         EPSL= 1e-04, EPSU = 1e-04, EPSS =1e-3,
         UZSTOP={2:[0.01,7.01]} ) 
 #|___1B_BBB. METHOD B
 #|___1_BBB. BACKWARDS IPS1
 
-IPS1= forward+back
+try: IPS1= forward+back
+except: IPS1 = back
 plot(IPS1,bifurcation_x="Omeg",bifurcation_y="Amplitude",
      solution_x="u",solution_y="v",height=600,stability=True) 
 
@@ -87,7 +94,7 @@ l_Loop_dat = load(
     IPS=2, ICP=[2,11,9],
     UZSTOP={2:[0.01,7.01]}, 
     UZR={2:3.5},    #UZR={2:np.arange(2,7,0.25)},
-    DS=+0.005, DSMAX=0.05, 
+    DS=+0.001, DSMAX=0.001, 
     NTST=50,
     EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4)
 Loop_dat = merge( run(l_Loop_dat) +

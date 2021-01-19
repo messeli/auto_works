@@ -33,13 +33,26 @@
 
         R2 = (Q1**2)+(Q2**2)
         R = R2**0.5D0
-        C = 3
- 
-        FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*ABS(R-C)*BETA*Q1  ! FSNUB_u = ( 1/(Q1**2+Q2**2)**0.5D0 - 1 ) * BETA * Q1 
-        FSNUB_v = -0.5D0*(tanh(K*(R-c))+1)*ABS(R-C)*BETA*Q2  ! FSNUB_v = ( 1/(Q1**2+Q2**2)**0.5D0 - 1 ) * BETA * Q2
+        C = 1
+        
+        ! WRITE (*,*) R
+        ! IF (R.LT.0.1D0) THEN
+        !   FSNUB_u = 0
+        !   FSNUB_v = 0
+        ! ELSE 
+        !   FSNUB_u = -0.5D0*(tanh(K*(R-C))+1) * ABS(1-1.D0/R)*BETA*Q1  
+        !   FSNUB_v = -0.5D0*(tanh(K*(R-c))+1) * ABS(1-1.D0/R)*BETA*Q2  
+        ! ENDIF
+
+
+
+        ! FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*ABS(1-R**(-1))*BETA*Q1  
+        ! FSNUB_v = -0.5D0*(tanh(K*(R-C))+1)*ABS(1-R**(-1))*BETA*Q2  
+        FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*ABS(R-1)*BETA*Q1  
+        FSNUB_v = -0.5D0*(tanh(K*(R-C))+1)*ABS(R-1)*BETA*Q2 
         FCUBIC_u = -GAMMA*R2*Q1
         FCUBIC_v = -GAMMA*R2*Q2
-  
+
         F(1) = Q3
         F(2) = Q4
         F(3) = -OMEG*(JPH-2)*Q4          &
@@ -92,8 +105,8 @@
         PAR(10)=BETA
         PAR(13)=K
 
-        U(1)=0
-        U(2)=0
+        U(1)=0.01
+        U(2)=0.01
         U(3)=0
         U(4)=0         
       END SUBROUTINE STPNT
