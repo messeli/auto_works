@@ -35,8 +35,10 @@
         R = R2**0.5D0
         C = 1
 
-        FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*ABS(1-R**(-1))*BETA*Q1  ! FSNUB_u = ( 1/(Q1**2+Q2**2)**0.5D0 - 1 ) * BETA * Q1 
-        FSNUB_v = -0.5D0*(tanh(K*(R-C))+1)*ABS(1-R**(-1))*BETA*Q2  ! FSNUB_v = ( 1/(Q1**2+Q2**2)**0.5D0 - 1 ) * BETA * Q2
+        ! FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*ABS(1-R**(-1))*BETA*Q1  
+        ! FSNUB_v = -0.5D0*(tanh(K*(R-C))+1)*ABS(1-R**(-1))*BETA*Q2  
+        FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*ABS(R-1)/R*BETA*Q1  
+        FSNUB_v = -0.5D0*(tanh(K*(R-C))+1)*ABS(R-1)/R*BETA*Q2 
         FCUBIC_u = -GAMMA*R2*Q1
         FCUBIC_v = -GAMMA*R2*Q2
   
@@ -78,8 +80,8 @@
         JPH  = 0.143
         OMEGP = 0.0
         KAPPA = 0.0  ! 1.D0
-        BETA = 0.D0  ! 10.D0
-        K = 0.D0     ! 10.D0
+        BETA = 0.01D0  ! 10.D0
+        K = 0.01D0     ! 10.D0
 
         PAR(1)=GAMMA 
         PAR(2)=OMEG 

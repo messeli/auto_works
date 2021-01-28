@@ -34,7 +34,7 @@
         R2 = (Q1**2)+(Q2**2)
         R = R2**0.5D0
         C = 1 ! e-3  
-        A = 1
+        A = 1 ! Normalise with C (but originally A is the overhung distance)
 
         FSNUB_u = -0.5D0*(tanh(K*(R-C/A))+1)*ABS((R-C/A)/R)*BETA*Q1  
         FSNUB_v = -0.5D0*(tanh(K*(R-C/A))+1)*ABS((R-C/A)/R)*BETA*Q2  
