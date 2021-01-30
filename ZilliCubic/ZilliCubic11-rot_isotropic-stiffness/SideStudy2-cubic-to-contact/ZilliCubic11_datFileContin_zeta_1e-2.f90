@@ -84,8 +84,8 @@
         OMEGP = 0.0D0
 
         KAPPA = 0.0D0    ! 1.0D0 !|0-1: Cubic to ~contact homotopy parameter
-        BETA  = 0.0D0 ! 0.01D0  1000.D0 !|0-1000: k_snub/k_r
-        K     = 0.0D0 ! 0.01D0  10.D0 !|0-20: ~Contact steepness 
+        BETA  = 35.01D0 ! 0.01D0  1000.D0 !|0-1000: k_snub/k_r !|35 makes TORUS appear.
+        K     = 0.01D0 ! 0.01D0  10.D0 !|0-20: ~Contact steepness 
 
         RHO   = 0.0D0 ! 1.0D0 !|0-1: Cubic to Power5 homotopy parameter
         KSI   = 0.1D0 ! 0.1D0 !|0-0.2: Power-5 stiffness ratio, (k_5*c^4)/k_r 

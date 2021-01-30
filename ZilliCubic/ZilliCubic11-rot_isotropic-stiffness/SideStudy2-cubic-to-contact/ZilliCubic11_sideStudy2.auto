@@ -95,8 +95,9 @@ l_Loop_dat = load(
    NMX=10000,
    IPS=2, ICP=[2,11,9],
    UZSTOP={2:[0.01,7.01]}, #10.0
-   # UZR={2:3.5},  #|USER SAMPLE @ Omeg=3.5 #UZR={2:np.arange(2,7,0.25)},
-   DS=+0.001, DSMAX=0.05, 
+   UZR={2:[3.5,3.6,3.75,6.75,7.0]},#UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
+   #|:USER SAMPLE @ a range # UZR={2:3.5},
+   DS=+0.001, DSMAX=0.05,   
    NTST=200,
    EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4)
 Loop_dat = merge( run(l_Loop_dat) +
@@ -117,18 +118,19 @@ for Z in Loop_cubic("UZ"):
    count+=1
    print("===========",count,"/",size,"=========")
    l_Loop_homot = load(Z,
-      IPS=2, ICP=[15,11,9],
-      NTST=50,
-      NMX=60000, # RL0=-0.1,RL1=1.1, #|700000
-      # UZR={8:[0.987]},
-      # UZSTOP={8:[1.0]}, #|SAMPLE @ kappa=1
-      UZR={15:[0.987]}, 
-      UZSTOP={15:[1.0]}, #|SAMPLE @ rho=1
+      IPS=2, ICP=[8,11,9],
+      # IPS=2, ICP=[15,11,9],
+      NTST=1000,#50
+      NMX=60000, RL0=-0.1,RL1=1.5, #|700000
+      UZR={8:[1.0]}, # UZR={8:[1.0,0.985]},
+      UZSTOP={8:[1.5]}, #|SAMPLE @ kappa=1
+      # UZR={15:[0.987]}, 
+      # UZSTOP={15:[1.0]}, #|SAMPLE @ rho=1
       DS=-0.001, DSMAX=0.01) 
    #|:Contin par8: kappa  from 0 to 1 (cubic to contact)
    #| Do homotopy in both increasing and decreasing directions of kappa
    try: 
-      Loop_homot = Loop_kappa + \
+      Loop_homot = Loop_homot + \
          merge( run(l_Loop_homot) + run(l_Loop_homot,DS="-") )
    except:
       Loop_homot = \
@@ -142,14 +144,35 @@ plot(Loop_homot,
 #| Run w/ contactNonlin from one-fd sampled orbits @kappa=1 in Omeg
 #| OR RUN w/ power5Nonlin from one-fd sampled orbits @pho=1 in Omeg
 print("=====2A_DDD===CONTACT_NONLINEARITY_RUN")
-l_Loop_newNonlin = load(Loop_homot("UZ1"), #'UZ1'
-   IPS=2,ICP=[2,11,9],
-   RL0=0,RL1=7.02, #10.0
-   DS = -0.001,DSMAX=0.001,
-   UZSTOP={2:[0.01,7.01]} ) #10.01
-Loop_newNonlin=merge(run(l_Loop_newNonlin)+run(l_Loop_newNonlin,DS="-"))
+count = 0
+size = len(Loop_homot('UZ'))
+for X in Loop_homot("UZ")[0]: #|HERE [0] : enough to do one on d solFam
+   count+=1 
+   print("===========",count,"/",size,"=========")
+   l_Loop_newNonlin = load(X, #'UZ1'
+      IPS=2,ICP=[2,11,9],
+      NMX=4000,
+      NTST=200,
+      RL0=0,RL1=15.02, #10.0
+      DS = -0.001,DSMAX=0.01,
+      UZR={2:7.0}, #|NEW SMPALING FOR CONTACT STEEPNESS INCREASE, K.
+      UZSTOP={2:[0.01,15.01]} ) #10.01
+   try:
+      Loop_newNonlin = Loop_newNonlin + \
+         merge(run(l_Loop_newNonlin)+run(l_Loop_newNonlin,DS="-"))
+   except:
+      Loop_newNonlin = \
+         merge(run(l_Loop_newNonlin)+run(l_Loop_newNonlin,DS="-"))
+#|:Nt:All UZ samples converge to a new sol family for post Omeg=6.6.
+#|...Now increase the contact steepness K : 0.01 => 3
+
+l_Loop_steepen =load(Loop_newNonlin("UZ"), #|One UZ will be enough.
+   IPS=2,ICP=[2,11,9] )
+Loop_steepen = merge(run(l_Loop_steepen)+run(l_Loop_steepen,DS='-'))
+
 #| Populate periodic sol bifur object
-IPS2 = IPS2 + Loop_newNonlin
+IPS2 = IPS2 + Loop_newNonlin + Loop_steepen
+
 #|___2A_DDD.
 #|___2_AAA. METHOD A
 #|___222. IPS2
