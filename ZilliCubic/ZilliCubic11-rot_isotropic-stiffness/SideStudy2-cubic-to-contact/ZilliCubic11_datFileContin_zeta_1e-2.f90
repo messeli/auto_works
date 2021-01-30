@@ -13,7 +13,8 @@
         DOUBLE PRECISION, INTENT(IN) :: U(NDIM), PAR(*)
         DOUBLE PRECISION, INTENT(OUT) :: F(NDIM)
         DOUBLE PRECISION, INTENT(INOUT) :: DFDU(NDIM,NDIM), DFDP(NDIM,*)
-        DOUBLE PRECISION ZETA,C,Q1,Q3,Q2,Q4,U5,R2,R,GAMMA,BETA,KAPPA,K,OMEG,OMEGP,MH,EPSH,JPH,FSNUB_u,FSNUB_v,FCUBIC_u,FCUBIC_v
+        DOUBLE PRECISION ZETA,C,Q1,Q3,Q2,Q4,R2,R,GAMMA,BETA,KAPPA,RHO,K
+        DOUBLE PRECISION OMEG,OMEGP,MH,EPSH,JPH,FSNUB_u,FSNUB_v,FCUBIC_u,FCUBIC_v,F5_u,F5_v,KSI
       
         GAMMA = PAR(1) 
         OMEG = PAR(2)
@@ -25,6 +26,8 @@
         KAPPA = PAR(8) !|Nonlinearity Homotopy. 0:cubic, 1:contact
         BETA = PAR(10) !|Snubber ring stiffness measure: ks/kr 
         K = PAR(13) 
+        KSI = PAR(14)
+        RHO = PAR(15)
 
         Q1=U(1)
         Q2=U(2)
@@ -33,14 +36,14 @@
  
         R2 = (Q1**2)+(Q2**2)
         R = R2**0.5D0
-        C = 1
+        C = 1 !|NondimD wrt c-clearance.
 
-        ! FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*ABS(1-R**(-1))*BETA*Q1  
-        ! FSNUB_v = -0.5D0*(tanh(K*(R-C))+1)*ABS(1-R**(-1))*BETA*Q2  
-        FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*ABS(R-1)/R*BETA*Q1  
-        FSNUB_v = -0.5D0*(tanh(K*(R-C))+1)*ABS(R-1)/R*BETA*Q2 
+        FSNUB_u  = -0.5D0*(tanh(K*(R-1))+1) *ABS(1-1/R)*BETA*Q1  
+        FSNUB_v  = -0.5D0*(tanh(K*(R-1))+1) *ABS(1-1/R)*BETA*Q2 
         FCUBIC_u = -GAMMA*R2*Q1
         FCUBIC_v = -GAMMA*R2*Q2
+        F5_u     = -KSI*R2**2*Q1
+        F5_v     = -KSI*R2**2*Q2
   
         F(1) = Q3
         F(2) = Q4
@@ -49,14 +52,14 @@
                +((OMEG**2)*(1-JPH)-1)*Q1 &
                +2*ZETA*OMEG*Q2           &
                +MH*EPSH*(OMEG**2)        &
-               +KAPPA*FSNUB_u+(1-KAPPA)*FCUBIC_u !|NONLINEARITY HOMOTOPY
+               +KAPPA*FSNUB_u + RHO*F5_u + (1-KAPPA)*(1-RHO)*FCUBIC_u !|NONLINEARITY HOMOTOPY
 
         F(4) = +OMEG*(JPH-2)*Q3          &
                -2*ZETA*Q4                  &
                +((OMEG**2)*(1-JPH)-1)*Q2 &
                -2*ZETA*OMEG*Q1           &
                -MH*EPSH*OMEGP            &
-               +KAPPA*FSNUB_v+(1-KAPPA)*FCUBIC_v !|NONLINEARITY HOMOTOPY
+               +KAPPA*FSNUB_v+RHO*F5_v+(1-KAPPA)*(1-RHO)*FCUBIC_v !|NONLINEARITY HOMOTOPY
 
       ! IF (IJAC.EQ.1) RETURN
       !   DFDU(1,1)=0
@@ -68,20 +71,24 @@
         INTEGER, INTENT(IN) :: NDIM
         DOUBLE PRECISION, INTENT(INOUT) :: U(NDIM),PAR(*)
         DOUBLE PRECISION, INTENT(IN) :: T
-        DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,S4,C4,R2,GAMMA,KAPPA,K,OMEG,OMEGP,MH,EPSH,JPH,BETA,TPI!WN,F_M,K3_M,OMEG,
+        DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,S4,C4,R2,GAMMA,KAPPA,K,OMEG
+        DOUBLE PRECISION OMEGP,MH,EPSH,JPH,BETA,TPI,KSI,RHO!WN,F_M,K3_M,OMEG,
 
-        ! GIVEN BACKWARDS (MATLAB LOWER AMPLITUDE END DIMENSIONS)
-        GAMMA = 0.25 !2nd continue gamma from 0 to 0.25
-        OMEG = 4.05 !The speed the .dat file is generated at, in Matlab ode45
-        MH = 0.9 !1st continue MH from 0 to 0.9
-  
-        EPSH =0.353
-        ZETA = 1e-2 !1e-2 8e-3 5e-3 1e-3 1e-4 1e-5
-        JPH  = 0.143
-        OMEGP = 0.0
-        KAPPA = 0.0  ! 1.D0
-        BETA = 0.01D0  ! 10.D0
-        K = 0.01D0     ! 10.D0
+        !| .DAT file data from MATLAB has gamma Omeg mh epsh zeta JpH OmegP as below:
+        GAMMA = 0.25D0 !2nd continue gamma from 0 to 0.25 !|0-0.25: Cubic stiffness ratio, (k_3*r^2)/k_r
+        OMEG  = 4.05D0 !The speed the .dat file is generated at, in Matlab ode45
+        MH    = 0.9D0 !1st continue MH from 0 to 0.9
+        EPSH  = 0.353D0
+        ZETA  = 0.01D0 !1e-2 8e-3 5e-3 1e-3 1e-4 1e-5
+        JPH   = 0.143D0
+        OMEGP = 0.0D0
+
+        KAPPA = 0.0D0    ! 1.0D0 !|0-1: Cubic to ~contact homotopy parameter
+        BETA  = 0.0D0 ! 0.01D0  1000.D0 !|0-1000: k_snub/k_r
+        K     = 0.0D0 ! 0.01D0  10.D0 !|0-20: ~Contact steepness 
+
+        RHO   = 0.0D0 ! 1.0D0 !|0-1: Cubic to Power5 homotopy parameter
+        KSI   = 0.1D0 ! 0.1D0 !|0-0.2: Power-5 stiffness ratio, (k_5*c^4)/k_r 
 
         PAR(1)=GAMMA 
         PAR(2)=OMEG 
@@ -93,6 +100,8 @@
         PAR(8)=KAPPA
         PAR(10)=BETA
         PAR(13)=K  
+        PAR(14)=KSI
+        PAR(15)=RHO
 
       END SUBROUTINE STPNT
 

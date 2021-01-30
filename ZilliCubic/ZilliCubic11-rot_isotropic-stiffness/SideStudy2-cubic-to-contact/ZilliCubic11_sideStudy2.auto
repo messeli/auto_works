@@ -79,6 +79,8 @@ startTime = time.time()
 #      solution_x="u",solution_y="v",height=600,stability=True)
 #|___111.
 
+########################################################################
+
 #|___222> IPS2 
 #|___2_AAA> METHOD A : ~PURE AUTO 
 #|___2A_DDD> DoubleLoop periodic solutions
@@ -92,7 +94,7 @@ l_Loop_dat = load(
    c="ZilliCubic11",
    NMX=10000,
    IPS=2, ICP=[2,11,9],
-   UZSTOP={2:[0.01,10.01]}, 
+   UZSTOP={2:[0.01,7.01]}, #10.0
    # UZR={2:3.5},  #|USER SAMPLE @ Omeg=3.5 #UZR={2:np.arange(2,7,0.25)},
    DS=+0.001, DSMAX=0.05, 
    NTST=200,
@@ -100,53 +102,59 @@ l_Loop_dat = load(
 Loop_dat = merge( run(l_Loop_dat) +
               run(l_Loop_dat,DS="-") ) #|Solution family from .dat
 Loop_cubic = Loop_dat #|Change name for clarity
-IPS2 = Loop_cubic #Start Populating the bifurcation plot.
+IPS2 = Loop_cubic #|Start Populating the bifurcation plot.
 plot(Loop_cubic,
    stability=True, height=600, 
    bifurcation_x="Omeg", bifurcation_y="Amplitude",
    solution_x="u", solution_y="v")
 
-#| kappa(par(8)) homotopy @ user samplD orbit f Loop_cubic: .dat solFam
-print("=====2A_DDD===KAPPA_HOMOTOPY")
+#| kappa(par(8)) homotopy cubic to contact @ user samplD orbit
+#| OR rho(par(15)) homotopy cubic to power5 @ user samplD orbit
+print("=====2A_DDD===FORCE_HOMOTOPY")
 count = 0 
 size = len(Loop_cubic("UZ"))
 for Z in Loop_cubic("UZ"):
    count+=1
    print("===========",count,"/",size,"=========")
-   l_Loop_kappa = load(Z,
-      IPS=2, ICP=[8,11,9],
+   l_Loop_homot = load(Z,
+      IPS=2, ICP=[15,11,9],
       NTST=50,
-      NMX=700000, RL0=-0.1,RL1=1.1,
-      UZR={8:[0.987]}, #|newly added 
-      UZSTOP={8:[1.0]}, #|SAMPLE @ kappa=1
+      NMX=60000, # RL0=-0.1,RL1=1.1, #|700000
+      # UZR={8:[0.987]},
+      # UZSTOP={8:[1.0]}, #|SAMPLE @ kappa=1
+      UZR={15:[0.987]}, 
+      UZSTOP={15:[1.0]}, #|SAMPLE @ rho=1
       DS=-0.001, DSMAX=0.01) 
    #|:Contin par8: kappa  from 0 to 1 (cubic to contact)
    #| Do homotopy in both increasing and decreasing directions of kappa
    try: 
-      Loop_kappa = Loop_kappa + \
-         merge( run(l_Loop_kappa) + run(l_Loop_kappa,DS="-") )
+      Loop_homot = Loop_kappa + \
+         merge( run(l_Loop_homot) + run(l_Loop_homot,DS="-") )
    except:
-      Loop_kappa = \
-         merge( run(l_Loop_kappa)+run(l_Loop_kappa,DS="-") )
+      Loop_homot = \
+         merge( run(l_Loop_homot)+run(l_Loop_homot,DS="-") )
 
-plot(Loop_kappa,
+plot(Loop_homot,
    stability=True, height=600,
-   bifurcation_x="kappa", bifurcation_y="Amplitude",
+   bifurcation_y="Amplitude",
    solution_x="u", solution_y="v")
 
 #| Run w/ contactNonlin from one-fd sampled orbits @kappa=1 in Omeg
+#| OR RUN w/ power5Nonlin from one-fd sampled orbits @pho=1 in Omeg
 print("=====2A_DDD===CONTACT_NONLINEARITY_RUN")
-l_Loop_contact = load(Loop_kappa("UZ1"), #'UZ1'
+l_Loop_newNonlin = load(Loop_homot("UZ1"), #'UZ1'
    IPS=2,ICP=[2,11,9],
+   RL0=0,RL1=7.02, #10.0
    DS = -0.001,DSMAX=0.001,
-   UZSTOP={2:[0.01,10.01]} )
-Loop_contact = merge(run(l_Loop_contact)+run(l_Loop_contact,DS="-"))
+   UZSTOP={2:[0.01,7.01]} ) #10.01
+Loop_newNonlin=merge(run(l_Loop_newNonlin)+run(l_Loop_newNonlin,DS="-"))
 #| Populate periodic sol bifur object
-IPS2 = IPS2 + Loop_contact
+IPS2 = IPS2 + Loop_newNonlin
 #|___2A_DDD.
 #|___2_AAA. METHOD A
 #|___222. IPS2
 
+########################################################################
 
 #|___HHH WHOLE DIAGRAM 
 print("=====HHH___RELABEL___PLOT___SAVE")
