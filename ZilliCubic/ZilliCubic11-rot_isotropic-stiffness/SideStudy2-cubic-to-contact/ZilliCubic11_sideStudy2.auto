@@ -94,7 +94,7 @@ l_Loop_dat = load(
    c="ZilliCubic11",
    NMX=10000,
    IPS=2, ICP=[2,11,9],
-   UZSTOP={2:[0.01,7.01]}, #10.0
+   RL0=0,RL1=7.01, #UZSTOP={2:[0.01,7.01]}, #10.0
    UZR={2:[3.5,3.6,3.75,6.75,7.0]},#UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
    #|:USER SAMPLE @ a range # UZR={2:3.5},
    DS=+0.001, DSMAX=0.05,   
@@ -146,7 +146,7 @@ plot(Loop_homot,
 print("=====2A_DDD===CONTACT_NONLINEARITY_RUN")
 count = 0
 size = len(Loop_homot('UZ'))
-for X in Loop_homot("UZ")[0]: #|HERE [0] : enough to do one on d solFam
+for X in Loop_homot("UZ"): #|HERE [0] : enough to do one on d solFam
    count+=1 
    print("===========",count,"/",size,"=========")
    l_Loop_newNonlin = load(X, #'UZ1'
