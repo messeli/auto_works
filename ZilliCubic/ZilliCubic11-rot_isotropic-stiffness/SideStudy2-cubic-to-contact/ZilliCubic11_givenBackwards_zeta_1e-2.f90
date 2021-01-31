@@ -81,8 +81,8 @@
         JPH  = 0.143
         OMEGP = 0.0
         KAPPA = 1.0  ! 1.D0
-        BETA = 1.5D0  ! 10.D0 
-        K = 100.D0     ! 10.D0
+        BETA = 50.D0  !Lastly was 1.5D0 !|btw 1.25 to 125 see explanation in func_ode45_tanh.m or betlek.31.01.2021
+        K = 15.D0     !Less than 10.D0 is crap, see explanation in func_ode45_tanh.m or betlek.31.01.2021
 
         PAR(1)=GAMMA 
         PAR(2)=OMEG 
@@ -107,7 +107,8 @@
         ! U(2)=0.000000023340008
         ! U(3)=-0.001299216246013
         ! U(4)=0.000000244301170
-                  
+        
+        !| Take the stpnt below from matlab datum at Omeg=7.01 (or whatever it is in MATLAB!)
         U(1) = -3.79737E-01
         u(2) = -2.59377E-03
         U(3) = 0.00000E+00

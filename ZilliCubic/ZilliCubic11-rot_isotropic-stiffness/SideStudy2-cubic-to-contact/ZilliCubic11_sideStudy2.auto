@@ -49,28 +49,28 @@ startTime = time.time()
 #|___1_FFF.
 
 #|___1B_BBB> METHOD B: All-MATLAB startPoints (ONLY for smaller zeta)
-# print("=====1B_BBB===METHOD_B")
-# zetaList   = ["1e-2"] #,"8e-3","5e-3","1e-3","1e-4","1e-5"]
-# eqFileName = ["ZilliCubic11_givenBackwards_zeta_"+x for x in zetaList]
-# for i in range(0,len(zetaList)):
-#     back = run(
-#         e=eqFileName[i],
-#         c="ZilliCubic11",
-#         ICP=[2,9],
-#         NTST=200,
-#         NMX=1000000,
-#         DS=-0.01,DSMAX=0.01,  #DSMAX=0.00001, 
-#         EPSL= 1e-04, EPSU = 1e-04, EPSS =1e-3,
-#         UZSTOP={2:[0.01,7.01]} ) 
+print("=====1B_BBB===METHOD_B")
+zetaList   = ["1e-2"] #,"8e-3","5e-3","1e-3","1e-4","1e-5"]
+eqFileName = ["ZilliCubic11_givenBackwards_zeta_"+x for x in zetaList]
+for i in range(0,len(zetaList)):
+    back = run(
+        e=eqFileName[i],
+        c="ZilliCubic11",
+        ICP=[2,9],
+        NTST=200,
+        NMX=1000000,
+        DS=-0.01,DSMAX=0.01,  #DSMAX=0.00001, 
+        EPSL= 1e-04, EPSU = 1e-04, EPSS =1e-3,
+        UZSTOP={2:[0.01,7.01]} ) 
 #|___1B_BBB. METHOD B
 #|___1_BBB. BACKWARDS IPS1
-# 
-# try: IPS1= forward+back
-# except: IPS1 = back
-# plot(IPS1,bifurcation_x="Omeg",bifurcation_y="Amplitude",
-#      solution_x="u",solution_y="v",height=600,stability=True) 
-# 
-# 
+
+try: IPS1= forward+back
+except: IPS1 = back
+plot(IPS1,bifurcation_x="Omeg",bifurcation_y="Amplitude",
+     solution_x="u",solution_y="v",height=600,stability=True) 
+
+
 #| Kappa Homotopy
 # A = load(back,ICP=[8,9],NTST=50,DS=0.01,DSMAX=0.05, 
 #     RL0=-0.01,RL1=1.01,UZSTOP={8:[0,1]} )
@@ -94,20 +94,20 @@ l_Loop_dat = load(
    c="ZilliCubic11",
    NMX=10000,
    IPS=2, ICP=[2,11,9],
-   RL0=0,RL1=7.01, #UZSTOP={2:[0.01,7.01]}, #10.0
-   UZR={2:[3.5,3.6,3.75,6.75,7.0]},#UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
-   #|:USER SAMPLE @ a range # UZR={2:3.5},
-   DS=+0.001, DSMAX=0.05,   
+   RL0=0,RL1=10.01, #UZSTOP={2:[0.01,7.01]}, #10.0
+   UZR={2:[3.5,3.6,3.75,3.85,4,4.5,5,5.5,6,10]},
+   # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
+   DS=+0.001, DSMAX=0.05, 
    NTST=200,
    EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4)
 Loop_dat = merge( run(l_Loop_dat) +
               run(l_Loop_dat,DS="-") ) #|Solution family from .dat
 Loop_cubic = Loop_dat #|Change name for clarity
 IPS2 = Loop_cubic #|Start Populating the bifurcation plot.
-plot(Loop_cubic,
-   stability=True, height=600, 
-   bifurcation_x="Omeg", bifurcation_y="Amplitude",
-   solution_x="u", solution_y="v")
+# plot(Loop_cubic,
+#    stability=True, height=600, 
+#    bifurcation_x="Omeg", bifurcation_y="Amplitude",
+#    solution_x="u", solution_y="v")
 
 #| kappa(par(8)) homotopy cubic to contact @ user samplD orbit
 #| OR rho(par(15)) homotopy cubic to power5 @ user samplD orbit
@@ -120,13 +120,13 @@ for Z in Loop_cubic("UZ"):
    l_Loop_homot = load(Z,
       IPS=2, ICP=[8,11,9],
       # IPS=2, ICP=[15,11,9],
-      NTST=1000,#50
-      NMX=60000, RL0=-0.1,RL1=1.5, #|700000
+      NTST=200,# 1000
+      NMX=5000, RL0=-0.1,RL1=2, #|60000
       UZR={8:[1.0]}, # UZR={8:[1.0,0.985]},
-      UZSTOP={8:[1.5]}, #|SAMPLE @ kappa=1
+      #|:SAMPLE @ kappa=1
       # UZR={15:[0.987]}, 
       # UZSTOP={15:[1.0]}, #|SAMPLE @ rho=1
-      DS=-0.001, DSMAX=0.01) 
+      DS=0.001, DSMAX=0.01) 
    #|:Contin par8: kappa  from 0 to 1 (cubic to contact)
    #| Do homotopy in both increasing and decreasing directions of kappa
    try: 
@@ -153,10 +153,9 @@ for X in Loop_homot("UZ"): #|HERE [0] : enough to do one on d solFam
       IPS=2,ICP=[2,11,9],
       NMX=4000,
       NTST=200,
-      RL0=0,RL1=15.02, #10.0
+      RL0=0,RL1=10, 
       DS = -0.001,DSMAX=0.01,
-      UZR={2:7.0}, #|NEW SMPALING FOR CONTACT STEEPNESS INCREASE, K.
-      UZSTOP={2:[0.01,15.01]} ) #10.01
+      UZR={2:7.0} ) #|NEW SMPALING FOR CONTACT STEEPNESS INCREASE, K.
    try:
       Loop_newNonlin = Loop_newNonlin + \
          merge(run(l_Loop_newNonlin)+run(l_Loop_newNonlin,DS="-"))
@@ -172,7 +171,6 @@ Loop_steepen = merge(run(l_Loop_steepen)+run(l_Loop_steepen,DS='-'))
 
 #| Populate periodic sol bifur object
 IPS2 = IPS2 + Loop_newNonlin + Loop_steepen
-
 #|___2A_DDD.
 #|___2_AAA. METHOD A
 #|___222. IPS2
