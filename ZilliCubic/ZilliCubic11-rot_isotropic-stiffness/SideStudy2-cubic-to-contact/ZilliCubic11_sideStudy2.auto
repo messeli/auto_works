@@ -63,7 +63,7 @@ for i in range(0,len(zetaList)):
         NMX=1000000,
         DS=-0.01,DSMAX=0.01,  #DSMAX=0.00001, 
         EPSL= 1e-04, EPSU = 1e-04, EPSS =1e-3,
-        UZSTOP={2:[0.01,7.01]} ) 
+        UZSTOP={2:[0.01,10.01]} ) 
     back = merge( run(l_back) + run(l_back,DS='-') )
 #|___1B_BBB. METHOD B
 #|___1_BBB. BACKWARDS IPS1
@@ -162,7 +162,7 @@ for X in Loop_homot("UZ"): #|HERE [0] : enough to do one on d solFam
          NTST=200,
          RL0=0,RL1=10.1, 
          DS = -0.001,DSMAX=0.01,
-         UZR={2:7.5} ) #|NEW SAMPLING FOR CONTACT STEEPNESS INCREASE, K.
+         UZR={2:3.5} ) #|NEW SAMPLING FOR CONTACT STEEPNESS INCREASE, K.
       try:
          Loop_newNonlin = Loop_newNonlin + \
             merge(run(l_Loop_newNonlin)+run(l_Loop_newNonlin,DS="-"))

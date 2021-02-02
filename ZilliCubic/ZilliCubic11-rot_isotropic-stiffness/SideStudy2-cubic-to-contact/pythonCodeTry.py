@@ -24,7 +24,7 @@ f = open('b.all_sideStudy2','r')
 content = f.read()
 f.seek(0)
 lines = f.readlines()
-pattern = r"\n.{13}4.{7}(7.499).+?\n" #|ACTION REQ FOR WHAT TO WRITE
+pattern = r"\n.{13}4.{7}(3.499).+?\n" #|ACTION REQ FOR WHAT TO WRITE
 pat = re.compile(pattern)
 matches = pat.finditer(content)
 
