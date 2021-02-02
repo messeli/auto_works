@@ -73,7 +73,7 @@
 
         ! GIVEN BACKWARDS (MATLAB LOWER AMPLITUDE END DIMENSIONS)
         GAMMA = 0 !0.25 !2nd continue gamma from 0 to 0.25
-        OMEG = 7.0 ! Continue OMEG from 0 to 7. 
+        OMEG = 5.0 ! Continue OMEG from 0 to 7. 
         MH = 0.9 !1st continue MH from 0 to 0.9
   
         EPSH =0.353
@@ -81,8 +81,8 @@
         JPH  = 0.143
         OMEGP = 0.0
         KAPPA = 1.0  ! 1.D0
-        BETA = 50.D0  !Lastly was 1.5D0 !|btw 1.25 to 125 see explanation in func_ode45_tanh.m or betlek.31.01.2021
-        K = 15.D0     !Less than 10.D0 is crap, see explanation in func_ode45_tanh.m or betlek.31.01.2021
+        BETA = 1.5D0  !Lastly was 1.5D0 !|btw 1.25 to 125 see explanation in func_ode45_tanh.m or betlek.31.01.2021
+        K = 30.D0     !Less than 10.D0 is crap, see explanation in func_ode45_tanh.m or betlek.31.01.2021
 
         PAR(1)=GAMMA 
         PAR(2)=OMEG 
@@ -109,10 +109,15 @@
         ! U(4)=0.000000244301170
         
         !| Take the stpnt below from matlab datum at Omeg=7.01 (or whatever it is in MATLAB!)
-        U(1) = -3.79737E-01
-        u(2) = -2.59377E-03
-        U(3) = 0.00000E+00
-        U(4) = 0.00000E+00
+        ! U(1) = -3.79737E-01
+        ! u(2) = -2.59377E-03
+        ! U(3) = 0.00000E+00
+        ! U(4) = 0.00000E+00
+        !| Take the stpnt below from matlab datum at Omeg=5.00 beta=1.5 K=30
+        U(1) = -3.88852349524439D-01
+        u(2) = -1.903803765019D-03
+        U(3) = 1.2420423D-8
+        U(4) = -1.06246196D-7
 
       END SUBROUTINE STPNT
 
