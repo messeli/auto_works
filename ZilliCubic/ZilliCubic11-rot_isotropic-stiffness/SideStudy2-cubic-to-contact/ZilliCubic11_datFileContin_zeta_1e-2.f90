@@ -38,8 +38,8 @@
         R = R2**0.5D0
         C = 1 !|NondimD wrt c-clearance.
 
-        FSNUB_u  = -0.5D0*(tanh(K*(R-1))+1) *ABS(1-1/R)*BETA*Q1  
-        FSNUB_v  = -0.5D0*(tanh(K*(R-1))+1) *ABS(1-1/R)*BETA*Q2 
+        FSNUB_u  = -0.5D0*(tanh(K*(R-1))+1) *(1-1/R)*BETA*Q1  
+        FSNUB_v  = -0.5D0*(tanh(K*(R-1))+1) *(1-1/R)*BETA*Q2 
         FCUBIC_u = -GAMMA*R2*Q1
         FCUBIC_v = -GAMMA*R2*Q2
         F5_u     = -KSI*R2**2*Q1
@@ -48,18 +48,18 @@
         F(1) = Q3
         F(2) = Q4
         F(3) = -OMEG*(JPH-2)*Q4          &
-               -2*ZETA*Q3                  &
+               -2*ZETA*Q3                &
                +((OMEG**2)*(1-JPH)-1)*Q1 &
                +2*ZETA*OMEG*Q2           &
                +MH*EPSH*(OMEG**2)        &
                +KAPPA*FSNUB_u + RHO*F5_u + (1-KAPPA)*(1-RHO)*FCUBIC_u !|NONLINEARITY HOMOTOPY
 
         F(4) = +OMEG*(JPH-2)*Q3          &
-               -2*ZETA*Q4                  &
+               -2*ZETA*Q4                &
                +((OMEG**2)*(1-JPH)-1)*Q2 &
                -2*ZETA*OMEG*Q1           &
                -MH*EPSH*OMEGP            &
-               +KAPPA*FSNUB_v+RHO*F5_v+(1-KAPPA)*(1-RHO)*FCUBIC_v !|NONLINEARITY HOMOTOPY
+               +KAPPA*FSNUB_v + RHO*F5_v + (1-KAPPA)*(1-RHO)*FCUBIC_v !|NONLINEARITY HOMOTOPY
 
       ! IF (IJAC.EQ.1) RETURN
       !   DFDU(1,1)=0

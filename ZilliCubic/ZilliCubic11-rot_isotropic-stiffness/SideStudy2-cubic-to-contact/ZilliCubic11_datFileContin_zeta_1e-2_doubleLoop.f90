@@ -33,12 +33,12 @@
  
         R2 = (Q1**2)+(Q2**2)
         R = R2**0.5D0
-        C = 3
+        C = 1
 
         ! FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*ABS(1-R**(-1))*BETA*Q1  
         ! FSNUB_v = -0.5D0*(tanh(K*(R-C))+1)*ABS(1-R**(-1))*BETA*Q2  
-        FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*ABS(R-1)*BETA*Q1  
-        FSNUB_v = -0.5D0*(tanh(K*(R-C))+1)*ABS(R-1)*BETA*Q2 
+        FSNUB_u = -0.5D0*(tanh(K*(R-1))+1)*ABS(R-1)*BETA*Q1  
+        FSNUB_v = -0.5D0*(tanh(K*(R-1))+1)*ABS(R-1)*BETA*Q2 
         FCUBIC_u = -GAMMA*R2*Q1
         FCUBIC_v = -GAMMA*R2*Q2
 

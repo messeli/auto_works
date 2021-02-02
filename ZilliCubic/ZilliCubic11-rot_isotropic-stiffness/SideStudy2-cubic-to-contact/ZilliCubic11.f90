@@ -46,10 +46,8 @@
 
 
 
-        ! FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*ABS(1-R**(-1))*BETA*Q1  
-        ! FSNUB_v = -0.5D0*(tanh(K*(R-C))+1)*ABS(1-R**(-1))*BETA*Q2  
-        FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*ABS(R-1)*BETA*Q1  
-        FSNUB_v = -0.5D0*(tanh(K*(R-C))+1)*ABS(R-1)*BETA*Q2 
+        FSNUB_u = -0.5D0*(tanh(K*(R-1))+1)*(1-1/R)*BETA*Q1  
+        FSNUB_v = -0.5D0*(tanh(K*(R-1))+1)*(1-1/R)*BETA*Q2 
         FCUBIC_u = -GAMMA*R2*Q1
         FCUBIC_v = -GAMMA*R2*Q2
 
@@ -60,7 +58,7 @@
                +((OMEG**2)*(1-JPH)-1)*Q1 &
                +2*ZETA*OMEG*Q2           &
                +MH*EPSH*(OMEG**2)        &
-               +KAPPA*FSNUB_u+(1-KAPPA)*FCUBIC_u !|NONLINEARITY HOMOTOPY
+               +KAPPA*FSNUB_u+(1-KAPPA)*FCUBIC_u !|NONLINEARITY HOMOTOPYs
         F(4) = +OMEG*(JPH-2)*Q3          &
                -2*ZETA*Q4                &
                +((OMEG**2)*(1-JPH)-1)*Q2 &

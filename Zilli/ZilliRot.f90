@@ -31,7 +31,8 @@
  
         R = SQRT(Q1**2+Q3**2)
 
-        ! SIGMOID FUNCTION to MODEL: isContact = R >= 1 
+        !| SIGMOID FUNCTION to MODEL: isContact = R >= 1  
+        !| tanh is closer to heaviside step function than sigmoid > See #20 presentation
         ISCONTACT = 1/( 1+EXP(-10*(R-1)) )
 
         F(1) = Q2
