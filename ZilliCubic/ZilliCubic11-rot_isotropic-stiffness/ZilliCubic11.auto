@@ -107,22 +107,18 @@ print("=====1B_BBB===METHOD_B")
 zetaList   = ["1e-2","8e-3","5e-3","1e-3","1e-4","1e-5"]
 eqFileName = ["ZilliCubic11_givenBackwards_zeta_"+x for x in zetaList]
 for i in range(0,len(zetaList)):
+    l_back = load(
+                e=eqFileName[i],
+                c="ZilliCubic11",
+                ICP=[2,9],
+                NTST=50,
+                DS=-0.05,DSMAX=0.05, 
+                EPSL=1e-6,EPSU=1e-6,EPSS=1e-3,
+                UZSTOP={2:[0.01,7.01]} ) 
     try:
-        back = back + run(
-            e=eqFileName[i],
-            c="ZilliCubic11",
-            ICP=[2,9],
-            NTST=50,
-            DS=-0.01,DSMAX=0.05, 
-            UZSTOP={2:[0.01,7.01]} ) 
+        back = back + run(l_back)
     except:
-        back = run(
-            e=eqFileName[i],
-            c="ZilliCubic11",
-            ICP=[2,9],
-            NTST=50,
-            DS=-0.01,DSMAX=0.05, 
-            UZSTOP={2:[0.01,7.01]} ) 
+        back = run(l_back)
 #|___1B_BBB. METHOD B
 #|___1_BBB. BACKWARDS IPS1
 
@@ -157,9 +153,10 @@ print("=====2A_SSS===SAMPLE_ZETA")
 l_sLoop_zeta = load(IPS2_sLoop('UZ1'),
     NMX=20000,
     IPS=2, ICP=[6,11,9],
-    NTST=600,
+    NTST=200,
     DS=+0.001,DSMAX=0.001, #|Continuation in zeta !!!
-    UZR={6:[8e-3,5e-3,1e-3,1e-4,1e-5,0.00, 0.05,0.075,0.082,0.10,0.15]},
+    UZR={6:[8e-3,5e-3,1e-3,1e-5,0.00, 0.05,0.075,0.082,0.10,0.15]}, 
+    #|:Omitted 1e-4 as MX for zeta1e-4 (but not for 1e-5 ??)
     RL0=-0.001) 
     #|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??
 sLoop_zeta = merge( run(l_sLoop_zeta) + 
@@ -173,11 +170,14 @@ print("=====2A_SSS===RUN_zetaOrbits_STARTED")
 counter = 0
 for Z in sLoop_zeta('UZ'):
     counter+=1
-    print("=====2A_DDD===ZETA_RUN:",counter,"/",len(sLoop_zeta('UZ')))
+    print("=====2A_SSS===ZETA_RUN:",counter,"/",len(sLoop_zeta('UZ')))
     IPS2_sLoop = IPS2_sLoop + run(Z,
-        IPS=2,ICP=[2,11,9],
+        NTST=200,
+        IPS=2,ICP=[2,11,9,6],
         DS=-0.005,DSMAX=0.005,
+        EPSL=1e-7,EPSU=1e-7,EPSS=1e-4, 
         UZSTOP={2:[0.01,7.01]} )
+    
 
 try: 
     IPS2 = IPS2 + IPS2_sLoop
@@ -199,7 +199,7 @@ l_dLoop_dat = load(
     UZSTOP={2:[0.01,7.01]},
     UZR={2:3.0},
     EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4, # 6 6 3
-    NTST=100)
+    NTST=200)
 #|:RecommD [EPSL,EPSU,EPSS] range is [1e-7,1e-7,1e-5]-[1e-6,1e-6,1e-3].
 IPS2_dLoop = merge( run(l_dLoop_dat) + 
                     run(l_dLoop_dat,DS="-") )
@@ -208,7 +208,7 @@ IPS2_dLoop = merge( run(l_dLoop_dat) +
 print("=====2A_DDD===SAMPLE_ZETA")
 l_dLoop_zeta = load(IPS2_dLoop('UZ1'),
     IPS=2, ICP=[6,11,9],
-    NTST=600,
+    NTST=200,
     DS=+0.001,DSMAX=0.001, #|Continuation in zeta !!!
     UZR={6:[8e-3,5e-3,1e-3,1e-4,1e-5, 0.00, 0.011,0.0116]}
     ,RL0=-0.001) #|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??
@@ -224,8 +224,10 @@ for Z in dLoop_zeta('UZ'):
     counter+=1
     print("=====2A_DDD===ZETA_RUN:",counter,"/",len(dLoop_zeta('UZ')))
     IPS2_dLoop = IPS2_dLoop + run(Z,
+        NTST=200,
         IPS=2,ICP=[2,11,9],
         DS=-0.005,DSMAX=0.005,
+        # ITNW=9,NWTN=7,
         UZSTOP={2:[0.01,7.01]} )
 try:
     IPS2 = IPS2 + IPS2_dLoop
@@ -251,16 +253,16 @@ for i in range(0,len(datFileName)):
         IPS=2,ICP=[2,11,9],
         DS=+0.005,DSMAX=0.005, 
         UZSTOP={2:[0.01,7.01]}, #|UZR={2:3.47}
-        NTST=100, 
+        NTST=200, 
         EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4 ) # 6 6 3
  
-    if i == len(zetaList)-1 : #|zeta=1e-5 is d most diffic t converg
-    #| Increase max # f Newtn-Chord iters, t b able t decrease tol
+    if i >= len(zetaList)-1: #|zeta=1e-5 is d most diffic t converg
+    #| Increase max # f Newton-Chord iters, t b able t decrease tol
         IPS2_sLoop = merge( run(l_sLoop_dat,ITNW=9,NWTN=7) + 
                             run(l_sLoop_dat,ITNW=9,NWTN=7,DS="-") )
-    
-    IPS2_sLoop = merge( run(l_sLoop_dat) + 
-                        run(l_sLoop_dat,DS="-") )
+    else:
+        IPS2_sLoop = merge( run(l_sLoop_dat) + 
+                            run(l_sLoop_dat,DS="-") )
 
     try: 
         IPS2 = IPS2 + IPS2_sLoop
@@ -299,11 +301,11 @@ l_sLoop_zetaFold = run(  #|run() loads fold contin, not load() !
     IPS2_sLoop('LP1'),
     c='ZilliCubic11', 
     IPS=2,ISW=2,ICP= [6,2,11,9], #|ISW=2 for fold contin
-    NTST=100,
+    NTST=200,
     NMX=5000,
     DS=+0.001,DSMAX=0.005, #|THL={6:1,2:0.5} not makeJ zeta increase!??
     UZR={6:[8e-3,5e-3,1e-3,1e-4,1e-5, 0.02,0.05,0.075,0.082]},
-    UZSTOP={6:[1e-5,0.2]},
+    UZSTOP={6:[1e-5,0.2],2:[0,7.00]},
     RL0=1.01e-3,RL1=0.2,
     ITNW=7,NWTN=3)  #|The 0.0 not sampled ??.
 sLoop_zetaFold = merge( run(l_sLoop_zetaFold) + 
@@ -318,6 +320,7 @@ IPS2_sLoop = IPS2_sLoop + sLoop_zetaFold #|Uncomment fr clarity f d plot
 for Z in sLoop_zetaFold('UZ'):
     IPS2_further = load(Z,
         c='ZilliCubic11',
+        NTST=200,
         IPS=2,ICP= [2,11,9],ISW=1, #|ISW=1 is the normal already 
         DS=+0.001,DSMAX=0.005, 
         UZSTOP={2:[0.01,7.01]})
