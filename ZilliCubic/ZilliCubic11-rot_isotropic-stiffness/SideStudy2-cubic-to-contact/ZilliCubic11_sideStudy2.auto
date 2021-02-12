@@ -61,9 +61,9 @@ for i in range(0,len(zetaList)):
         ICP=[2,9],
         NTST=200,
         NMX=1000000,
+        RL0=0.01, RL1=7.01,
         DS=-0.01,DSMAX=0.01,  #DSMAX=0.00001, 
-        EPSL= 1e-04, EPSU = 1e-04, EPSS =1e-3,
-        UZSTOP={2:[0.01,10.01]} ) 
+        EPSL= 1e-04, EPSU = 1e-04, EPSS =1e-3)
     back = merge( run(l_back) + run(l_back,DS='-') )
 #|___1B_BBB. METHOD B
 #|___1_BBB. BACKWARDS IPS1
@@ -194,9 +194,7 @@ l_Loop_dat = load(
    c="ZilliCubic11",
    NMX=10000,
    IPS=2, ICP=[2,11,9],
-   RL0=0,RL1=10.01, #UZSTOP={2:[0.01,7.01]}, #10.0
-   UZR={2:[3.5,3.6,3.85,4.5,6,7,8,9]}, #3.5,3.6,3.85,4.5,6,7,8,
-   # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
+   RL0=0,RL1=7, #UZSTOP={2:[0.01,7.01]}, #10.0
    DS=+0.001, DSMAX=0.05, 
    NTST=200,
    EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4)
@@ -217,8 +215,8 @@ l_Loop_foldContin = run(Loop_cubic("LP1"),
    UZSTOP={8:1.0},
    DS=0.001,DSMAX=0.005,
    NTST=200)
-Loop_foldContin = run(l_Loop_foldContin) + \
-               run(l_Loop_foldContin,DS="-")
+Loop_foldContin = run(l_Loop_foldContin) #|Forward dir is enough
+
 plot(Loop_foldContin,stability=True,
    bifurcation_x="kappa",bifurcation_y="Amplitude")
 
@@ -232,8 +230,8 @@ l_Loop_tanh = load(Loop_foldContin("UZ1"),
    RL0=0.0, RL1=10.0,
    DS=0.001,DSMAX=0.005,
    NTST=200)
-Loop_tanh = ( run(l_Loop_tanh) + \
-                 run(l_Loop_tanh,DS='-') ) 
+Loop_tanh = merge( run(l_Loop_tanh) + \
+                   run(l_Loop_tanh,DS='-') ) 
 
 #| Populate IPS2
 IPS2 = IPS2 + Loop_tanh 

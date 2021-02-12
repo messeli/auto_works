@@ -78,8 +78,8 @@
         JPH  = 0.143
         OMEGP = 0.0
         KAPPA = 1.0  ! 1.D0
-        BETA = 1.5D0  !Lastly was 1.5D0 !|btw 1.25 to 125 see explanation in func_ode45_tanh.m or betlek.31.01.2021
-        K = 30.D0     !Less than 10.D0 is crap, see explanation in func_ode45_tanh.m or betlek.31.01.2021
+        BETA = 10.D0  !Lastly was 1.5D0 !|btw 1.25 to 125 see explanation in func_ode45_tanh.m or betlek.31.01.2021
+        K = 100.D0     !Lastly was 30 | see explanation in func_ode45_tanh.m or betlek.31.01.2021
 
         PAR(1)=GAMMA 
         PAR(2)=OMEG 
