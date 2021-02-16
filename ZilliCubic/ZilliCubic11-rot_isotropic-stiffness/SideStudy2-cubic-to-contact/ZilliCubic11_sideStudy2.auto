@@ -87,230 +87,230 @@ plot(IPS1,bifurcation_x="Omeg",bifurcation_y="Amplitude",
 #|___222> IPS2 
 #|___2_AAA> METHOD A : ~PURE AUTO 
 #|___2A_KKK> Only kappa continuation
-# #|___2AK_SSS>
-# #| Use Matlab-generated orbit at thetaP=2.91(dLoop)/4.05(sLoop) once.
-# print("=====2Al_KKK===CONTINUE_MATLAB_ORBIT")
-# l_sLoop_dat = load(
-#    # e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
-#    # dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
-#    e="ZilliCubic11_datFileContin_zeta_1e-2",
-#    dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
-#    c="ZilliCubic11",
-#    NMX=10000,
-#    IPS=2, ICP=[2,11,9],
-#    RL0=0,RL1=10.01, #UZSTOP={2:[0.01,7.01]}, #10.0
-#    UZR={2:[3.6,3.85,4.5,6,7,8,9,3.5]}, #3.5,3.6,3.85,4.5,6,7,8,
-#    # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
-#    DS=+0.001, DSMAX=0.05, 
-#    NTST=200,
-#    EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-5)
-# sLoop_dat = merge( run(l_sLoop_dat) +
-#               run(l_sLoop_dat,DS="-") ) #|Solution family from .dat
-# sLoop_cubic = sLoop_dat #|Change name for clarity
-# IPS2 = sLoop_cubic #|Start Populating the bifurcation plot.
-# plot(sLoop_cubic,
-#    stability=True, height=600, 
-#    bifurcation_x="Omeg", bifurcation_y="Amplitude",
-#    solution_x="u", solution_y="v")
+#|___2AK_SSS>
+#| Use Matlab-generated orbit at thetaP=2.91(dLoop)/4.05(sLoop) once.
+print("=====2Al_KKK===CONTINUE_MATLAB_ORBIT")
+l_sLoop_dat = load(
+   # e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
+   # dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
+   e="ZilliCubic11_datFileContin_zeta_1e-2",
+   dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
+   c="ZilliCubic11",
+   NMX=10000,
+   IPS=2, ICP=[2,11,9],
+   RL0=0,RL1=10.01, #UZSTOP={2:[0.01,7.01]}, #10.0
+   UZR={2:[3.6,3.85,4.5,6,7,8,9,3.5]}, #3.5,3.6,3.85,4.5,6,7,8,
+   # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
+   DS=+0.001, DSMAX=0.05, 
+   NTST=200,
+   EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-5)
+sLoop_dat = merge( run(l_sLoop_dat) +
+              run(l_sLoop_dat,DS="-") ) #|Solution family from .dat
+sLoop_cubic = sLoop_dat #|Change name for clarity
+IPS2 = sLoop_cubic #|Start Populating the bifurcation plot.
+plot(sLoop_cubic,
+   stability=True, height=600, 
+   bifurcation_x="Omeg", bifurcation_y="Amplitude",
+   solution_x="u", solution_y="v")
 
-# #| kappa(par(8)) homotopy cubic to contact @ user samplD orbit
-# #| OR rho(par(15)) homotopy cubic to power5 @ user samplD orbit
-# print("=====2AL_KKK===FORCE_HOMOTOPY")
-# count = 0 
-# size = len(sLoop_cubic("UZ"))
-# for Z in sLoop_cubic("UZ"):
-#    count+=1
-#    print("====sLoop===",count,"/",size,"===kappaHomot===")
-#    # if count>=2:
-#    #    break
+#| kappa(par(8)) homotopy cubic to contact @ user samplD orbit
+#| OR rho(par(15)) homotopy cubic to power5 @ user samplD orbit
+print("=====2AL_KKK===FORCE_HOMOTOPY")
+count = 0 
+size = len(sLoop_cubic("UZ"))
+for Z in sLoop_cubic("UZ"):
+   count+=1
+   print("====sLoop===",count,"/",size,"===kappaHomot===")
+   # if count>=2:
+   #    break
 
-#    try:
-#       l_sLoop_homot = load(Z,
-#          IPS=2, ICP=[8,11,9],
-#          # IPS=2, ICP=[15,11,9],
-#          NTST=200,# 1000
-#          NMX=5000, RL0=-0.1,RL1=2, #|60000
-#          UZR={8:[1.0]}, # UZR={8:[1.0,0.985]},
-#          #|:SAMPLE @ kappa=1
-#          # UZR={15:[0.987]}, 
-#          # UZSTOP={15:[1.0]}, #|SAMPLE @ rho=1
-#          DS=0.001, DSMAX=0.01) 
-#       #|:Contin par8: kappa  from 0 to 1 (cubic to contact)
-#       #| Do homotopy in both increasing and decreasing directions of kappa
-#       try: 
-#          sLoop_homot = sLoop_homot + \
-#             merge( run(l_sLoop_homot) + run(l_sLoop_homot,DS="-") )
-#       except:
-#          sLoop_homot = \
-#             merge( run(l_sLoop_homot)+run(l_sLoop_homot,DS="-") )
+   try:
+      l_sLoop_homot = load(Z,
+         IPS=2, ICP=[8,11,9],
+         # IPS=2, ICP=[15,11,9],
+         NTST=200,# 1000
+         NMX=5000, RL0=-0.1,RL1=2, #|60000
+         UZR={8:[1.0]}, # UZR={8:[1.0,0.985]},
+         #|:SAMPLE @ kappa=1
+         # UZR={15:[0.987]}, 
+         # UZSTOP={15:[1.0]}, #|SAMPLE @ rho=1
+         DS=0.001, DSMAX=0.01) 
+      #|:Contin par8: kappa  from 0 to 1 (cubic to contact)
+      #| Do homotopy in both increasing and decreasing directions of kappa
+      try: 
+         sLoop_homot = sLoop_homot + \
+            merge( run(l_sLoop_homot) + run(l_sLoop_homot,DS="-") )
+      except:
+         sLoop_homot = \
+            merge( run(l_sLoop_homot)+run(l_sLoop_homot,DS="-") )
 
-#       if sLoop_homot("UZ"):
-#          break
-#    except:
-#       continue
+      if sLoop_homot("UZ"):
+         break
+   except:
+      continue
 
 
-# plot(sLoop_homot,
-#    stability=True, height=600,
-#    bifurcation_y="Amplitude",
-#    solution_x="u", solution_y="v")
+plot(sLoop_homot,
+   stability=True, height=600,
+   bifurcation_y="Amplitude",
+   solution_x="u", solution_y="v")
 
-# #| Run w/ contactNonlin from one-fd sampled orbits @kappa=1 in Omeg
-# #| OR RUN w/ power5Nonlin from one-fd sampled orbits @pho=1 in Omeg
-# print("=====2AL_KKK===CONTACT_NONLINEARITY_RUN")
-# count = 0
-# size = len(sLoop_homot('UZ'))
-# for X in sLoop_homot("UZ"): #|HERE [0] : enough to do one on d solFam
-#    count+=1 
-#    print("====sLoop===",count,"/",size,"===tanh===")
-#    if count>=2:
-#       break
-#    try: #|this try could be unnecessary
-#       l_sLoop_newNonlin = load(X, #'UZ1'
-#          IPS=2,ICP=[2,11,9],
-#          NMX=4000,
-#          NTST=200,
-#          RL0=0,RL1=10.1, 
-#          DS = -0.001,DSMAX=0.01,
-#          UZR={2:3.5} ) #|NEW SAMPLING FOR CONTACT STEEPNESS INCREASE, K.
-#       try:
-#          sLoop_newNonlin = sLoop_newNonlin + \
-#             merge(run(l_sLoop_newNonlin)+run(l_sLoop_newNonlin,DS="-"))
-#       except:
-#          sLoop_newNonlin = \
-#             merge(run(l_sLoop_newNonlin)+run(l_sLoop_newNonlin,DS="-"))
-#    except: 
-#        continue
-# #|:Nt:All UZ samples converge to a new sol family for post Omeg=6.6.
+#| Run w/ contactNonlin from one-fd sampled orbits @kappa=1 in Omeg
+#| OR RUN w/ power5Nonlin from one-fd sampled orbits @pho=1 in Omeg
+print("=====2AL_KKK===CONTACT_NONLINEARITY_RUN")
+count = 0
+size = len(sLoop_homot('UZ'))
+for X in sLoop_homot("UZ"): #|HERE [0] : enough to do one on d solFam
+   count+=1 
+   print("====sLoop===",count,"/",size,"===tanh===")
+   if count>=2:
+      break
+   try: #|this try could be unnecessary
+      l_sLoop_newNonlin = load(X, #'UZ1'
+         IPS=2,ICP=[2,11,9],
+         NMX=4000,
+         NTST=200,
+         RL0=0,RL1=10.1, 
+         DS = -0.001,DSMAX=0.01,
+         UZR={2:3.5} ) #|NEW SAMPLING FOR CONTACT STEEPNESS INCREASE, K.
+      try:
+         sLoop_newNonlin = sLoop_newNonlin + \
+            merge(run(l_sLoop_newNonlin)+run(l_sLoop_newNonlin,DS="-"))
+      except:
+         sLoop_newNonlin = \
+            merge(run(l_sLoop_newNonlin)+run(l_sLoop_newNonlin,DS="-"))
+   except: 
+       continue
+#|:Nt:All UZ samples converge to a new sol family for post Omeg=6.6.
 
-# #| Now increase the contact steepness K : 0.01 => 3
-# # l_Loop_steepen =load(Loop_newNonlin("UZ"), #|One UZ will be enough.
-# #    IPS=2,ICP=[2,11,9] )
-# # Loop_steepen = merge(run(l_Loop_steepen)+run(l_Loop_steepen,DS='-'))
+#| Now increase the contact steepness K : 0.01 => 3
+# l_Loop_steepen =load(Loop_newNonlin("UZ"), #|One UZ will be enough.
+#    IPS=2,ICP=[2,11,9] )
+# Loop_steepen = merge(run(l_Loop_steepen)+run(l_Loop_steepen,DS='-'))
 
-# #| Populate periodic sol bifur object
-# try:IPS2 = IPS2 + sLoop_newNonlin + sLoop_steepen
-# except: IPS2 = IPS2 + sLoop_newNonlin
-# # wholebifur(IPS1,IPS2)
-# #|___2AK_SSS.
+#| Populate periodic sol bifur object
+try:IPS2 = IPS2 + sLoop_newNonlin + sLoop_steepen
+except: IPS2 = IPS2 + sLoop_newNonlin
+# wholebifur(IPS1,IPS2)
+#|___2AK_SSS.
 
-# #|___2AK_DDD>
-# #| Use Matlab-generated orbit at thetaP=2.91(dLoop)/4.05(sLoop) once.
-# print("=====2Al_KKK===dLoop_CONTINUE_MATLAB_ORBIT")
-# l_dLoop_dat = load(
-#    e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
-#    dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
-#    c="ZilliCubic11",
-#    NMX=2000,
-#    IPS=2, ICP=[2,11,9],
-#    RL0=0,RL1=10.01, #UZSTOP={2:[0.01,7.01]}, #10.0
-#    UZR={2:[2.9,3,3.25,3.5,4.5,5.75,6,2.8]}, #3.5,3.6,3.85,4.5,6,7,8,
-#    # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
-#    DS=+0.001, DSMAX=0.05, 
-#    NTST=200,
-#    EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-5)
-# dLoop_dat = merge( run(l_dLoop_dat) +
-#               run(l_dLoop_dat,DS="-") ) #|Solution family from .dat
-# dLoop_cubic = dLoop_dat #|Change name for clarity
-# try:IPS2 = IPS2 + dLoop_cubic
-# except:IPS2 = dLoop_cubic #|Start Populating the bifurcation plot.
-# plot(dLoop_cubic,
-#    stability=True, height=600, 
-#    bifurcation_x="Omeg", bifurcation_y="Amplitude",
-#    solution_x="u", solution_y="v")
+#|___2AK_DDD>
+#| Use Matlab-generated orbit at thetaP=2.91(dLoop)/4.05(sLoop) once.
+print("=====2Al_KKK===dLoop_CONTINUE_MATLAB_ORBIT")
+l_dLoop_dat = load(
+   e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
+   dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
+   c="ZilliCubic11",
+   NMX=2000,
+   IPS=2, ICP=[2,11,9],
+   RL0=0,RL1=10.01, #UZSTOP={2:[0.01,7.01]}, #10.0
+   UZR={2:[2.9,3,3.25,3.5,4.5,5.75,6,2.8]}, #3.5,3.6,3.85,4.5,6,7,8,
+   # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
+   DS=+0.001, DSMAX=0.05, 
+   NTST=200,
+   EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-5)
+dLoop_dat = merge( run(l_dLoop_dat) +
+              run(l_dLoop_dat,DS="-") ) #|Solution family from .dat
+dLoop_cubic = dLoop_dat #|Change name for clarity
+try:IPS2 = IPS2 + dLoop_cubic
+except:IPS2 = dLoop_cubic #|Start Populating the bifurcation plot.
+plot(dLoop_cubic,
+   stability=True, height=600, 
+   bifurcation_x="Omeg", bifurcation_y="Amplitude",
+   solution_x="u", solution_y="v")
 
-# #| kappa(par(8)) homotopy cubic to contact @ user samplD orbit
-# #| OR rho(par(15)) homotopy cubic to power5 @ user samplD orbit
-# print("=====2AL_KKK===FORCE_HOMOTOPY")
-# count = 0 
-# size = len(dLoop_cubic("UZ"))
-# for Z in dLoop_cubic("UZ"):
-#    count+=1
-#    print("===dLoop====",count,"/",size,"===kappaHomot====")
-#    # if count>=2:
-#    #    break
+#| kappa(par(8)) homotopy cubic to contact @ user samplD orbit
+#| OR rho(par(15)) homotopy cubic to power5 @ user samplD orbit
+print("=====2AL_KKK===FORCE_HOMOTOPY")
+count = 0 
+size = len(dLoop_cubic("UZ"))
+for Z in dLoop_cubic("UZ"):
+   count+=1
+   print("===dLoop====",count,"/",size,"===kappaHomot====")
+   # if count>=2:
+   #    break
 
-#    try:
-#       l_dLoop_homot = load(Z,
-#          IPS=2, ICP=[8,11,9],
-#          # IPS=2, ICP=[15,11,9],
-#          NTST=200,# 1000
-#          NMX=3000, RL0=-0.1,RL1=2, #|60000
-#          UZR={8:[1.0]}, # UZR={8:[1.0,0.985]},
-#          #|:SAMPLE @ kappa=1
-#          # UZR={15:[0.987]}, 
-#          # UZSTOP={15:[1.0]}, #|SAMPLE @ rho=1
-#          DS=0.001, DSMAX=0.01) 
-#       #|:Contin par8: kappa  from 0 to 1 (cubic to contact)
-#       #| Do homotopy in both increasing and decreasing directions of kappa
-#       try: 
-#          dLoop_homot = dLoop_homot + \
-#             merge( run(l_dLoop_homot) + run(l_dLoop_homot,DS="-") )
-#       except:
-#          dLoop_homot = \
-#             merge( run(l_dLoop_homot)+run(l_dLoop_homot,DS="-") )
+   try:
+      l_dLoop_homot = load(Z,
+         IPS=2, ICP=[8,11,9],
+         # IPS=2, ICP=[15,11,9],
+         NTST=200,# 1000
+         NMX=3000, RL0=-0.1,RL1=2, #|60000
+         UZR={8:[1.0]}, # UZR={8:[1.0,0.985]},
+         #|:SAMPLE @ kappa=1
+         # UZR={15:[0.987]}, 
+         # UZSTOP={15:[1.0]}, #|SAMPLE @ rho=1
+         DS=0.001, DSMAX=0.01) 
+      #|:Contin par8: kappa  from 0 to 1 (cubic to contact)
+      #| Do homotopy in both increasing and decreasing directions of kappa
+      try: 
+         dLoop_homot = dLoop_homot + \
+            merge( run(l_dLoop_homot) + run(l_dLoop_homot,DS="-") )
+      except:
+         dLoop_homot = \
+            merge( run(l_dLoop_homot)+run(l_dLoop_homot,DS="-") )
       
-#       if dLoop_homot("UZ2"): 
-#          break
-#    except:
-#       continue
+      if dLoop_homot("UZ2"): 
+         break
+   except:
+      continue
 
-# plot(dLoop_homot,
-#    stability=True, height=600,
-#    bifurcation_y="Amplitude",
-#    solution_x="u", solution_y="v")
+plot(dLoop_homot,
+   stability=True, height=600,
+   bifurcation_y="Amplitude",
+   solution_x="u", solution_y="v")
 
-# #| Run w/ contactNonlin from one-fd sampled orbits @kappa=1 in Omeg
-# #| OR RUN w/ power5Nonlin from one-fd sampled orbits @pho=1 in Omeg
-# print("=====2AL_KKK===dLoop_CONTACT_NONLINEARITY_RUN")
-# count = 0
-# size = len(dLoop_homot('UZ'))
-# for X in dLoop_homot("UZ"): #|HERE [0] : enough to do one on d solFam
-#    count+=1 
-#    print("====dLoop===",count,"/",size,"===tanh===")
-#    if count>=4: 
-#       break
-#    try: #|this try could be unnecessary
-#       l_dLoop_newNonlin = load(X, #'UZ1'
-#          IPS=2,ICP=[2,11,9],
-#          NMX=4000,
-#          NTST=200,
-#          RL0=0,RL1=10.1, 
-#          DS = -0.001,DSMAX=0.01,
-#          UZR={2:3.5} ) #|NEW SAMPLING FOR CONTACT STEEPNESS INCREASE, K.
-#       try:
-#          dLoop_newNonlin = dLoop_newNonlin + \
-#             merge(run(l_dLoop_newNonlin)+run(l_dLoop_newNonlin,DS="-"))
-#       except:
-#          dLoop_newNonlin = \
-#             merge(run(l_dLoop_newNonlin)+run(l_dLoop_newNonlin,DS="-"))
+#| Run w/ contactNonlin from one-fd sampled orbits @kappa=1 in Omeg
+#| OR RUN w/ power5Nonlin from one-fd sampled orbits @pho=1 in Omeg
+print("=====2AL_KKK===dLoop_CONTACT_NONLINEARITY_RUN")
+count = 0
+size = len(dLoop_homot('UZ'))
+for X in dLoop_homot("UZ"): #|HERE [0] : enough to do one on d solFam
+   count+=1 
+   print("====dLoop===",count,"/",size,"===tanh===")
+   if count>=4: 
+      break
+   try: #|this try could be unnecessary
+      l_dLoop_newNonlin = load(X, #'UZ1'
+         IPS=2,ICP=[2,11,9],
+         NMX=4000,
+         NTST=200,
+         RL0=0,RL1=10.1, 
+         DS = -0.001,DSMAX=0.01,
+         UZR={2:3.5} ) #|NEW SAMPLING FOR CONTACT STEEPNESS INCREASE, K.
+      try:
+         dLoop_newNonlin = dLoop_newNonlin + \
+            merge(run(l_dLoop_newNonlin)+run(l_dLoop_newNonlin,DS="-"))
+      except:
+         dLoop_newNonlin = \
+            merge(run(l_dLoop_newNonlin)+run(l_dLoop_newNonlin,DS="-"))
 
-#    except: 
-#        continue
-# #|:Nt:All UZ samples converge to a new sol family for post Omeg=6.6.
+   except: 
+       continue
+#|:Nt:All UZ samples converge to a new sol family for post Omeg=6.6.
 
-# #| Now increase the contact steepness K : 0.01 => 3
-# # l_dLoop_steepen =load(dLoop_newNonlin("UZ"), #|One UZ will be enough.
-# #    IPS=2,ICP=[2,11,9] )
-# # dLoop_steepen = merge(run(l_dLoop_steepen)+run(l_dLoop_steepen,DS='-'))
+#| Now increase the contact steepness K : 0.01 => 3
+# l_dLoop_steepen =load(dLoop_newNonlin("UZ"), #|One UZ will be enough.
+#    IPS=2,ICP=[2,11,9] )
+# dLoop_steepen = merge(run(l_dLoop_steepen)+run(l_dLoop_steepen,DS='-'))
 
-# #| Populate periodic sol bifur object
-# try:IPS2 = IPS2 + dLoop_newNonlin + dLoop_steepen
-# except: IPS2 = IPS2 + dLoop_newNonlin
-# #|___2AK_DDD.
+#| Populate periodic sol bifur object
+try:IPS2 = IPS2 + dLoop_newNonlin + dLoop_steepen
+except: IPS2 = IPS2 + dLoop_newNonlin
+#|___2AK_DDD.
 
-# #|___HHH> WHOLE DIAGRAM 
-# print("=====HHH___RELABEL___PLOT___SAVE")
-# try:all_sideStudy2 = rl( IPS1+IPS2 )
-# except:all_sideStudy2 = rl( IPS2 )
-# p=plot(all_sideStudy2,
-#    stability=True, height=600,
-#    bifurcation_x="Omeg", bifurcation_y="Amplitude",
-#    solution_x="u", solution_y="v")
-# p.config(color_list="black red green blue\
-#    violet orange gray brown teal turquoise purple")
-# save(all_sideStudy2,"all_sideStudy2_kappaHomot")
-# #|___HHH. 
+#|___HHH> WHOLE DIAGRAM 
+print("=====HHH___RELABEL___PLOT___SAVE")
+try:all_sideStudy2 = rl( IPS1+IPS2 )
+except:all_sideStudy2 = rl( IPS2 )
+p=plot(all_sideStudy2,
+   stability=True, height=600,
+   bifurcation_x="Omeg", bifurcation_y="Amplitude",
+   solution_x="u", solution_y="v")
+p.config(color_list="black red green blue\
+   violet orange gray brown teal turquoise purple")
+save(all_sideStudy2,"all_sideStudy2_kappaHomot")
+#|___HHH. 
 #|___2A_KKK. Only kappa continuation
 
 #|___2A_FFF> Fold of OMEG is fold-continD in KAPPA (Nt:Comment 2AL_KKK)

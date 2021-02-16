@@ -52,14 +52,14 @@
                +((OMEG**2)*(1-JPH)-1)*Q1 &
                +2*ZETA*OMEG*Q2           &
                +MH*EPSH*(OMEG**2)        &
-               +KAPPA*FSNUB_u + RHO*F5_u + (1-KAPPA)*(1-RHO)*FCUBIC_u !|NONLINEARITY HOMOTOPY
+               +KAPPA*FSNUB_u + RHO*F5_u + (1-KAPPA-RHO)*FCUBIC_u !|NONLINEARITY HOMOTOPY
 
         F(4) = +OMEG*(JPH-2)*Q3          &
                -2*ZETA*Q4                &
                +((OMEG**2)*(1-JPH)-1)*Q2 &
                -2*ZETA*OMEG*Q1           &
                -MH*EPSH*OMEGP            &
-               +KAPPA*FSNUB_v + RHO*F5_v + (1-KAPPA)*(1-RHO)*FCUBIC_v !|NONLINEARITY HOMOTOPY
+               +KAPPA*FSNUB_v + RHO*F5_v + (1-KAPPA-RHO)*FCUBIC_v !|NONLINEARITY HOMOTOPY
 
       ! IF (IJAC.EQ.1) RETURN
       !   DFDU(1,1)=0
@@ -84,8 +84,8 @@
         OMEGP = 0.0D0
 
         KAPPA = 0.0D0    ! 1.0D0 !|0-1: Cubic to ~contact homotopy parameter
-        BETA = 10.D0  ! 1.5 3 5  10  |btw 1.25 to 125 see explanation in func_ode45_tanh.m or betlek.31.01.2021
-        K = 150.D0    ! 30 100  |see explanation in func_ode45_tanh.m or betlek.31.01.2021
+        BETA = 6.D0  ! 1.5 3 5  10  |btw 1.25 to 125 see explanation in func_ode45_tanh.m or betlek.31.01.2021
+        K = 30.D0    ! 30 100  |see explanation in func_ode45_tanh.m or betlek.31.01.2021
 
         RHO   = 0.0D0 ! 1.0D0 !|0-1: Cubic to Power5 homotopy parameter
         KSI   = 0.1D0 ! 0.1D0 !|0-0.2: Power-5 stiffness ratio, (k_5*c^4)/k_r 
