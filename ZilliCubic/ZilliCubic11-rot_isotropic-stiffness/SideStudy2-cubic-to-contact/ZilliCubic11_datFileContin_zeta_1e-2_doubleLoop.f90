@@ -84,7 +84,7 @@
   
         KAPPA = 0.D0  ! 1.D0
         BETA = 6.D0  ! 1.5 3 5 10  |btw 1.25 to 125 see explanation in func_ode45_tanh.m or betlek.31.01.2021
-        K = 30.D0    ! 30 100  |see explanation in func_ode45_tanh.m or betlek.31.01.2021
+        K = 600.D0    ! 30 100  |see explanation in func_ode45_tanh.m or betlek.31.01.2021
 
         PAR(1)=GAMMA 
         PAR(2)=OMEG 
