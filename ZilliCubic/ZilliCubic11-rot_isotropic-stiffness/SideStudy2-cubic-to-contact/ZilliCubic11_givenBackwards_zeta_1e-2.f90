@@ -69,17 +69,17 @@
         DOUBLE PRECISION ZETA,BETA,Q1,Q2,Q3,Q4,S4,C4,R2,GAMMA,KAPPA,K,OMEG,OMEGP,MH,EPSH,JPH 
 
         ! GIVEN BACKWARDS (MATLAB LOWER AMPLITUDE END DIMENSIONS)
-        GAMMA = 0 !0.25 !2nd continue gamma from 0 to 0.25
-        OMEG = 5.0 ! Continue OMEG from 0 to 7. 
-        MH = 0.9 !1st continue MH from 0 to 0.9
+        GAMMA = 0.25D0 !0.25 !2nd continue gamma from 0 to 0.25
+        OMEG = 5.0D0 ! Continue OMEG from 0 to 7. 
+        MH = 0.9D0 !1st continue MH from 0 to 0.9
+        EPSH =0.353D0
+        ZETA = 0.02D0  !TRUE ONE IS 1e-2;BUT, TRY 0.05 for avoiding backward continuation from simulation datum
+        JPH  = 0.143D0
+        OMEGP = 0.D0
   
-        EPSH =0.353
-        ZETA = 0.02  !TRUE ONE IS 1e-2;BUT, TRY 0.05 for avoiding backward continuation from simulation datum
-        JPH  = 0.143
-        OMEGP = 0.0
-        KAPPA = 1.0  ! 1.D0
-        BETA = 10.D0  !Lastly was 1.5D0 !|btw 1.25 to 125 see explanation in func_ode45_tanh.m or betlek.31.01.2021
-        K = 100.D0     !Lastly was 30 | see explanation in func_ode45_tanh.m or betlek.31.01.2021
+        KAPPA = 1.D0  ! 1.D0
+        BETA = 10.D0  ! 1.5 3 5 10  |btw 1.25 to 125 see explanation in func_ode45_tanh.m or betlek.31.01.2021
+        K = 150.D0    ! 30 100  |see explanation in func_ode45_tanh.m or betlek.31.01.2021
 
         PAR(1)=GAMMA 
         PAR(2)=OMEG 

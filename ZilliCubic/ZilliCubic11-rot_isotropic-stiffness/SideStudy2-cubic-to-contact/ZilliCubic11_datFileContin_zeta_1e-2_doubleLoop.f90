@@ -35,10 +35,8 @@
         R = R2**0.5D0
         C = 1
 
-        ! FSNUB_u = -0.5D0*(tanh(K*(R-C))+1)*ABS(1-R**(-1))*BETA*Q1  
-        ! FSNUB_v = -0.5D0*(tanh(K*(R-C))+1)*ABS(1-R**(-1))*BETA*Q2  
-        FSNUB_u = -0.5D0*(tanh(K*(R-1))+1)*ABS(R-1)*BETA*Q1  
-        FSNUB_v = -0.5D0*(tanh(K*(R-1))+1)*ABS(R-1)*BETA*Q2 
+        FSNUB_u = -0.5D0*(tanh(K*(R-1))+1)*(1-1/R)*BETA*Q1  
+        FSNUB_v = -0.5D0*(tanh(K*(R-1))+1)*(1-1/R)*BETA*Q2 
         FCUBIC_u = -GAMMA*R2*Q1
         FCUBIC_v = -GAMMA*R2*Q2
 
@@ -55,13 +53,13 @@
                +((OMEG**2)*(1-JPH)-1)*Q1 &
                +2*ZETA*OMEG*Q2           &
                +MH*EPSH*(OMEG**2)        &
-               +KAPPA*FSNUB_u+(1-KAPPA)*FCUBIC_u !|NONLINEARITY HOMOTOPY
+               +KAPPA*FSNUB_u + (1-KAPPA)*FCUBIC_u !|NONLINEARITY HOMOTOPY
         F(4) = +OMEG*(JPH-2)*Q3          &
                -2*ZETA*Q4                &
                +((OMEG**2)*(1-JPH)-1)*Q2 &
                -2*ZETA*OMEG*Q1           &
                -MH*EPSH*OMEGP            &
-               +KAPPA*FSNUB_v+(1-KAPPA)*FCUBIC_v !|NONLINEARITY HOMOTOPY
+               +KAPPA*FSNUB_v + (1-KAPPA)*FCUBIC_v !|NONLINEARITY HOMOTOPY
 
       ! IF (IJAC.EQ.1) RETURN
       !   DFDU(1,1)=0
@@ -76,17 +74,17 @@
         DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,S4,C4,R2,R,GAMMA,KAPPA,K,BETA,OMEG,OMEGP,MH,EPSH,JPH,X,Y,TPI!WN,F_M,K3_M,OMEG,
 
         ! GIVEN BACKWARDS (MATLAB LOWER AMPLITUDE END DIMENSIONS)
-        GAMMA = 0.25 !2nd continue gamma from 0 to 0.25
-        OMEG = 2.91 !The speed the .dat file is generated at, in Matlab ode45
-        MH = 0.9 !1st continue MH from 0 to 0.9
+        GAMMA = 0.25D0 !2nd continue gamma from 0 to 0.25
+        OMEG = 2.91D0 !The speed the .dat file is generated at, in Matlab ode45
+        MH = 0.9D0 !1st continue MH from 0 to 0.9
+        EPSH =0.353D0
+        ZETA = 0.01D0 !TRUE ONE SHOULD BE 1e-2; Others 8e-3 5e-3 1e-3 1e-4 1e-5
+        JPH  = 0.143D0
+        OMEGP = 0.D0
   
-        EPSH =0.353
-        ZETA = 0.02 !TRUE ONE SHOULD BE 1e-2; Others 8e-3 5e-3 1e-3 1e-4 1e-5
-        JPH  = 0.143
-        OMEGP = 0.0
-        KAPPA = 0.0  ! 1.D0
-        BETA = 0.D0  ! 10.D0
-        K = 0.D0     ! 10.D0
+        KAPPA = 0.D0  ! 1.D0
+        BETA = 10.D0  ! 1.5 3 5 10  |btw 1.25 to 125 see explanation in func_ode45_tanh.m or betlek.31.01.2021
+        K = 150.D0    ! 30 100  |see explanation in func_ode45_tanh.m or betlek.31.01.2021
 
         PAR(1)=GAMMA 
         PAR(2)=OMEG 
