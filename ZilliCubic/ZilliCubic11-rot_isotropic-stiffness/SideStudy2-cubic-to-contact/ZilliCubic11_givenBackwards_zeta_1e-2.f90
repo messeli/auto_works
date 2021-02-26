@@ -73,7 +73,7 @@
         OMEG = 5.0D0 ! Continue OMEG from 0 to 7. 
         MH = 0.9D0 !1st continue MH from 0 to 0.9
         EPSH =0.353D0
-        ZETA = 0.02D0  !TRUE ONE IS 1e-2;BUT, TRY 0.05 for avoiding backward continuation from simulation datum
+        ZETA = 0.01D0  !TRUE ONE IS 1e-2;BUT, TRY 0.05 for avoiding backward continuation from simulation datum
         JPH  = 0.143D0
         OMEGP = 0.D0
   

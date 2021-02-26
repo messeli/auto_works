@@ -15,8 +15,8 @@ l_dLoop_dat = load(
     DS=+0.005, DSMAX=0.005, 
     NTST=50,
     EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4)
-dLoop_dat = merge( run(l_dLoop_dat) +
-                   run(l_dLoop_dat,DS="-") )
+dLoop_dat = run(l_dLoop_dat)# merge( run(l_dLoop_dat) +
+             #      run(l_dLoop_dat,DS="-") )
 
 #| Vary zeta at one of the tips of the periodic orbit.
 print("=====2A_DDD===SAMPLE_ZETA")
@@ -28,8 +28,8 @@ l_dLoop_zeta = load(dLoop_dat('UZ1'),
     DS=+0.001, DSMAX=0.001) 
     #|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??.
 
-dLoop_zeta = merge( run(l_dLoop_zeta) +
-                    run(l_dLoop_zeta,DS="-") )
+dLoop_zeta = run(l_dLoop_zeta) #merge( run(l_dLoop_zeta) +
+              #      run(l_dLoop_zeta,DS="-") )
 
 #| To plot externally, export the data (Refer to AUTO doc), FAIL YET
 dLoop_zeta.writeRawFilename("myASCIIoutputFile") #|Fail
@@ -67,7 +67,7 @@ x = run(IPS2("LP1"),
     ICP=[5,2,11,9],
     ISW=2,
     NMX=2000,NTST=500, 
-    RL0=0.09,RL1=1.0, # RL0=0.01
+    RL0=0.01,RL1=1.0, # RL0=0.09
     UZR={5:[0.092,0.4]})  # UZR={5:[0.11,0.4]}) 
 
 eH_fold = run(x)  # + run(x,DS="-")
@@ -100,8 +100,8 @@ p=plot(all_sideStudy1,
     solution_x="u",
     solution_y="v",
     height=600)
-p.config(color_list="black red green blue \
-                     violet orange gray brown teal turquoise purple")
+p.config(color_list="red green blue ") # black #\
+                     # orange gray brown teal turquoise purple violet")
 save(all_sideStudy1,"all_sideStudy1")
 
 endTime = time.time()
