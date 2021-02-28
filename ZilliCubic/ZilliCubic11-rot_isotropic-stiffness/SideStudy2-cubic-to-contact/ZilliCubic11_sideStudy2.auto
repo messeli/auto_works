@@ -4,89 +4,89 @@ import re
 
 startTime = time.time()
 #|___111>IPS1
-# print("=====111===IPS1")
-#|___1_FFF> FORWARD: Cont mH:0-0.9>gamma:0-0.25>Omeg:0-7.0
-# print("=====1_FFF===FORWARD_SYNCH")
-# print("=====1_FFF===CONTINUE_mH")
-# mH = run("ZilliCubic11") 
+# # print("=====111===IPS1")
+# #|___1_FFF> FORWARD: Cont mH:0-0.9>gamma:0-0.25>Omeg:0-7.0
+# # print("=====1_FFF===FORWARD_SYNCH")
+# # print("=====1_FFF===CONTINUE_mH")
+# # mH = run("ZilliCubic11") 
 
-# print("=====1_FFF===CONTINUE_gamma")
-# # gam = run(mH("UZ1"), 
-# #     ICP=[1,9],
+# # print("=====1_FFF===CONTINUE_gamma")
+# # # gam = run(mH("UZ1"), 
+# # #     ICP=[1,9],
+# # #     NMX=1000,
+# # #     DS=0.001,DSMAX=0.5,
+# # #     UZSTOP={1:0.25}) 
+
+# # forward1 = run(mH("UZ1"),
+# #     ICP=[2,9],
+# #     NMX=3000,
+# #     DS=0.001,DSMAX=0.5,
+# #     UZSTOP={2:0.5}) 
+
+# # kappa = run(forward1("UZ1"),
+# #     ICP=[8,9],
+# #     NMX=3000,
+# #     DS=0.001,DSMAX=0.5,
+# #     UZSTOP={8:1.0}) 
+# # beta = run(kappa("UZ1"),
+# #     ICP=[10,9],
 # #     NMX=1000,
 # #     DS=0.001,DSMAX=0.5,
-# #     UZSTOP={1:0.25}) 
+# #     UZSTOP={10:0.5}) 
+# # K = run(beta("UZ1"),
+# #     ICP=[13,9],
+# #     NMX=1000,
+# #     DS=0.001,DSMAX=0.5,
+# #     UZSTOP={13:100}) 
+# # print("=====1_FFF===CONTINUE_Omeg_FORWARD")
+# # forward = run(K("UZ1"),
+# #     ICP=[2,9],
+# #     NMX=10000,
+# #     NTST=200,
+# #     DS=0.01,DSMAX=0.05,
+# #     EPSL= 1e-05, EPSU = 1e-05, EPSS =1e-4,
+# #     ITMX= 8, ITNW= 7, NWTN = 6, # 3
+# #     UZSTOP={2:7})
+# # save(forward,"forward") 
+# #|___1_FFF.
 
-# forward1 = run(mH("UZ1"),
-#     ICP=[2,9],
-#     NMX=3000,
-#     DS=0.001,DSMAX=0.5,
-#     UZSTOP={2:0.5}) 
+# #|___1B_BBB> METHOD B: All-MATLAB startPoints (ONLY for smaller zeta)
+# print("=====1B_BBB===METHOD_B")
+# zetaList   = ["1e-2"] #,"8e-3","5e-3","1e-3","1e-4","1e-5"]
+# eqFileName = ["ZilliCubic11_givenBackwards_zeta_"+x for x in zetaList]
+# for i in range(0,len(zetaList)):
+#     l_back = load(
+#         e=eqFileName[i],
+#         c="ZilliCubic11",
+#         ICP=[2,9],
+#         NTST=200,
+#         NMX=1000000,
+#         RL0=0.01, RL1=7.01,
+#         DS=-0.01,DSMAX=0.01,  #DSMAX=0.00001, 
+#         EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-5)
+#     back = merge( run(l_back) + run(l_back,DS='-') )
+# #|___1B_BBB. METHOD B
+# #|___1_BBB. BACKWARDS IPS1
 
-# kappa = run(forward1("UZ1"),
-#     ICP=[8,9],
-#     NMX=3000,
-#     DS=0.001,DSMAX=0.5,
-#     UZSTOP={8:1.0}) 
-# beta = run(kappa("UZ1"),
-#     ICP=[10,9],
-#     NMX=1000,
-#     DS=0.001,DSMAX=0.5,
-#     UZSTOP={10:0.5}) 
-# K = run(beta("UZ1"),
-#     ICP=[13,9],
-#     NMX=1000,
-#     DS=0.001,DSMAX=0.5,
-#     UZSTOP={13:100}) 
-# print("=====1_FFF===CONTINUE_Omeg_FORWARD")
-# forward = run(K("UZ1"),
-#     ICP=[2,9],
-#     NMX=10000,
-#     NTST=200,
-#     DS=0.01,DSMAX=0.05,
-#     EPSL= 1e-05, EPSU = 1e-05, EPSS =1e-4,
-#     ITMX= 8, ITNW= 7, NWTN = 6, # 3
-#     UZSTOP={2:7})
-# save(forward,"forward") 
-#|___1_FFF.
-
-#|___1B_BBB> METHOD B: All-MATLAB startPoints (ONLY for smaller zeta)
-print("=====1B_BBB===METHOD_B")
-zetaList   = ["1e-2"] #,"8e-3","5e-3","1e-3","1e-4","1e-5"]
-eqFileName = ["ZilliCubic11_givenBackwards_zeta_"+x for x in zetaList]
-for i in range(0,len(zetaList)):
-    l_back = load(
-        e=eqFileName[i],
-        c="ZilliCubic11",
-        ICP=[2,9],
-        NTST=200,
-        NMX=1000000,
-        RL0=0.01, RL1=7.01,
-        DS=-0.01,DSMAX=0.01,  #DSMAX=0.00001, 
-        EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-5)
-    back = merge( run(l_back) + run(l_back,DS='-') )
-#|___1B_BBB. METHOD B
-#|___1_BBB. BACKWARDS IPS1
-
-try: IPS1= forward+back
-except: IPS1 = back
-plot(IPS1,bifurcation_x="Omeg",bifurcation_y="Amplitude",
-     solution_x="u",solution_y="v",height=600,stability=True) 
+# try: IPS1= forward+back
+# except: IPS1 = back
+# plot(IPS1,bifurcation_x="Omeg",bifurcation_y="Amplitude",
+#      solution_x="u",solution_y="v",height=600,stability=True) 
 
 
-#| Kappa Homotopy
-# A = load(back,ICP=[8,9],NTST=200,DS=0.01,DSMAX=0.05, 
-#     RL0=-0.01,RL1=1.01,UZSTOP={8:[0,1]} )
-# B = run(A)+run(A,DS='-')
-# plot(B,bifurcation_x="kappa",bifurcation_y="Amplitude",
-#      solution_x="u",solution_y="v",height=600,stability=True)
+# #| Kappa Homotopy
+# # A = load(back,ICP=[8,9],NTST=200,DS=0.01,DSMAX=0.05, 
+# #     RL0=-0.01,RL1=1.01,UZSTOP={8:[0,1]} )
+# # B = run(A)+run(A,DS='-')
+# # plot(B,bifurcation_x="kappa",bifurcation_y="Amplitude",
+# #      solution_x="u",solution_y="v",height=600,stability=True)
 #|___111.
 
 ########################################################################
 
 #|___222> IPS2 
 #|___2_AAA> METHOD A : ~PURE AUTO 
-#|___2A_KKK> Only kappa continuation
+# #|___2A_KKK> Only kappa continuation
 # #|___2AK_SSS>
 # #| Use Matlab-generated orbit at thetaP=2.91(dLoop)/4.05(sLoop) once.
 # print("=====2Al_KKK===CONTINUE_MATLAB_ORBIT")
@@ -181,7 +181,7 @@ plot(IPS1,bifurcation_x="Omeg",bifurcation_y="Amplitude",
 #             merge(run(l_sLoop_newNonlin)+run(l_sLoop_newNonlin,DS="-"))
 #    except: 
 #        continue
-# #|:Nt:All UZ samples converge to a new sol family for post Omeg=6.6.
+# save(sLoop_newNonlin, "sLoop_newNonlin")
 
 # #| Now increase the contact steepness K : 0.01 => 3
 # # l_Loop_steepen =load(Loop_newNonlin("UZ"), #|One UZ will be enough.
@@ -260,8 +260,8 @@ plot(IPS1,bifurcation_x="Omeg",bifurcation_y="Amplitude",
 #    bifurcation_y="Amplitude",
 #    solution_x="u", solution_y="v")
 
-# #| Run w/ contactNonlin from one-fd sampled orbits @kappa=1 in Omeg
-# #| OR RUN w/ power5Nonlin from one-fd sampled orbits @pho=1 in Omeg
+# #| Run w/ tanh-contactNonlin from one-fd sampled orbits @kappa=1 in Omeg
+# #| OR RUN w/ quinticNonlin from one-fd sampled orbits @pho=1 in Omeg
 # print("=====2A_KKK===dLoop_CONTACT_NONLINEARITY_RUN")
 # count = 0
 # size = len(dLoop_homot('UZ'))
@@ -287,7 +287,7 @@ plot(IPS1,bifurcation_x="Omeg",bifurcation_y="Amplitude",
 
 #    except: 
 #        continue
-# #|:Nt:All UZ samples converge to a new sol family for post Omeg=6.6.
+# save(dLoop_newNonlin, "dLoop_newNonlin")
 
 # #| Now increase the contact steepness K : 0.01 => 3
 # # l_dLoop_steepen =load(dLoop_newNonlin("UZ"), #|One UZ will be enough.
@@ -313,134 +313,207 @@ plot(IPS1,bifurcation_x="Omeg",bifurcation_y="Amplitude",
 # #|___HHH. 
 #|___2A_KKK. Only kappa continuation
 
+
 #|___2A_FFF> Fold of OMEG is fold-continD in KAPPA (Nt:Comment 2AL_KKK)
-#|___2AF_SSS> Single-loop
-print("=====2A_FFF===CONTINUE_sLoop_MATLAB_ORBIT")
-l_sLoop_dat = load(
-   e="ZilliCubic11_datFileContin_zeta_1e-2",
-   dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
-   c="ZilliCubic11",
-   NMX=10000,
-   IPS=2, ICP=[2,11,9],
-   RL0=0,RL1=10, #UZSTOP={2:[0.01,7.01]}, #10.0
-   DS=+0.001, DSMAX=0.05, 
-   NTST=200,
-   EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-3)
-sLoop_dat = merge( run(l_sLoop_dat       )+
-                   run(l_sLoop_dat,DS="-") ) #|Solution family from .dat
-sLoop_cubic = sLoop_dat #|Change name for clarity
-IPS2 = sLoop_cubic #|Start Populating the bifurcation plot.
-plot(sLoop_cubic,
-   stability=True, height=600, 
-   bifurcation_x="Omeg", bifurcation_y="Amplitude",
-   solution_x="u", solution_y="v")
+# #|___2AF_SSS> Single-loop
+# print("=====2A_FFF===CONTINUE_sLoop_MATLAB_ORBIT")
+# l_sLoop_dat = load(
+#    e="ZilliCubic11_datFileContin_zeta_1e-2",
+#    dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
+#    c="ZilliCubic11",
+#    NMX=10000,
+#    IPS=2, ICP=[2,11,9],
+#    RL0=0,RL1=10, #UZSTOP={2:[0.01,7.01]}, #10.0
+#    DS=+0.001, DSMAX=0.05, 
+#    NTST=200,
+#    EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-3)
+# sLoop_dat = merge( run(l_sLoop_dat       )+
+#                    run(l_sLoop_dat,DS="-") ) #|Solution family from .dat
+# sLoop_cubic = sLoop_dat #|Change name for clarity
+# IPS2 = sLoop_cubic #|Start Populating the bifurcation plot.
+# plot(sLoop_cubic,
+#    stability=True, height=600, 
+#    bifurcation_x="Omeg", bifurcation_y="Amplitude",
+#    solution_x="u", solution_y="v")
 
-#| Fold continuation 
-l_sLoop_foldContin = run(sLoop_cubic("LP1"),
-   IPS=2, ICP=[8,2,11,9], ISW = 2, 
-   NMX=10000,
-   RL0=0.0,RL1=1.01,
-   UZR={8:1.0}, #1.0
-   DS=0.001,DSMAX=0.005,DSMIN = 1e-5, #|DSMIN didnot do the trick
-   NTST=200)
-print("HEREHEREHEREHEREHEREHERE0")
-sLoop_foldContin = run(l_sLoop_foldContin) #|free() invalid next size (fast)
-print("HEREHEREHEREHEREHEREHERE1") #|does not print this 
-plot(sLoop_foldContin,stability=True, height= 600, 
-   bifurcation_x="kappa",bifurcation_y="Amplitude")
-print("HEREHEREHEREHEREHEREHERE2")
-#| Populate IPS2 
-IPS2 = IPS2 + sLoop_foldContin
-print("HEREHEREHEREHEREHEREHERE3")
-#| RUN tanh
-l_sLoop_tanh = load(sLoop_foldContin("UZ1"),
-   IPS=2, ICP=[2,11,8,9], ISW=1,
-   NMX=10000,
-   RL0=0.0, RL1=10.0,
-   DS=0.001,DSMAX=0.005,
-   NTST=200)
-sLoop_tanh = merge( run(l_sLoop_tanh) + 
-                    run(l_sLoop_tanh,DS='-') ) 
+# #| Fold continuation 
+# l_sLoop_foldContin = run(sLoop_cubic("LP1"),
+#    IPS=2, ICP=[8,2,11,9], ISW = 2, 
+#    NMX=10000,
+#    RL0=0.0,RL1=1.01,
+#    UZR={8:1.0}, #1.0
+#    DS=0.001,DSMAX=0.005,DSMIN = 1e-5, #|DSMIN didnot do the trick
+#    NTST=200)
+# print("HEREHEREHEREHEREHEREHERE0")
+# sLoop_foldContin = run(l_sLoop_foldContin) #|free() invalid next size (fast)
+# print("HEREHEREHEREHEREHEREHERE1") #|does not print this 
+# plot(sLoop_foldContin,stability=True, height= 600, 
+#    bifurcation_x="kappa",bifurcation_y="Amplitude")
+# print("HEREHEREHEREHEREHEREHERE2")
+# #| Populate IPS2 
+# IPS2 = IPS2 + sLoop_foldContin
+# print("HEREHEREHEREHEREHEREHERE3")
+# #| RUN tanh
+# l_sLoop_tanh = load(sLoop_foldContin("UZ1"),
+#    IPS=2, ICP=[2,11,8,9], ISW=1,
+#    NMX=10000,
+#    RL0=0.0, RL1=10.0,
+#    DS=0.001,DSMAX=0.005,
+#    NTST=200)
+# sLoop_tanh = merge( run(l_sLoop_tanh) + 
+#                     run(l_sLoop_tanh,DS='-') ) 
 
-#| Populate IPS2
-IPS2 = IPS2 + sLoop_tanh 
-#|___2AF_SSS.
+# #| Populate IPS2
+# IPS2 = IPS2 + sLoop_tanh 
+# #|___2AF_SSS.
 
-#|___2AF_DDD>
-print("=====2A_FFF===CONTINUE_dLoop_MATLAB_ORBIT")
-l_dLoop_dat = load(
-   e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
-   dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
-   # e="ZilliCubic11_datFileContin_zeta_1e-2",
-   # dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
-   c="ZilliCubic11",
-   NMX=2000,
-   IPS=2, ICP=[2,11,9],
-   RL0=0,RL1=7, #UZSTOP={2:[0.01,7.01]}, #10.0
-   DS=+0.001, DSMAX=0.05, 
-   NTST=200,
-   EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4)
-dLoop_dat = merge( run(l_dLoop_dat       )+
-                   run(l_dLoop_dat,DS="-") ) #|Solution family from .dat
-dLoop_cubic = dLoop_dat #|Change name for clarity
-try:IPS2 = IPS2 + dLoop_cubic 
-except:IPS2 = dLoop_cubic #|Start Populating the bifurcation plot.
-plot(dLoop_cubic,
-   stability=True, height=600, 
-   bifurcation_x="Omeg", bifurcation_y="Amplitude",
-   solution_x="u", solution_y="v")
+# #|___2AF_DDD>
+# print("=====2A_FFF===CONTINUE_dLoop_MATLAB_ORBIT")
+# l_dLoop_dat = load(
+#    e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
+#    dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
+#    # e="ZilliCubic11_datFileContin_zeta_1e-2",
+#    # dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
+#    c="ZilliCubic11",
+#    NMX=2000,
+#    IPS=2, ICP=[2,11,9],
+#    RL0=0,RL1=7, #UZSTOP={2:[0.01,7.01]}, #10.0
+#    DS=+0.001, DSMAX=0.05, 
+#    NTST=200,
+#    EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4)
+# dLoop_dat = merge( run(l_dLoop_dat       )+
+#                    run(l_dLoop_dat,DS="-") ) #|Solution family from .dat
+# dLoop_cubic = dLoop_dat #|Change name for clarity
+# try:IPS2 = IPS2 + dLoop_cubic 
+# except:IPS2 = dLoop_cubic #|Start Populating the bifurcation plot.
+# plot(dLoop_cubic,
+#    stability=True, height=600, 
+#    bifurcation_x="Omeg", bifurcation_y="Amplitude",
+#    solution_x="u", solution_y="v")
 
-#| Fold continuation 
-for dLoop_LP in dLoop_cubic("LP"):
-   try: #|the LP1 first (then LP2)
-      l_dLoop_foldContin = run(dLoop_LP,
-         IPS=2, ICP=[8,2,11,9], ISW = 2, 
+# #| Fold continuation 
+# for dLoop_LP in dLoop_cubic("LP"):
+#    try: #|the LP1 first (then LP2)
+#       l_dLoop_foldContin = run(dLoop_LP,
+#          IPS=2, ICP=[8,2,11,9], ISW = 2, 
+#          NMX=5000,
+#          RL0=0.0,RL1=1.01,
+#          UZR={8:1.0},
+#          DS=0.001,DSMAX=0.005,
+#          NTST=200)
+#       try:dLoop_foldContin = dLoop_foldContin + run(l_dLoop_foldContin) #|Forward dir is enough
+#       except:dLoop_foldContin = run(l_dLoop_foldContin)
+#    except:
+#       continue #|to the LP2. 
+
+# plot(dLoop_foldContin,stability=True,
+#    bifurcation_x="kappa",bifurcation_y="Amplitude")
+
+# #| Populate IPS2 
+# IPS2 = IPS2 + dLoop_foldContin
+
+# #| RUN tanh
+# l_dLoop_tanh = load(dLoop_foldContin("UZ1"),
+#    IPS=2, ICP=[2,11,9], ISW=1,
+#    NMX=5000,
+#    RL0=0.0, RL1=10.0,
+#    DS=0.001,DSMAX=0.005,
+#    NTST=200)
+# dLoop_tanh = merge( run(l_dLoop_tanh       )+
+#                     run(l_dLoop_tanh,DS='-') ) 
+
+# #| Populate IPS2
+# IPS2 = IPS2 + dLoop_tanh 
+# #|___2AF_DDD.
+
+# #|___HHH> WHOLE DIAGRAM 
+# print("=====HHH___RELABEL___PLOT___SAVE")
+# try:all_sideStudy2 = rl( IPS1+IPS2 )
+# except:all_sideStudy2 = rl( IPS2 )
+# p=plot(all_sideStudy2,
+#    stability=True, height=600,
+#    bifurcation_x="Omeg", bifurcation_y="Amplitude",
+#    solution_x="u", solution_y="v")
+# p.config(color_list="black red green blue\
+#    violet orange gray brown teal turquoise purple")
+# save(all_sideStudy2,"all_sideStudy2_foldContin")
+# #|___HHH.
+
+#|___2A_FFF.
+#|___2_AAA. METHOD A
+
+
+#|___2_PPP> Period Doubling Continuation 
+sLoop_newNonlin = loadbd('sLoop_newNonlin') #|saved in kappa-homotopy
+dLoop_newNonlin = loadbd('dLoop_newNonlin') #|saved in kappa-homotopy
+Loop_newNonlin = sLoop_newNonlin + dLoop_newNonlin
+size = len(Loop_newNonlin("PD"))
+try:
+   count = 0
+   PD = []
+   for P in Loop_newNonlin("PD"):
+      count +=1 
+      print("=====PD=====",count,"/",size,"=====")
+      l_PD = load(P,
+         IPS=2, ICP=[2,11,9], ISW=-1,
          NMX=5000,
-         RL0=0.0,RL1=1.01,
-         UZR={8:1.0},
+         RL0=0.0,RL1=10,
+         #UZR={2:1.0},
          DS=0.001,DSMAX=0.005,
-         NTST=200)
-      try:dLoop_foldContin = dLoop_foldContin + run(l_dLoop_foldContin) #|Forward dir is enough
-      except:dLoop_foldContin = run(l_dLoop_foldContin)
-   except:
-      continue #|to the LP2. 
+         NTST=300, 
+         EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-5 )
+      PD = PD + run(l_PD)
 
-plot(dLoop_foldContin,stability=True,
-   bifurcation_x="kappa",bifurcation_y="Amplitude")
+   save(PD, "PD" )
+   plot(PD,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",
+      stability=True)
 
-#| Populate IPS2 
-IPS2 = IPS2 + dLoop_foldContin
-
-#| RUN tanh
-l_dLoop_tanh = load(dLoop_foldContin("UZ1"),
-   IPS=2, ICP=[2,11,9], ISW=1,
-   NMX=5000,
-   RL0=0.0, RL1=10.0,
-   DS=0.001,DSMAX=0.005,
-   NTST=200)
-dLoop_tanh = merge( run(l_dLoop_tanh       )+
-                    run(l_dLoop_tanh,DS='-') ) 
-
-#| Populate IPS2
-IPS2 = IPS2 + dLoop_tanh 
-#|___2AF_DDD.
+   if PD("PD"): #|Additional PD points (period-quadrupling)
+      size = len(PD("PD"))
+      count = 0
+      PD_new = []  
+      for G in PD("PD"):
+         count += 1 
+         print("HERE ------",count,"/",size,"------------ 2")
+         PD_new = PD_new + run(G,
+            IPS=2, ICP=[2,11,9], ISW=-1,
+            NMX=5000,
+            RL0=0.0,RL1=10,
+            #UZR={2:1.0},
+            DS=0.001,DSMAX=0.005,
+            NTST=300,
+            EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-5 )
+      PD = PD + PD_new 
+except:
+   pass 
 
 #|___HHH> WHOLE DIAGRAM 
 print("=====HHH___RELABEL___PLOT___SAVE")
-try:all_sideStudy2 = rl( IPS1+IPS2 )
-except:all_sideStudy2 = rl( IPS2 )
-p=plot(all_sideStudy2,
+# try:all_sideStudy2 = rl( IPS1+IPS2 + PD )
+# except:all_sideStudy2 = rl( IPS2 + PD )
+Loop_newNonlin = Loop_newNonlin + PD
+p=plot(Loop_newNonlin,
    stability=True, height=600,
    bifurcation_x="Omeg", bifurcation_y="Amplitude",
    solution_x="u", solution_y="v")
 p.config(color_list="black red green blue\
-   violet orange gray brown teal turquoise purple")
-save(all_sideStudy2,"all_sideStudy2_foldContin")
+   violet gray orange brown teal turquoise purple")
+# save(all_sideStudy2,"all_sideStudy2_PDcontin")
 #|___HHH.
 
-#|___2A_FFF.
-#|___2_AAA. METHOD A
+
+#|___2_PPP. Period Doubling Continuation 
+
+
+
+
 #|___222. IPS2
+
+
+
+
+
+
 
 ########################################################################
 

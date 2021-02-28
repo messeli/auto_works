@@ -84,8 +84,8 @@
         OMEGP = 0.0D0
 
         KAPPA = 0.0D0    ! 1.0D0 !|0-1: Cubic to ~contact homotopy parameter
-        BETA = 6.D0  ! 1.5 3 5  10  |btw 1.25 to 125 see explanation in func_ode45_tanh.m or betlek.31.01.2021
-        K = 600.D0    ! 30 100  |see explanation in func_ode45_tanh.m or betlek.31.01.2021
+        BETA = 10.D0  ! 1.5 3 5  10  |btw 1.25 to 125 see explanation in func_ode45_tanh.m or betlek.31.01.2021
+        K = 150.D0    ! 30 100  |see explanation in func_ode45_tanh.m or betlek.31.01.2021
 
         RHO   = 0.0D0 ! 1.0D0 !|0-1: Cubic to Power5 homotopy parameter
         KSI   = 0.1D0 ! 0.1D0 !|0-0.2: Power-5 stiffness ratio, (k_5*c^4)/k_r 
