@@ -1,8 +1,8 @@
 import time
 startTime = time.time()
-#|___222> IPS2 
-#|___2_AAA> METHOD A : ~PURE AUTO 
-#|___2A_DDD> DoubleLoop periodic solutions
+#|___IPS2> IPS2 
+#|___IPS2_A> METHOD A : ~PURE AUTO 
+#|___IPS2_A_DL> DoubleLoop periodic solutions
 #| Use Matlab-generated orbit at thetaP=2.91 once.
 print("=====2A_DDD===CONTINUE_MATLAB_ORBIT")
 l_dLoop_dat = load(
@@ -10,12 +10,12 @@ l_dLoop_dat = load(
     c="ZilliCubic11",
     dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
     IPS=2, ICP=[2,11,9],
-    UZSTOP={2:[0.01,7.01]}, 
-    UZR={2:3.0}, 
-    DS=+0.005, DSMAX=0.005, 
+    UZSTOP={2:[0.01,7.01]},
+    UZR={2:3.0},
+    DS=+0.005, DSMAX=0.005,
     NTST=50,
     EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4)
-dLoop_dat = run(l_dLoop_dat)# merge( run(l_dLoop_dat) +
+dLoop_dat = run(l_dLoop_dat) # merge( run(l_dLoop_dat) +
              #      run(l_dLoop_dat,DS="-") )
 
 #| Vary zeta at one of the tips of the periodic orbit.
@@ -59,8 +59,30 @@ for Z in dLoop_zeta('UZ'):
             UZR={2:[2.3045]},
             UZSTOP={2:[0.01,7.01]})
 
+#|___IPS2_A_DL_HOMOT> eH Homotopy 
+l_eH_homot = load(IPS2("LP1"),
+	ICP=[5,11,9],
+    NMX=2000,NTST=500, 
+    RL0=0.01,RL1=1.0, # RL0=0.09
+    DS=-0.003,DSMAX=0.005,  
+    UZR={5:[0.05]})
+eH_homot = run(l_eH_homot)
+l_low_eH_bd = load(eH_homot("UZ1"),
+	ICP=[2,11,9],
+	 NMX=2000,NTST=500, 
+    RL0=0.01,RL1=10.0, # RL0=0.09
+    DS=+0.002,DSMAX=0.005  )
+low_eH_bd = merge(run(l_low_eH_bd) + run(l_low_eH_bd,DS="-"))
+IPS2 = IPS2 + low_eH_bd 
 
-#|___2AD_EEE> eH-foldContinuation
+#|___IPS2_A_DL_HOMOT_ZETA-FOLD>
+# print("I AM HERE !")
+# l_t = run(low_eH_bd("LP1"),ISW=2,ICP=[6,2,11,9],RL0=-1,RL1=5)
+# t = run(l_t)
+# IPS2 += t
+#|___IPS2_A_DL_HOMOT_ZETA-FOLD.
+
+#|___IPS2_A_DL_EH> eH-foldContinuation
 print("=====EEE===eH-foldContinuation")
 #| Load the fold continuation with run(), not load()
 x = run(IPS2("LP1"),
@@ -68,10 +90,11 @@ x = run(IPS2("LP1"),
     ISW=2,
     NMX=2000,NTST=500, 
     RL0=0.01,RL1=1.0, # RL0=0.09
-    UZR={5:[0.092,0.4]})  # UZR={5:[0.11,0.4]}) 
+    UZR={5:[0.092,0.4]})  #|free() error below 0.092 !!!??? 
 
-eH_fold = run(x)  # + run(x,DS="-")
+eH_fold = merge(run(x) + run(x,DS="-"))
 plot(eH_fold,stability=True,height=600)
+save(eH_fold,"eH_fold")
 
 #| Family of sol form user point on eH-foldContinuation
 print("=====EEE===Family of sol from user point on eH-foldContin")
@@ -82,17 +105,27 @@ y = load(eH_fold("UZ1"),
     UZR={2:[1,2]},
     UZSTOP={2:[0.01,7.01]})
 
-IPS2_new_eH = merge( run(y) + run(y,DS="-") )
-IPS2 = IPS2 + IPS2_new_eH
-#|___2AD_EEE.
-#|___2A_DDD.
-#|___2_AAA. METHOD A
-#|___222. IPS2
+low_eH_bd_fold = merge( run(y) + run(y,DS="-") )
+IPS2 = IPS2 + low_eH_bd_fold
+
+
+
+
+#| Switching the branch of the fold continuation
+for BP in eH_fold("BP"):
+	eH_fold = eH_fold + run(BP,ISW=-1,ICP=[5,2,11,9],RL0=0.01,RL1=1.1) 
+plot(eH_fold)
+
+#|___IPS2_A_DL_EH.
+#|___IPS2_A_DL.
+#|___IPS2_A. METHOD A
+#|___IPS2.
 
 
 #|___HHH WHOLE DIAGRAM 
 print("=====HHH___RELABEL___PLOT___SAVE")
-all_sideStudy1 = rl( eH_fold + IPS2 )
+try:all_sideStudy1 = rl( eH_fold + IPS2 )
+except:all_sideStudy1 = rl( IPS2 )
 p=plot(all_sideStudy1,
     stability=True,
     bifurcation_x="Omeg",
@@ -100,8 +133,8 @@ p=plot(all_sideStudy1,
     solution_x="u",
     solution_y="v",
     height=600)
-p.config(color_list="red green blue ") # black #\
-                     # orange gray brown teal turquoise purple violet")
+p.config(color_list="black red green blue \
+                     orange gray brown teal purple turquoise violet")
 save(all_sideStudy1,"all_sideStudy1")
 
 endTime = time.time()
