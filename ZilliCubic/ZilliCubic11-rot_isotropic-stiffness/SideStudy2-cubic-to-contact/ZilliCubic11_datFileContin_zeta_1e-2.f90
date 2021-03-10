@@ -145,13 +145,14 @@
         NTST = NINT(GETP('NTST',0,U))
         NCOL = NINT(GETP('NCOL',0,U))
 
-        !|AAA/BBB METHOD A/B  
+        !|___METHOD-A/B> METHOD A/B  
         !|:CORRECT AMPLITUDE FOR IPS=2
-        DUMM = GETU(i,j,U,NDX,NTST,NCOL,PAR(2))
+        DUMM = GETU(i,j,U,NDX,NTST,NCOL,PAR(2)) 
+        !|:Will get amp and print the states to dummy_write_file.txt
         PAR(9) = DUMM 
-        !|AAA/BBB END
+        !|___METHOD-A/B.
         
-        !|CCC METHOD C
+        !|___METHOD-C> METHOD C
         ! DO i=1,NDX
         !   DO j=0,NCOL*NTST
         !     UU(i,j) = GETU(i,j,U,NDX,NTST,NCOL)
@@ -160,13 +161,13 @@
         ! R2(:) = UU(1,:)**2 + UU(2,:)**2  !El by El multip
         ! R(:) = R2**0.5 
         ! PAR(9) = MAXVAL(R)
-        !|CCC END
+        !|___METHOD-C.
 
-        !|DDD DEFAULT METHOD - PHASED AMP
+        !|___METHOD-D> DEFAULT METHOD - PHASED AMP
         ! PAR(9) = (U(1)**2 + U(2)**2)**0.5 
         !|:The initial data of one period is sampled for amplitude.
         !|:See the qoute above.
-        !|DDD END 
+        !|___METHOD-D. 
 
       END SUBROUTINE PVLS
 
@@ -177,36 +178,38 @@
         DOUBLE PRECISION, INTENT(IN) :: U(NDX,0:NCOL*NTST)
         DOUBLE PRECISION, ALLOCATABLE :: R2(:),R(:)
         DOUBLE PRECISION :: M,N , MYPAR
+        !| MYPAR - the parameter to print in the 1st col of dummy_write_file.txt
 
-        !|AAA METHOD A
+        !|___METHOD-A>
         M = 0.D0
         DO p=0,NCOL*NTST
           N = ( U(1,p)**2+U(2,p)**2 )**0.5D0
-          if (N.GT.M) THEN
+          IF (N.GT.M) THEN
             M = N
             I_MAX = p
           END IF 
         END DO 
 
-        !| In order to locate all 4 states in a particular orbit,
-        !| ...e.g for time simulation starting point, 
-        !| ...parse the following file.         OPEN (unit = 10, file = "dummy_write_file.txt",access = "append")
-        WRITE(10,*) MYPAR,U(1,I_MAX),U(2,I_MAX),U(3,I_MAX),U(4,I_MAX),M
-        CLOSE(10)
+        !| Print the amplitude point's all 4 states.
+        !| ...E.g for time simulation initial data, 
+        !| ...parse the following file.  
+        ! OPEN (unit = 10, file = "dummy_write_file.txt",access = "append")
+        ! WRITE(10,*) MYPAR,U(1,I_MAX),U(2,I_MAX),U(3,I_MAX),U(4,I_MAX),M
+        ! CLOSE(10)
 
         GETU = M
         
-        !|AAA END
+        !|___METHOD-A.
 
-        !|BBB METHOD B
+        !|___METHOD-B> This is forced to handle large orbit data: Unnecessary, use A. 
         ! R2(:) = U(1,:)**2 + U(2,:)**2  !
         ! R(:) = R2**0.5 
         ! GETU = MAXVAL(R)
-        !|BBB END
+        !|___METHOD-B.
 
-        !|CCC METHOD C
-        ! GETU = U(i,j)
-        !|CCC END
+        !|___METHOD-C> Get the pure U, find the max in the PVLS subroutine.
+        ! GETU = U(i,j) 
+        !|___METHOD-C.
       END FUNCTION GETU
 
 

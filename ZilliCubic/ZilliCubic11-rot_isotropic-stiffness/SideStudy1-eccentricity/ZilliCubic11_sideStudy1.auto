@@ -90,7 +90,7 @@ x = run(IPS2("LP1"),
     ISW=2,
     NMX=2000,NTST=500, 
     RL0=0.01,RL1=1.0, # RL0=0.09
-    UZR={5:[0.092,0.4]})  #|free() error below 0.092 !!!??? 
+    UZR={5:[0.09,0.092,0.4]})  #|free() error below 0.092 !!!??? 
 
 eH_fold = merge(run(x) + run(x,DS="-"))
 plot(eH_fold,stability=True,height=600)
