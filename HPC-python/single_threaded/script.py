@@ -110,10 +110,9 @@ for i in range(0,len(Omeg_range)):
   #|PPP. POINCARE
   #|Continue to the next Omeg in Omeg_range
 p.savefig('myplot.png')
-p.show()
+# p.show()
 #|NNN. 3D&2D 
 #| Stats
 stop_plot = time.time()
-time_plot = stop_time - start_time 
+time_plot = stop_plot- start_plot 
 print("time_plot is {}".format(time_plot) )
->>>>>>> 89b8c9c4077867121a20fdebe50030832a8a6684:HPC-python/single_threaded/script.py
