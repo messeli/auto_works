@@ -27,7 +27,7 @@ parallel="parallel --max-procs $SLURM_NTASKS --joblog parallel_joblog" # Define 
 #     --phase_contrast_output=phase_contrast_\$(basename {1}).pdf" :::: files_to_process.txt
 
 python write-Omeg_range.py "5.01,7.01,0.10"
-$parallel "$srun python write-Omeg_range.py" :::: Omeg_range.txt
+$parallel "$srun python script_GNU_parallel.py" :::: Omeg_range.txt
 python plot.py
 
 # python3 write-Omeg_range.py "5.01,7.02,0.10"

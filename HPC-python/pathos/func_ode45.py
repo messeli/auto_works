@@ -30,16 +30,13 @@ def func_ode45_v1(Omeg,qn,tend,tol):
       dq = n.array([dq1,dq2,dq3,dq4]).reshape(4) ;
       return dq
 
-   def contactevent():
-      pass
-      pass
-
    print(Omeg)
    qn = n.array(qn).reshape(4)
 
    sol1 = solve_ivp(func_rot, [0,tend], qn, rtol=tol, atol=tol*1e-2) ;
    Q_new = sol1.y ;#|numpy.ndarray, Q.shape=(4, 23850), rows (23850,)
    T_new = sol1.t ;#|numpy.ndarray, T.shape=(23850,)
+   print(f"{Omeg}:",T_new.shape)
    return (T_new,Q_new)
 #|___V1___|.
 
