@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import numpy as n
 import matplotlib.pyplot as p
 from mpl_toolkits.mplot3d import Axes3D 
