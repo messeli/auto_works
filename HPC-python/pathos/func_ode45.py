@@ -33,7 +33,7 @@ def func_ode45_v1(Omeg,qn,tend,tol):
    print(Omeg)
    qn = n.array(qn).reshape(4)
 
-   sol1 = solve_ivp(func_rot, [0,tend], qn, rtol=tol, atol=tol*1e-2) ;
+   sol1 = solve_ivp(func_rot, [0,tend], qn,method="RK45", rtol=tol, atol=tol*1e-2) ;
    Q_new = sol1.y ;#|numpy.ndarray, Q.shape=(4, 23850), rows (23850,)
    T_new = sol1.t ;#|numpy.ndarray, T.shape=(23850,)
    print(f"{Omeg}:",T_new.shape)
