@@ -1,10 +1,12 @@
 #| Source: https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html#scipy.integrate.solve_ivp
 import numpy as n
 from scipy.integrate import solve_ivp
+from numba import jit #|This compiles functions instead of interpretting it.
 
 
 #|___V1___|> NESTED FUNCS (more like in d MATLAB)
 def func_ode45_v1(Omeg,qn,tend,tol):
+   @jit(nopython=True) 
    def func_rot(tn, qn):
       JpH = 0.143  ; epsH = 3.53e-1 ; zeta = 0.010 ;
       gamma = 0.25 ; mH    = 0.9    ;

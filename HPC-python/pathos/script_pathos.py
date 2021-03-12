@@ -30,8 +30,8 @@ def one_Omeg_sim(Omeg,qn_,tend,tol):
   
   return (T_new,Q_new)
 
-# X = [ one_Omeg_sim(*args) for args  in zip(Omeg_range,[qn_]*N,[tend]*N,[tol]*N) ] #|Non parallel version, used for profiling with cProfile
-X = pool.map(one_Omeg_sim,Omeg_range,[qn_]*N,[tend]*N,[tol]*N)
+X = [ one_Omeg_sim(*args) for args  in zip(Omeg_range,[qn_]*N,[tend]*N,[tol]*N) ] #|Non parallel version, used for profiling with cProfile
+# X = pool.map(one_Omeg_sim,Omeg_range,[qn_]*N,[tend]*N,[tol]*N)
 
 T = [ T_new for T_new,Q_new in X]
 Q = [ Q_new for T_new,Q_new in X]

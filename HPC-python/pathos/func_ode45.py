@@ -1,10 +1,13 @@
 #| Source: https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html#scipy.integrate.solve_ivp
 import numpy as n
 from scipy.integrate import solve_ivp
+from numba import jit
 
 
 #|___V1___|> NESTED FUNCS (more like in d MATLAB)
+# @jit(nopython=True) #|jit does not work here, currently. 
 def func_ode45_v1(Omeg,qn,tend,tol):
+   @jit(nopython=True)
    def func_rot(tn, qn):
       JpH = 0.143  ; epsH = 3.53e-1 ; zeta = 0.010 ;
       gamma = 0.25 ; mH    = 0.9    ;
@@ -36,7 +39,7 @@ def func_ode45_v1(Omeg,qn,tend,tol):
    sol1 = solve_ivp(func_rot, [0,tend], qn,method="RK45", rtol=tol, atol=tol*1e-2) ;
    Q_new = sol1.y ;#|numpy.ndarray, Q.shape=(4, 23850), rows (23850,)
    T_new = sol1.t ;#|numpy.ndarray, T.shape=(23850,)
-   print(f"{Omeg}:",T_new.shape)
+   # print(f"{Omeg}:",T_new.shape)
    return (T_new,Q_new)
 #|___V1___|.
 

@@ -1,0 +1,1 @@
+3rd day, with Viladimir, but the solutions he gave were a bit out of the context of the GPC-Python. However, still it might be worth checking the different thing, namely GAWK. 
