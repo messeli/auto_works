@@ -28,12 +28,12 @@ with the parameters:
 to be the same in Win10-Matlab, UbuVM-Python, Sunbird-Python, Win10-Python;
 with 4 processing threads in parallel;
 it took the simul and plot to complete about:
--  5 sec and 4   sec for Win10-Matlab (22 sec and 4 sec without parfor)
+-  6 sec and 4   sec for Win10-Matlab (22 sec and 4 sec without parfor)
 - 28 sec and 3.6 sec for both GNU Parallel and Pathos on Ubuntu-Python
--    sec and     sec for GNU Parallel + Numba.jit on Ubuntu-Python
+- 26 sec and 3.6 sec for GNU Parallel + Numba.jit on Ubuntu-Python
 - 32 sec and 3   sec for Pathos on Win10-Python 
 - 38 sec and 1   sec for Pathos on Sunbird-Python
-- 21 for Numba+Pathos on Win10-Python (66 sec without pathos, ie without paralleling)
+- 21 for Numba+Pathos on Win10-Python (66 sec without pathos with numba)
 - (102 sec for no no parallel=noPathos+noGNUParallel and no numba.jit)
 (Take the plotting times with a grain of salt: I might have done p.show() and closed in 4 sec etc.)
 Also;
