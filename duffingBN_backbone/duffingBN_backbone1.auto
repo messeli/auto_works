@@ -1,8 +1,8 @@
 zeroLine = run('duffingBN_backbone1')
 save(zeroLine,"zeroLine")
 plot(zeroLine)
-# duffingBN_backbone = run(zeroLine("BP1"),NPR=100,ISW=-1,UZR={3:1.01},UZSTOP={3:3})#e="duffingBN_backbone",c="duffingBN_backbone.1") #run(duffingBN_backbone("1"),UZSTOP={3: 3})
-# SP=["BP0"],
+duffingBN_backbone = run(zeroLine("BP1"),NPR=100,ISW=-1,UZR={3:1.00},UZSTOP={3:3})#e="duffingBN_backbone",c="duffingBN_backbone.1") #run(duffingBN_backbone("1"),UZSTOP={3: 3})
+SP=["BP0"],
 
 # BN The below does not add much to the solution!
 # for sol in duffingBN_backbone("BP"): 

@@ -1,0 +1,144 @@
+import time
+import re 
+
+startTime = time.time()
+#|>>|IPS1|>> IPS1
+#|__|IPS1|__.
+
+########################################################################
+
+#|>>|IPS2|>> IPS2 
+#|>>|IPS2_A|>> METHOD A : ~PURE AUTO 
+#|>>|IPS2_A_SL|>> Single-loop
+print("=====2A_FFF===CONTINUE_sLoop_MATLAB_ORBIT")
+l_sLoop_dat = load(
+   #e="ZilliCubic11_datFileContin_zeroZetaEpsH_SL",
+   #dat="synchronousLine-SLoop-3p32-zeroZeta_zeroEpsH",   
+   #dat="synchronousLine-SLoop-3p50-zeroZeta_zeroEpsH",
+   #dat="synchronousLine-SLoop-3p46-zeroZeta",
+   #
+   e="ZilliCubic11_datFileContin_zeta_1e-2",
+   dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
+   c="ZilliCubic11",
+   NMX=3000,
+   IPS=2, ILP=1,ICP=[2,11, 9],#2:Omeg, 5:epsH, 6:zeta
+   DS=+0.005, DSMAX=0.005, #2: DS=+0.0001, DSMAX=0.0001, 
+   UZSTOP={2:[0.01,10.0],6:1e-2},  # 5:0.353,
+   EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4,
+   NTST=200)
+sLoop_dat = merge( run(l_sLoop_dat       )  +
+                   run(l_sLoop_dat,DS="-") ) #|Solution family from .dat
+sLoop_cubic = sLoop_dat #|Change name for clarity
+IPS2 = sLoop_cubic #|Start Populating the bifurcation plot.
+plot(sLoop_cubic,
+   stability=True, height=600, 
+   bifurcation_y="Amplitude",
+   solution_x="u", solution_y="v")
+#
+
+l_zetaFold = run(IPS2("LP1"),IPS=2,ICP=[6,2,11,9],ISW=2,RL0=-1,RL1=1,NTST=400) 
+zetaFold = run(l_zetaFold) #+ run(l_zetaFold,DS="-")
+IPS2 = sLoop_cubic+zetaFold
+plot(sLoop_cubic, stability=True, height=600, bifurcation_y="Amplitude", solution_x="u", solution_y="v")
+
+#|__|IPS2_A_SL|__
+
+#|>>|IPS2_A_DL>
+# print("=====2A_FFF===CONTINUE_dLoop_MATLAB_ORBIT")
+# l_dLoop_dat = load(
+#    e="ZilliCubic11_datFileContin_zeroZetaEpsH_DL",
+#    #dat="synchronousLine-DLoop-2p18-zeroZeta_impactedZeroEpsH", 
+#    dat="synchronousLine-DLoop-2p18-zeroZeta_zeroEpsH",
+#    c="ZilliCubic11",
+#    NMX=3000,
+#    IPS=2, ICP=[2,11,9],  #2:Omeg, 5:epsH, 6:zeta
+#    UZSTOP={5:0.353,2:[0.01,10.0],6:1e-2}, #RL0=0,RL1=7, #UZSTOP={2:[0.01,7.01]}, #10.0
+#    DS=+0.001, DSMAX=0.01, 
+#    NTST=200 )
+# dLoop_dat = merge( run(l_dLoop_dat       )+
+#                    run(l_dLoop_dat,DS="-") ) #|Solution family from .dat
+# dLoop_cubic = dLoop_dat #|Change name for clarity
+# try:IPS2 = IPS2 + dLoop_cubic 
+# except:IPS2 = dLoop_cubic #|Start Populating the bifurcation plot.
+# plot(dLoop_cubic,
+#    stability=True, height=600, 
+#    bifurcation_y="Amplitude",
+#    solution_x="u", solution_y="v")
+#|__|IPS2_A_DL|__ 
+#|__|IPS2_A|__ 
+
+#|>>|IPS2_BD|>> WHOLE DIAGRAM 
+# print("=====HHH___RELABEL___PLOT___SAVE")
+# try:all_sideStudy2 = rl( IPS1+IPS2 )
+# except:all_sideStudy2 = rl( IPS2 )
+# p=plot(all_sideStudy2,
+#    stability=True, height=600,
+#    bifurcation_x="Omeg", bifurcation_y="Amplitude",
+#    solution_x="u", solution_y="v")
+# p.config(color_list="black red green blue\
+#    violet orange gray brown teal turquoise purple")
+# save(all_sideStudy2,"all_sideStudy2_foldContin")
+#|__|IPS2_BD|__
+#|__|IPS2|__ 
+
+
+#|>>|BD|>> WHOLE DIAGRAM 
+# print("=====HHH___RELABEL___PLOT___SAVE")
+# try:all_sideStudy2 = rl( IPS1+IPS2 + Loop_newNonlin)
+# except:
+#    try:all_sideStudy2 = rl( IPS2 + Loop_newNonlin)
+#    except:all_sideStudy2 = rl( Loop_newNonlin)
+# p=plot(all_sideStudy2,
+#    stability=True, height=600,
+#    bifurcation_x="Omeg", bifurcation_y="Amplitude",
+#    solution_x="u", solution_y="v")
+# p.config(color_list="black red green blue\
+#    violet gray orange brown teal turquoise purple")
+# save(all_sideStudy2,"all_sideStudy2")
+#|__|BD|__
+
+########################################################################
+
+endTime = time.time()
+elapsedTime = endTime-startTime
+print( "=====FINISH___elapsedTime: ",
+   elapsedTime,    " sec"," | ",
+   elapsedTime/60, " min" )
+
+clean
+
+#|___WWW> Write some output at 'UZ' points to "myDummyWriteFile.txt" 
+#| FAIL IN AUTO: Cannot close file > RUN d BELOW IN pythonCodeTry.py  
+# f = open('b.all_sideStudy2','r')
+# content = f.read()
+# f.seek(0)
+# lines = f.readlines()
+# pattern = r"\n.{13}4.{7}(7.499).+?\n" #|ACTION REQ FOR WHAT TO WRITE
+# pat = re.compile(pattern)
+# matches = pat.finditer(content)
+#
+# spans = []
+# matchTexts = []
+# text = "" 
+# for i in matches: 
+#    spans.append(i.span(0))
+#    matchTexts.append(i.group(0))
+#    text = text + i.group(0)[:-1] #|Here w/ [:-1], no extra new line
+# f.close()
+#
+# f = open('myDummyWriteFile.txt', "w")
+# f.write(text)
+# f.close()   
+#|___WWW. Write 'UZ' data
+
+
+
+#| DEPOT
+# #| To plot externally, export the data (Refer to AUTO doc), FAIL YET
+# dLoop_zeta.writeRawFilename("myASCIIoutputFile") #|Fail
+# myArray = dLoop_zeta.toArray()
+# print("!!!!!!!!!!!size of myArray is, ", len(myArray[0]), len(myArray) )
+# with open("myDummFile.txt","w",encoding="utf-8") as f:
+#   for r in myArray:
+#     for q in r:
+#       f.write(str(r)+"\n")

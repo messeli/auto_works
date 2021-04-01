@@ -154,10 +154,10 @@ l_sLoop_zeta = load(IPS2_sLoop('UZ1'),
     NMX=20000,
     IPS=2, ICP=[6,11,9],
     NTST=200,
-    DS=+0.001,DSMAX=0.001, #|Continuation in zeta !!!
-    UZR={6:[8e-3,5e-3,1e-3,1e-5,0.00, 0.05,0.075,0.082,0.10,0.15]}, 
-    #|:Omitted 1e-4 as MX for zeta1e-4 (but not for 1e-5 ??)
-    RL0=-0.001) 
+    DS=+0.0005,DSMAX=0.0005, #|Continuation in zeta !!!
+    UZR={6:[8e-3,5e-3,1e-3,1e-5,0.00, 0.05,0.075,0.082,0.10,0.15]}, #
+    #|:(-) zetas give the same branches as positive ones.
+    RL0=-0.01) 
     #|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??
 sLoop_zeta = merge( run(l_sLoop_zeta) + 
                   run(l_sLoop_zeta,DS="-") )
@@ -177,8 +177,6 @@ for Z in sLoop_zeta('UZ'):
         DS=-0.005,DSMAX=0.005,
         EPSL=1e-7,EPSU=1e-7,EPSS=1e-4, 
         UZSTOP={2:[0.01,7.01]} )
-    
-
 try: 
     IPS2 = IPS2 + IPS2_sLoop
 except: 
@@ -186,58 +184,58 @@ except:
 #|___2A_SSS.
 
 
-#|___2A_DDD> DoubleLoop periodic solutions
-print("=====2A_DDD")
-#| Use Matlab-generated orbit at Omeg=2.91 once.
-print("=====2A_DDD===CONTINUE_MATLAB_ORBIT")
-l_dLoop_dat = load(
-    e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
-    c="ZilliCubic11",
-    dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
-    IPS=2,ICP=[2,11,9],
-    DS=+0.005,DSMAX=0.005, 
-    UZSTOP={2:[0.01,7.01]},
-    UZR={2:3.0},
-    EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4, # 6 6 3
-    NTST=200)
-#|:RecommD [EPSL,EPSU,EPSS] range is [1e-7,1e-7,1e-5]-[1e-6,1e-6,1e-3].
-IPS2_dLoop = merge( run(l_dLoop_dat) + 
-                    run(l_dLoop_dat,DS="-") )
+# #|___2A_DDD> DoubleLoop periodic solutions
+# print("=====2A_DDD")
+# #| Use Matlab-generated orbit at Omeg=2.91 once.
+# print("=====2A_DDD===CONTINUE_MATLAB_ORBIT")
+# l_dLoop_dat = load(
+#     e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
+#     c="ZilliCubic11",
+#     dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
+#     IPS=2,ICP=[2,11,9],
+#     DS=+0.005,DSMAX=0.005, 
+#     UZSTOP={2:[0.01,7.01]},
+#     UZR={2:3.0},
+#     EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4, # 6 6 3
+#     NTST=200)
+# #|:RecommD [EPSL,EPSU,EPSS] range is [1e-7,1e-7,1e-5]-[1e-6,1e-6,1e-3].
+# IPS2_dLoop = merge( run(l_dLoop_dat) + 
+#                     run(l_dLoop_dat,DS="-") )
 
-#| Vary zeta at one of the tips of the periodic orbit.
-print("=====2A_DDD===SAMPLE_ZETA")
-l_dLoop_zeta = load(IPS2_dLoop('UZ1'),
-    IPS=2, ICP=[6,11,9],
-    NTST=200,
-    DS=+0.001,DSMAX=0.001, #|Continuation in zeta !!!
-    UZR={6:[8e-3,5e-3,1e-3,1e-4,1e-5, 0.00, 0.011,0.0116]}
-    ,RL0=-0.001) #|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??
-dLoop_zeta = merge( run(l_dLoop_zeta) +
-                    run(l_dLoop_zeta,DS="-") )
-save(dLoop_zeta,"dLoop_zeta")
-plot(dLoop_zeta,stability=True,
-    bifurcation_x="zeta",bifurcation_y="Amplitude",height=600)
-try:
-    sdLoop_zeta = sLoop_zeta+dLoop_zeta 
-    plot(sdLoop_zeta,height=600,stability=True)
-except:pass
+# #| Vary zeta at one of the tips of the periodic orbit.
+# print("=====2A_DDD===SAMPLE_ZETA")
+# l_dLoop_zeta = load(IPS2_dLoop('UZ1'),
+#     IPS=2, ICP=[6,11,9],
+#     NTST=200,
+#     DS=+0.001,DSMAX=0.001, #|Continuation in zeta !!!
+#     UZR={6:[8e-3,5e-3,1e-3,1e-4,1e-5, 0.00, 0.011,0.0116]}
+#     ,RL0=-0.001) #|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??
+# dLoop_zeta = merge( run(l_dLoop_zeta) +
+#                     run(l_dLoop_zeta,DS="-") )
+# save(dLoop_zeta,"dLoop_zeta")
+# plot(dLoop_zeta,stability=True,
+#     bifurcation_x="zeta",bifurcation_y="Amplitude",height=600)
+# try:
+#     sdLoop_zeta = sLoop_zeta+dLoop_zeta 
+#     plot(sdLoop_zeta,height=600,stability=True)
+# except:pass
 
-#| Run all different zetaOrbits(:Z) made right above
-print("=====2A_DDD===RUN_zetaOrbits_STARTED")
-counter = 0
-for Z in dLoop_zeta('UZ'):
-    counter+=1
-    print("=====2A_DDD===ZETA_RUN:",counter,"/",len(dLoop_zeta('UZ')))
-    IPS2_dLoop = IPS2_dLoop + run(Z,
-        NTST=200,
-        IPS=2,ICP=[2,11,9],
-        DS=-0.005,DSMAX=0.005,
-        # ITNW=9,NWTN=7,
-        UZSTOP={2:[0.01,7.01]} )
-try:
-    IPS2 = IPS2 + IPS2_dLoop
-except:
-    IPS2 = IPS2_dLoop
+# #| Run all different zetaOrbits(:Z) made right above
+# print("=====2A_DDD===RUN_zetaOrbits_STARTED")
+# counter = 0
+# for Z in dLoop_zeta('UZ'):
+#     counter+=1
+#     print("=====2A_DDD===ZETA_RUN:",counter,"/",len(dLoop_zeta('UZ')))
+#     IPS2_dLoop = IPS2_dLoop + run(Z,
+#         NTST=200,
+#         IPS=2,ICP=[2,11,9],
+#         DS=-0.005,DSMAX=0.005,
+#         # ITNW=9,NWTN=7,
+#         UZSTOP={2:[0.01,7.01]} )
+# try:
+#     IPS2 = IPS2 + IPS2_dLoop
+# except:
+#     IPS2 = IPS2_dLoop
 #|___2A_DDD.
 #|___2_AAA. METHOD A
 
@@ -349,14 +347,14 @@ p.config(color_list="black red green blue \
                      violet orange gray brown teal turquoise purple")
 p.config(solution_x="u",solution_y="v")
 save(all,"all")
+#|___HHH END WHOLE DIAGRAM
 
 endTime = time.time()
 elapsedTime = endTime-startTime
 print("=====FINISH===elapsedTime: ",
     elapsedTime,    " sec"," | ", 
     elapsedTime/60, " min")
-#|___HHH END WHOLE DIAGRAM
-
+clean
 
 #|___TTT> NOTES=========================================================
 #|Nt: U dnt know d lable f UZR point:

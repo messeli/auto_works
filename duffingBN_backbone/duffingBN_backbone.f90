@@ -43,8 +43,8 @@ SUBROUTINE STPNT(NDIM,U,PAR,T)
   X = SIN(TPI*T) 
   Y = COS(TPI*T)
 
-  U(1) = 0
-  U(2) = 0
+  U(1) = 0 !Although we start from 0, we do IPS=2 periodic and sample at Omeg=1.
+  U(2) = 0 !Although we start from 0, we do IPS=2 periodic and sample at Omeg=1.
   U(3) = X
   U(4) = Y
 END SUBROUTINE STPNT
@@ -55,8 +55,7 @@ SUBROUTINE PVLS(NDIM,U,PAR)
   INTEGER, INTENT(IN) :: NDIM
   DOUBLE PRECISION, INTENT(IN) :: U(NDIM)
   DOUBLE PRECISION, INTENT(INOUT) :: PAR(*)
-
-  ! PAR(9) = U(1)**2 + U(2)**2
+  ! ALREADY MAX(U(1))
 END SUBROUTINE PVLS
 
 
