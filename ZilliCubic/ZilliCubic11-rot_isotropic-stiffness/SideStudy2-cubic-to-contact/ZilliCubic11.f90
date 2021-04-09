@@ -80,15 +80,15 @@
         DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,S4,C4,R2,R,GAMMA,KAPPA,K,OMEG,OMEGP,MH,EPSH,JPH,BETA,TPI!WN,F_M,K3_M,OMEG,
 
         ! FORWARDS (MATLAB SINE SWEEP GIVES THIS TOO)
-        GAMMA = 0.0 !2nd continue gamma from 0 to 0.25
-        OMEG = 0.1 ! Continue OMEG from 0 to 7. 
-        MH = 0.0 !1st continue MH from 0 to 0.9
+        GAMMA = 0.D0 !2nd continue gamma from 0 to 0.25
+        OMEG = 0.01D0 ! Continue OMEG from 0 to 7. 
+        MH = 0.D0 !1st continue MH from 0 to 0.9
 
-        EPSH =0.353
-        ZETA = 0.02 !0.01
-        JPH  = 0.143
-        OMEGP = 0.0
-        KAPPA = 0.0  ! 1.D0
+        EPSH =0.353D0
+        ZETA = 0.01D0 !0.01
+        JPH  = 0.143D0
+        OMEGP = 0.0D0
+        KAPPA = 0.0D0  ! 1.D0
         BETA = 0.D0  ! 10.D0
         K = 0.D0     ! 10.D0
 
@@ -103,10 +103,10 @@
         PAR(10)=BETA
         PAR(13)=K
 
-        U(1)=0.01
-        U(2)=0.01
-        U(3)=0
-        U(4)=0         
+        U(1)=2.60064D-05
+        U(2)=-4.70606D-09
+        U(3)=0.00000D+00
+        U(4)=0.00000D+00
       END SUBROUTINE STPNT
 
 

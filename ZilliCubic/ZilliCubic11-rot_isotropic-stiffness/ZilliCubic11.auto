@@ -50,59 +50,73 @@ mH = run("ZilliCubic11")
 print("=====1_FFF===CONTINUE_gamma")
 gam = run(mH("UZ1"),
     ICP=[1,9],
-    NMX=1000,
-    DS=0.001,DSMAX=0.5,
-    UZSTOP={1:0.25}) 
+    UZSTOP={1:0.25},NMX=1000,
+    DS=0.001,DSMAX=0.5) 
 
 #| OPT(IPS1_FOR) Bfr anything, Inc epsH to see if it makes the IPS2 sols join in a way !?
-print("HERERERERE here")
 eH = run(gam("UZ1"),
     ICP=[5,9],
-    NMX=1000,
-    DS=0.001,DSMAX=0.5,
-    UZSTOP={5:8.99e-1}) 
+    UZR={5:8.99e-1},UZSTOP={5:2.0},NMX=1000,
+    DS=0.001,DSMAX=0.5) 
 gam = gam + eH
+print("HERE\nHERE\nHERE\nHERE here")
 plot(gam,bifurcation_x="epsH",bifurcation_y="Amplitude")
 
 
 print("=====1_FFF===CONTINUE_Omeg_FORWARD")
 forward = run(gam("UZ2"),
     ICP=[2,9,5],
-    NMX=1000,
-    DS=0.001,DSMAX=0.05,
-    UZSTOP={2:7})
+    UZSTOP={2:7},NMX=1000,
+    DS=0.001,DSMAX=0.05)
 #|___1_FFF.
 
 
-#|___1_BBB> BACKWARDS (:lowAmp family) , W/ DIFFERENT ZETA
+#|>>|IPS1_BACK|>> BACKWARDS (:lowAmp family) , W/ DIFFERENT ZETA
 print("=====1_BBB===BACKWARD_SYNCH")
-#|___1B_AAA> METHOD A: ~PURE AUTO: Once frm Matlab datum,dn zeta contin
+#|>>|IPS1_BACK_A|>>  METHOD A: ~PURE AUTO: Once frm Matlab datum,dn zeta contin
 print("=====1B_AAA===METHOD_A")
-print("=====1B_AAA===FIRST_RUN_W/_MATLAB_DATUM")
+
+
+
+# OPT(IPS1_BACK_A) Increase epsH 
+print("=====1B_AAA===epsH increased before FIRST_RUN_W/_MATLAB_DATUM")
 back = run(
     e="ZilliCubic11_givenBackwards_zeta_1e-2",
     c="ZilliCubic11",
-    ICP=[2,9],
+    ICP=[5,9],
+    NTST=50,
+    DS=+0.01,DSMAX=0.05, 
+    UZSTOP={5:0.899})
+
+
+print("=====1B_AAA===FIRST_RUN_W/_MATLAB_DATUM")
+back = back + run( # OPT(IPS1_BACK_A) Remove second "back"
+    back("UZ1"),                                 #  OPT(IPS1_BACK_A) 
+    # e="ZilliCubic11_givenBackwards_zeta_1e-2", # ~OPT(IPS1_BACK_A) 
+    # c="ZilliCubic11",                          # ~OPT(IPS1_BACK_A) 
+    ICP=[2,9,5],
     NTST=50,
     DS=-0.01,DSMAX=0.05, 
+    UZR={2:7.0},
     UZSTOP={2:[0.01,7.01]})
 
-print("=====1B_AAA===SAMPLE_ZETA")
+
+print("===IPS1_BACK_A===SAMPLE_ZETA") 
 l_IPS1_zeta = load(
-    e="ZilliCubic11_givenBackwards_zeta_1e-2",
-    c="ZilliCubic11",
-    ICP=[6,9],
+    back("UZ1"),                                 # OPT(IPS1_BACK_A) switch btwn e,c and this line.
+    # e="ZilliCubic11_givenBackwards_zeta_1e-2", # ~OPT(IPS1_BACK_A)
+    # c="ZilliCubic11",                          # ~OPT(IPS1_BACK_A)
+    ICP=[6,9,2], # 2:omeg should be 7.0, with 9amp=0.9
     NMX=500,
     NTST=150,
     DS=+0.001,DSMAX=0.001,
     UZR={6:[8e-3,5e-3,1e-3,1e-4, 0.02,0.03,0.05,0.7,0.10,0.15]},
     UZSTOP={6:[1e-5,0.20]},
     RL0=-0.001) #|Does not sample all the requested(UZR) zeta ??
-
 IPS1_zeta = merge( run(l_IPS1_zeta) + 
                    run(l_IPS1_zeta,DS="-") )
-# plot(back_zeta,stability=True,
-#    bifurcation_x="zeta",bifurcation_y="Amplitude",height=600)
+plot(IPS1_zeta,stability=True,
+   bifurcation_x="zeta",bifurcation_y="Amplitude",height=600)
 
 print("=====1B_AAA===RUN_ZetaSamples_STARTED")
 for zetaSample in IPS1_zeta('UZ'):
@@ -112,6 +126,7 @@ for zetaSample in IPS1_zeta('UZ'):
         DS=-0.01,DSMAX=0.05,
         UZSTOP={2:[0.01,7.01]},
         ITNW=9,NWTN=5)
+
 #|___1B_AAA. METHOD A
 
 
@@ -163,6 +178,7 @@ l_sLoop_dat_initHomotInEpsH = load(
     NTST=200,NMX=5000)
 IPS2_sLoop = merge( run(l_sLoop_dat_initHomotInEpsH) + 
               run(l_sLoop_dat_initHomotInEpsH,DS="-") )
+print("MY POINT IS HERE\nMY POINT IS HERE\nMY POINT IS HERE")
 plot(IPS2_sLoop,stability=True,bifurcation_x="epsH",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
 
@@ -179,7 +195,7 @@ l_sLoop_dat = load(
     NTST=200)
 IPS2_sLoop = IPS2_sLoop + merge( run(l_sLoop_dat) + 
               run(l_sLoop_dat,DS="-") )
-plot(IPS2_sLoop,stability=True,bifurcation_x="epsH",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+#plot(IPS2_sLoop,stability=True,bifurcation_x="epsH",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
 #| Sample orbits at diff zeta in a contin frm a tip f d periodic orbit
 

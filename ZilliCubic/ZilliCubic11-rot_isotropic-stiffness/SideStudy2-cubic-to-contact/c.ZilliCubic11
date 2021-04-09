@@ -1,6 +1,7 @@
 # ZILLI CUBIC ROT (AUTONOMOUS - ISOTROPIC STIFFNESS)
 unames={1: 'u', 2: 'v',3:'u_dot' , 4:'v_dot'}
-parnames={1:'gamma', 2:'Omeg',3:'mH',4:'JpH',5:'epsH',6:'zeta',7:'OmegP',8:'kappa',9:'Amplitude',10:"beta",13:'K',14:'KSI',15:'RHO'}
+parnames={1:'gamma',
+2:'Omeg',3:'mH',4:'JpH',5:'epsH',6:'zeta',7:'OmegP',8:'kappa',9:'Amplitude',10:"beta",13:'K',14:'KSI',15:'RHO'}
 
 NDIM= 4,
 
@@ -15,9 +16,9 @@ UZSTOP = {3:0.9}
 
 #btw steps
 NTST= 200  # 1000   # 500
-DS  = 0.005, 
+DS  = 0.001, 
 DSMIN= 1e-4 
-DSMAX= 0.05, 
+DSMAX= 0.01, 
 IADS= 1
 EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4  # 1e-4
 NMX = 10000  # 100 
