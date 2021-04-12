@@ -7,7 +7,7 @@
 #| Ignore diagnostic files < AUTO output
 d.*   
 s.*
-b.*
+#b.* DO NOT IGNORE THESE: I NEED THE FILESIN ZilliCuic11_SideStudy2.../Res/epsH/ folder.
 #| Ignore temporary backups 
 *~
 #| Ignore 

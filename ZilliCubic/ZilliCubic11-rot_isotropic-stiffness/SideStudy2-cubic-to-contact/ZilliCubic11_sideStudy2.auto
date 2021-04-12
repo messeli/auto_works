@@ -1,5 +1,5 @@
 # parnames={
-# 1:'gamma', 
+# 1:'gamma',
 # 2:'Omeg',
 # 3:'mH',
 # 4:'JpH',
@@ -13,43 +13,56 @@
 # 14:'KSI',
 # 15:'RHO'}
 
+########IMPORTS###########
 import time
 import numpy as np
 import re 
+########CONTROLS##########
+isKappaContin  = True
+isFoldContin   = False
+##########################
 
 startTime = time.time()
 #|>>|IPS1|>>>IPS1
 #|>>|IPS1_FORW|>> FORWARD: Cont mH:0-0.9>>gamma:0-0.25>>Omeg:0-7 >> Kappa:0-1>>beta:0-10>>K:0-100>>Omeg:0-7
-mH       = run("ZilliCubic11") 
-forward1 = run(      mH("UZ1"), ICP=[ 2,9], UZSTOP={ 2:0.5 },  NMX=1000, DS=0.01,DSMAX=0.01)
-kappa    = run(forward1("UZ1"), ICP=[ 8,9], UZSTOP={ 8:1.0 }) 
-beta     = run(   kappa("UZ1"), ICP=[10,9], UZSTOP={10:10  },  NMX=2000) 
-K        = run(    beta("UZ1"), ICP=[13,9], UZSTOP={13:100 },  NMX=5000,DSMAX=0.05)
-K = K +    run(       K("UZ1"), ICP=[ 5,9], UZSTOP={5:10e-1 });plot(K) # OPT(IPS1_FORW) Increase epsH | UZSTOP={5:8.99e-1})
-forward  = run(       K("UZ2"), ICP=[ 2,9], UZSTOP={ 2:10   },  NMX=200000, \
-	NTST=200,DS=0.01,DSMAX=0.05,EPSL= 1e-05, EPSU = 1e-05, EPSS =1e-4,ITMX= 8, ITNW= 7, NWTN = 6)
-save(forward,"forward") 
+if True:
+	mH       = run( "ZilliCubic11" ) 
+	forward1 = run( mH("UZ1"), ICP=[ 2,9], UZSTOP={2:0.1},NMX=1000, DS=0.01,DSMAX=0.01 ) 
+	kappa    = run( forward1("UZ1"), ICP=[ 8,9,2], UZSTOP={8:1.0} ) 
+	beta     = run( kappa("UZ1"), ICP=[10,9,8], UZSTOP={10:10},NMX=2000 ) 
+	K        = run( beta("UZ1"), ICP=[13,9,10], UZSTOP={13:100},NMX=5000, DSMAX=0.05 )
+	forw     = [] 
+	for epsH_val in [1.5]: #epsH_val in [0.8,0.9,1.5] | epsH=0.353 is left to the backward cont just below.
+		print("<===DIAGNOSTIC===IPS1_FORW===> epsHval is ",epsH_val)
+		new   = run( K("UZ1"), ICP=[ 5,9,13], UZSTOP={5:epsH_val} ) # OPT(IPS1_FORW) Increase epsH | UZSTOP={5:10e-1 })
+		forw += run( new("UZ1"), ICP=[ 2,9,6], UZSTOP={2:10},NMX=200000, \
+			NTST=200,DS=0.01,DSMAX=0.05,EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4,ITMX=8,ITNW=7,NWTN=6 )
+	save(forw,"forw") 
 #|__|IPS1_FORW|__
 
 #|>>|IPS1_BACK_B|>>  METHOD B: All-MATLAB startPoints (ONLY for smaller zeta)
-print("=====1B_BBB===METHOD_B")
-zetaList   = ["1e-2"] #,"8e-3","5e-3","1e-3","1e-4","1e-5"]
-eqFileName = ["ZilliCubic11_givenBackwards_zeta_"+x for x in zetaList]
-for i in range(0,len(zetaList)):
-	l_back = load(
-		e=eqFileName[i],
-		c="ZilliCubic11",
-		ICP=[2,9],
-		NMX=1000000,RL0=0.01, RL1=7.01,
-		NTST=200,DS=-0.01,DSMAX=0.01,EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-5)
-	back = merge( run(l_back) + run(l_back,DS='-') )
+if False: 
+	print("===DIAGNOSTIC===IPS1_BACK_B")
+	zetaList   = ["1e-2"] #,"8e-3","5e-3","1e-3","1e-4","1e-5"]
+	eqFileName = ["ZilliCubic11_givenBackwards_zeta_"+x for x in zetaList]
+	for i in range(0,len(zetaList)):
+		l_back = load(
+			e=eqFileName[i],
+			c="ZilliCubic11",
+			ICP=[2,9],
+			NMX=1000000,RL0=0.01,RL1=10.0,
+			NTST=200,DS=-0.01,DSMAX=0.01,EPSL= 1e-06,EPSU = 1e-06,EPSS =1e-4)
+		back = merge( run(l_back) + run(l_back,DS='-') )
+	save(back,"back")
 #|__|IPS1_BACK_B|__
 #|__|IPS1_BACK|__
 
-try: IPS1= forward+back
-except: IPS1 = back
-plot(IPS1,bifurcation_x="Omeg",bifurcation_y="Amplitude", solution_x="u",solution_y="v",height=600,stability=True) 
-
+try:       IPS1 = forw + back
+except: 
+	try:    IPS1 = forw
+	except: IPS1 =        back  
+plot(IPS1,top_title="IPS1",bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v",height=600,stability=True) 
+save(IPS1,"IPS1")
 
 #| Kappa Homotopy
 # A = load(back,ICP=[8,9],NTST=200,DS=0.01,DSMAX=0.05, 
@@ -64,299 +77,317 @@ plot(IPS1,bifurcation_x="Omeg",bifurcation_y="Amplitude", solution_x="u",solutio
 #|>>|IPS2|>> IPS2 
 #|>>|IPS2_A|>> METHOD A : ~PURE AUTO 
 #|>>|IPS2_A_KAPPA|>> Only kappa continuation
-#|>>|IPS2_A_KAPPA_SL|>>
+if isKappaContin: #KAPPA-CONTIN TOOGLE (Omeg=cnst)
+	#|>>|IPS2_A_KAPPA_SL|>>
+	# print("===DIAGNOSTIC===IPS2_A_KAPPA_SL")
+	# #| OPT(IPS2_A_KAPPA_SL) Decrease zeta first
+	# l_sLoop_dat_initHomotInEpsH = load(
+	#     e="ZilliCubic11_datFileContin_zeta_1e-2",
+	#     c="ZilliCubic11",
+	#     dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
+	#     IPS=2,ICP=[6,11,9,2], # 2:'Omeg',5:'epsH',6:'zeta'
+	#     UZR={6:[1e-5]},UZSTOP={5:2.0},NMX=2000,
+	#     NTST=200,DS=+0.001,DSMAX=0.005,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-4) # 6 6 3s
+	# IPS2_sLoop = merge( run(l_sLoop_dat_initHomotInEpsH) + run(l_sLoop_dat_initHomotInEpsH,DS="-") )
+	# plot(IPS2_sLoop,top_title="zeta on cubic dat",stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
-#| OPT(IPS2_A_KAPPA_SL) Increase epsH first
-l_sLoop_dat_initHomotInEpsH = load(
-    e="ZilliCubic11_datFileContin_zeta_1e-2",
-    c="ZilliCubic11",
-    dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
-    IPS=2,ICP=[5,11,9], # 2:'Omeg',5:'epsH',6:'zeta'
-    UZR={5:[2]},UZSTOP={5:2.0},NMX=10000,
-    NTST=200,DS=+0.001,DSMAX=0.005,EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4) # 6 6 3s
-IPS2_sLoop = merge( run(l_sLoop_dat_initHomotInEpsH) + 
-              run(l_sLoop_dat_initHomotInEpsH,DS="-") )
-print("MY POINT IS HERE\nMY POINT IS HERE\nMY POINT IS HERE")
-plot(IPS2_sLoop,top_title="epsH on cubic",stability=True,bifurcation_x="epsH",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	# #| Use Matlab-generated orbit at thetaP=2.91(dLoop)/4.05(sLoop) once.
+	# l_sLoop_dat = load(
+	# 	IPS2_sLoop("UZ1"),                             #  OPT(IPS2_A_KAPPA_SL) | UZ1 for zeta=1e-5
+	# 	# e="ZilliCubic11_datFileContin_zeta_1e-2",    # ~OPT(IPS2_A_KAPPA_SL)
+	# 	# dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2", # ~OPT(IPS2_A_KAPPA_SL)
+	# 	c="ZilliCubic11",
+	# 	IPS=2, ICP=[2,11,9,6], #Print par6 = zeta |#par5=epsH 
+	# 	UZR={2:[9]},RL0=0,RL1=10.01,NMX=10000, # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
+	# 	NTST=200,DS=+0.001,DSMAX=0.05,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-4);
+	# sLoop_dat = merge( run(l_sLoop_dat) + run(l_sLoop_dat,DS="-") ) #|Solution family from .dat
+	# sLoop_cubic = sLoop_dat #|Change name for clarity
+	# IPS2 = sLoop_cubic #|Start Populating the bifurcation plot.
+	# plot(sLoop_cubic,top_title="sLoop_cubic",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
-#| Use Matlab-generated orbit at thetaP=2.91(dLoop)/4.05(sLoop) once.
-l_sLoop_dat = load(
-	IPS2_sLoop("LP2"),                             #  OPT(IPS2_A_KAPPA_SL)
-	# e="ZilliCubic11_datFileContin_zeta_1e-2",    # ~OPT(IPS2_A_KAPPA_SL)
-	# dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2", # ~OPT(IPS2_A_KAPPA_SL)
-	c="ZilliCubic11",
-	IPS=2, ICP=[2,11,9,5],
-	UZR={2:[3.6,3.85,4.5,6,7,8,9,3.5]},RL0=0,RL1=10.01,NMX=10000, # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
-	NTST=200,DS=+0.001,DSMAX=0.05,EPSL= 1e-07,EPSU=1e-07,EPSS=1e-5);
-sLoop_dat = merge( run(l_sLoop_dat) + run(l_sLoop_dat,DS="-") ) #|Solution family from .dat
-sLoop_cubic = sLoop_dat #|Change name for clarity
-IPS2 = sLoop_cubic #|Start Populating the bifurcation plot.
-plot(sLoop_cubic,stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	# #| Homotopy to newNonlin with kappa=0>1 OR rho=0>1 for tanh OR quintic, respectively (par8 OR par15)
+	# count = 0 
+	# size = len(sLoop_cubic("UZ"))
+	# for Z in sLoop_cubic("UZ"):
+	# 	count+=1
+	# 	print("===DIAGNOSTIC===IPS2_A_KAPPA_SL===Homotopy2newNonlin=",count,"/",size,)
+	# 	# if count>=2: break
+	# 	try:
+	# 		l_sLoop_homot = load(Z,
+	# 			IPS=2, ICP=[8,11,9,2], # In d case of RHO(quintic): IPS=2, ICP=[15,11,9],
+	# 			UZR={8:[1.0]},RL1=1.01,NMX=5000, #|NMX=60000 | UZR={8:[1.0,0.985]} | UZR={15:[0.987]}, | UZSTOP={15:[1.0]}
+	# 			NTST=200,DS=0.001,DSMAX=0.01) 
+	# 		try:   sLoop_homot = sLoop_homot + merge( run(l_sLoop_homot) + run(l_sLoop_homot,DS="-") )
+	# 		except:sLoop_homot =               merge( run(l_sLoop_homot) + run(l_sLoop_homot,DS="-") )
+	# 		if sLoop_homot("UZ"):
+	# 			break
+	# 	except:
+	# 			continue
+	# plot(sLoop_homot,top_title="sLoop_homot",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
-#| kappa(par(8)) homotopy cubic to contact @ user samplD orbit
-#| OR rho(par(15)) homotopy cubic to power5 @ user samplD orbit
-count = 0 
-size = len(sLoop_cubic("UZ"))
-for Z in sLoop_cubic("UZ"):
-	count+=1
-	print("====sLoop===",count,"/",size,"===kappaHomot===")
-	# if count>=2:
-	#    break
-	try:
-		l_sLoop_homot = load(Z,
-			IPS=2, ICP=[8,11,9],
-			# IPS=2, ICP=[15,11,9],
-			NTST=200,# 1000
-			NMX=5000, RL0=-0.1,RL1=2, #|60000
-			UZR={8:[1.0]}, # UZR={8:[1.0,0.985]},
-			#|:SAMPLE @ kappa=1
-			# UZR={15:[0.987]}, 
-			# UZSTOP={15:[1.0]}, #|SAMPLE @ rho=1
-			DS=0.001, DSMAX=0.01) 
-		try:   sLoop_homot = sLoop_homot + merge( run(l_sLoop_homot) + run(l_sLoop_homot,DS="-") )
-		except:sLoop_homot =               merge( run(l_sLoop_homot) + run(l_sLoop_homot,DS="-") )
-		if sLoop_homot("UZ"):
-			break
-	except:
-			continue
-plot(sLoop_homot,stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
-
-#| Run w/ newNonlin from one-fd sampled orbits @kappa=1/@pho=1 in Omeg
-count = 0
-size = len(sLoop_homot('UZ'))
-for X in sLoop_homot("UZ"):
-	count+=1 
-	print("====sLoop===",count,"/",size,"===tanh===")
-	if count>=2:
-		break
-	try: #|this try could be unnecessary
-		l_sLoop_newNonlin = load(X,  #'UZ1'
-			IPS=2,ICP=[2,11,9],
-			UZR={2:3.5}, RL0=0,RL1=10.1, NMX=4000,
-			NTST=200,DS = -0.001,DSMAX=0.01) #|NEW SAMPLING FOR CONTACT STEEPNESS INCREASE, K.
-		try:   sLoop_newNonlin = sLoop_newNonlin + merge(run(l_sLoop_newNonlin)+run(l_sLoop_newNonlin,DS="-"))
-		except:sLoop_newNonlin =                   merge(run(l_sLoop_newNonlin)+run(l_sLoop_newNonlin,DS="-"))
-	except: 
-		continue
-save(sLoop_newNonlin, "sLoop_newNonlin")
-
-#| OPT(IPS2_A_KAPPA_SL) Increase epsH 
-print("epsH change after newNonlin found")
-l_sLoop_newNonlin_epsH = load(
-	sLoop_newNonlin("LP1"),
-	IPS=2,ICP=[5,11,9],
-	UZR={5:[0.5,0.7, 0.899,1.0]},NMX=7000,
-	NTST=300,DSMAX=0.001)
-sLoop_newNonlin_epsH = run(l_sLoop_newNonlin_epsH) + run(l_sLoop_newNonlin_epsH,DS="-")
-print("MY HEREHREHRE\nHHREHHRHHEHRHE\nHHREHHEHRHHERH\nHREHHREHHRHEHRHE\nHRHEHRHEHRHEHRHHEHRHER\nHEHRHRHEHREH")
-plot(sLoop_newNonlin_epsH,top_title="epsH on tanh",bifurcation_x="epsH",bifurcation_y="Amplitude",stability=True)
-count = 0
-for E in sLoop_newNonlin_epsH("UZ"):
-	count += 1
-	print(count,"/",size(sLoop_newNonlin_epsH("UZ")))
-	l_sLoop_newNonlin = load(E,
-		ICP=[2,11,9,5],
-		RL1=10,NMX=30000,
-		DSMAX=0.05)
-	sLoop_newNonlin = sLoop_newNonlin + merge(run(l_sLoop_newNonlin) + run(l_sLoop_newNonlin) )
+	# #| SolFam of sLoop with newNonlin
+	# count = 0
+	# size = len(sLoop_homot('UZ'))
+	# sLoop_newNonlin = []
+	# for X in sLoop_homot("UZ"):
+	# 	count+=1 
+	# 	print("===DIAGNOSTIC===IPS2_A_KAPPA_SL===newNonlinSolFam=",count,"/",size,)
+	# 	if count>=2: break
+	# 	try: #|this try could be unnecessary
+	# 		l_sLoop_newNonlin = load(X,  #'UZ1'
+	# 			IPS=2,ICP=[2,11,9,8],NPR=1000,
+	# 			UZR={2:9.5},RL0=0,RL1=10.1,NMX=60000,
+	# 			NTST=300,DS=-0.001,DSMAX=0.01) #|NEW SAMPLING FOR CONTACT STEEPNESS INCREASE, K.
+	# 		sLoop_newNonlin = sLoop_newNonlin + merge(run(l_sLoop_newNonlin)+run(l_sLoop_newNonlin,DS="-"))
+	# 	except: 
+	# 		continue
+	# plot(sLoop_newNonlin,top_title="sLoop_newNonlin before epsH change",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	# save(sLoop_newNonlin, "sLoop_newNonlin") 
 
 
-#| Now increase the contact steepness K : 0.01 => 3
-# l_Loop_steepen =load(Loop_newNonlin("UZ"), #|One UZ will be enough.
-#    IPS=2,ICP=[2,11,9] )
-# Loop_steepen = merge(run(l_Loop_steepen)+run(l_Loop_steepen,DS='-'))
+	# #| OPT(IPS2_A_KAPPA_SL) Increase epsH 
+	# print("===DIAGNOSTIC===IPS2_A_KAPPA_SL===varyJepsH")
+	# l_sLoop_newNonlin_epsH = load(
+	# 	sLoop_newNonlin("UZ1"),#LP1 DELETED
+	# 	IPS=2,ICP=[5,11,9,2], 
+	# 	UZR={5:[1.5]},NMX=55000,  # UZR={5:[0.353,0.8,0.9,1.5]}
+	# 	NTST=300,DSMAX=0.01)
+	# sLoop_newNonlin_epsH = run(l_sLoop_newNonlin_epsH) + run(l_sLoop_newNonlin_epsH,DS="-")
+	# plot(sLoop_newNonlin_epsH,top_title="epsH on newNonlin",bifurcation_x="epsH",bifurcation_y="Amplitude",stability=True)
+	# count = 0
+	# size = len(sLoop_newNonlin_epsH("UZ"))
+	# sLoop_newNonlin_newEpsH = []
+	# for E in sLoop_newNonlin_epsH("UZ"):
+	# 	if count >= 4: break
+	# 	count += 1
+	# 	print("===DIAGNOSTIC===IPS2_A_KAPPA_SL===newNonlinWvariedEpsH=",count,"/",size)
+	# 	l_sLoop_newNonlin_newEpsH = load(E,
+	# 		ICP=[2,11,9,5],
+	# 		RL1=10,NMX=30000,	
+	# 		DS=0.001,DSMAX=0.01)
+	# 	sLoop_newNonlin_newEpsH += merge(run(l_sLoop_newNonlin_newEpsH) + run(l_sLoop_newNonlin_newEpsH,DS="-") )
+	# plot(sLoop_newNonlin_newEpsH,top_title="sLoop_newNonlin_newEpsH after epsH change",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	# save(sLoop_newNonlin_newEpsH, "sLoop_newNonlin_newEpsH") 	
+	# #| Add fold contin line :FAIL with  free(): invalid next size (fast)
+	# # print("===DIAGNOSTIC===IPS2_A_KAPPA_SL===newNonlinWvariedEpsH=",count,"/",size,)
+	# # l_sLoop_newNonlin_epsHfoldContin = run(
+	# # 	sLoop_newNonlin("LP1"),
+	# # 	IPS=2,ICP=[5,2,11,9],ISW=2)
+	# # sLoop_newNonlin += run(l_sLoop_newNonlin_epsHfoldContin) + run(l_sLoop_newNonlin_epsHfoldContin,DS="-")
 
-#| Populate periodic sol bifur object
-try:IPS2 = IPS2 + sLoop_newNonlin + sLoop_steepen
-except: IPS2 = IPS2 + sLoop_newNonlin
-# wholebifur(IPS1,IPS2)
-#|__|IPS2_A_KAPPA_SL|__
+	# #| Now increase the contact steepness K : 0.01 => 3
+	# # l_Loop_steepen =load(Loop_newNonlin("UZ"), #|One UZ will be enough.
+	# #    IPS=2,ICP=[2,11,9] )
+	# # Loop_steepen = merge(run(l_Loop_steepen)+run(l_Loop_steepen,DS='-'))
+
+	# #| Populate periodic sol bifur object
+	# try:    IPS2 = IPS2 + sLoop_newNonlin_newEpsH + sLoop_steepen
+	# except: IPS2 = IPS2 + sLoop_newNonlin_newEpsH
+	# # wholebifur(IPS1,IPS2)
+	#|__|IPS2_A_KAPPA_SL|__
 
 
-#|>>|IPS2_A_KAPPA_DL|>>
-#| Use Matlab-generated orbit at thetaP=2.91(dLoop)/4.05(sLoop) once.
-print("=====2A_KKK===dLoop_CONTINUE_MATLAB_ORBIT")
-l_dLoop_dat = load(
-	 e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
-	 dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
-	 c="ZilliCubic11",
-	 IPS=2, ICP=[2,11,9],
-	 UZR={2:[2.9,3,3.25,3.5,4.5,5.75,6,2.8]},RL0=0,RL1=10.01, NMX=2000,# UZSTOP={2:[0.01,7.01]}, #10.0
-	 NTST=200,DS=+0.001, DSMAX=0.05, EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-5)
-dLoop_dat = merge( run(l_dLoop_dat) + run(l_dLoop_dat,DS="-") ) #|Solution family from .dat
-dLoop_cubic = dLoop_dat #|Change name for clarity
-try:IPS2 = IPS2 + dLoop_cubic
-except:IPS2 = dLoop_cubic #|Start Populating the bifurcation plot.
-plot(dLoop_cubic,stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	#|>>|IPS2_A_KAPPA_DL|>>
+	print("===DIAGNOSTIC===IPS2_A_KAPPA_DL")
+	#| OPT(IPS2_A_KAPPA_DL) Decrease zeta first
+	l_dLoop_dat_initHomotInEpsH = load(
+	    e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
+	    c="ZilliCubic11",
+	    dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
+	    IPS=2,ICP=[6,11,9,2], # 2:'Omeg',5:'epsH',6:'zeta'
+	    UZR={6:[1e-5]},UZSTOP={5:2.0},NMX=2000,
+	    NTST=300,DS=+0.001,DSMAX=0.005,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-4) # 6 6 3s
+	IPS2_dLoop = merge( run(l_dLoop_dat_initHomotInEpsH) + run(l_dLoop_dat_initHomotInEpsH,DS="-") )
+	plot(IPS2_dLoop,top_title="zeta on cubic dat",stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
-#| kappa(par(8))/rho(par(15)) homotopy cubic to contact @ user samplD orbit
-print("=====2A_KKK===FORCE_HOMOTOPY")
-count = 0 
-size = len(dLoop_cubic("UZ"))
-for Z in dLoop_cubic("UZ"):
-	count+=1
-	print("===dLoop====",count,"/",size,"===kappaHomot====")
-	# if count>=2:
-	#    break
-	try:
-		l_dLoop_homot = load(Z,
-			IPS=2, ICP=[8,11,9], #rho-contin case: IPS=2, ICP=[15,11,9],
-			NMX=3000, RL0=-0.1,RL1=2,
-			UZR={8:[1.0]}, # UZR={8:[1.0,0.985]},
-			#|:SAMPLE @ kappa=1
-			# UZR={15:[0.987]}, 
-			# UZSTOP={15:[1.0]}, #|SAMPLE @ rho=1
-			NTST=200,DS=0.001, DSMAX=0.01) 
-		try: 
-			dLoop_homot = dLoop_homot + \
-				merge( run(l_dLoop_homot) + run(l_dLoop_homot,DS="-") )
+	#| Use Matlab-generated orbit at thetaP=2.91(dLoop)/4.05(sLoop) once.
+	l_dLoop_dat = load(
+		IPS2_dLoop("UZ1"),                             #  OPT(IPS2_A_KAPPA_SL) | UZ1 for zeta=1e-5|#"EP2" for unchanged epsH, "LP1"/"LP2" for lowest/highest! epsH.
+		# e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",    # ~OPT(IPS2_A_KAPPA_SL)
+		# dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop", # ~OPT(IPS2_A_KAPPA_SL)
+		c="ZilliCubic11",
+		IPS=2, ICP=[2,11,9,6], #Print par6 = zeta |#par5=epsH 
+		UZR={2:[5]},RL0=0,RL1=10.01,NMX=15000, # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
+		NTST=300,DS=+0.001,DSMAX=0.05,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4);
+	dLoop_dat = merge( run(l_dLoop_dat) + run(l_dLoop_dat,DS="-") ) #|Solution family from .dat
+	dLoop_cubic = dLoop_dat #|Change name for clarity
+	try:IPS2 = IPS2 + dLoop_cubic
+	except:IPS2 = dLoop_cubic #|Start Populating the bifurcation plot.
+	plot(dLoop_cubic,top_title="dLoop_cubic",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+
+	#| Homotopy to newNonlin with kappa=0>1 OR rho=0>1 for tanh OR quintic, respectively (par8 OR par15)
+	count = 0 
+	size = len(dLoop_cubic("UZ"))
+	dLoop_homot = []
+	for Z in dLoop_cubic("UZ"):
+		count+=1
+		print("===DIAGNOSTIC===IPS2_A_KAPPA_DL===Homotopy2newNonlin=",count,"/",size,)
+		# if count>=2: break
+		try:
+			l_dLoop_homot = load(Z,
+				IPS=2, ICP=[8,11,9,2], # In d case of RHO(quintic): IPS=2, ICP=[15,11,9],
+				UZR={8:[1.0]},RL0=-0.1,RL1=2,NMX=5000, 
+				NTST=300,DS=0.001,DSMAX=0.01) 
+			dLoop_homot = dLoop_homot + merge( run(l_dLoop_homot) + run(l_dLoop_homot,DS="-") )
+			if dLoop_homot("UZ"):
+				break
 		except:
-			dLoop_homot = \
-				merge( run(l_dLoop_homot)+run(l_dLoop_homot,DS="-") )
-		
-		if dLoop_homot("UZ2"): 
-			break
-	except:
-		continue
-plot(dLoop_homot,stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+				continue
+	plot(dLoop_homot,top_title="dLoop_homot",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
-#| Run w/ tanh-contactNonlin from one-fd sampled orbits @kappa=1 in Omeg
-#| OR RUN w/ quinticNonlin from one-fd sampled orbits @pho=1 in Omeg
-count = 0
-size = len(dLoop_homot('UZ'))
-for X in dLoop_homot("UZ"): 
-	 count+=1 
-	 print("====dLoop===",count,"/",size,"===tanh===")
-	 if count>=4: 
-			break
-	 try: #|this try could be unnecessary
-			l_dLoop_newNonlin = load(X, #'UZ1'
-				 IPS=2,ICP=[2,11,9],
-				 UZR={2:3.5},RL0=0,RL1=10.1,NMX=4000,
-				 NTST=200, DS = -0.001,DSMAX=0.01) #|NEW SAMPLING FOR CONTACT STEEPNESS INCREASE, K.
-			try:   dLoop_newNonlin = dLoop_newNonlin + merge(run(l_dLoop_newNonlin)+run(l_dLoop_newNonlin,DS="-"))
-			except:dLoop_newNonlin =                   merge(run(l_dLoop_newNonlin)+run(l_dLoop_newNonlin,DS="-"))
-	 except: 
+	#| SolFam of dLoop with newNonlin
+	count = 0
+	size = len(dLoop_homot('UZ'))
+	dLoop_newNonlin = []
+	for X in dLoop_homot("UZ"):
+		count+=1 
+		print("===DIAGNOSTIC===IPS2_A_KAPPA_DL===newNonlinSolFam=",count,"/",size,)
+		if count>=4: break
+		try: #|this try could be unnecessary
+			l_dLoop_newNonlin = load(X,  #'UZ1'
+				IPS=2,ICP=[2,11,9,8],NPR=1000,
+				UZR={2:6.5},RL0=0,RL1=10.1,NMX=3000,
+				NTST=300,DS=-0.001,DSMAX=0.01) #|NEW SAMPLING FOR CONTACT STEEPNESS INCREASE, K.
+			dLoop_newNonlin = dLoop_newNonlin + merge(run(l_dLoop_newNonlin)+run(l_dLoop_newNonlin,DS="-"))
+		except: 
 			continue
-save(dLoop_newNonlin, "dLoop_newNonlin")
+	plot(dLoop_newNonlin,top_title="dLoop_newNonlin before epsH change",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	#save(dLoop_newNonlin, "dLoop_newNonlin") 
 
-#| Now increase the contact steepness K : 0.01 => 3
-# l_dLoop_steepen =load(dLoop_newNonlin("UZ"), #|One UZ will be enough.
-#    IPS=2,ICP=[2,11,9] )
-# dLoop_steepen = merge(run(l_dLoop_steepen)+run(l_dLoop_steepen,DS='-'))
+	#| OPT(IPS2_A_KAPPA_DL) Increase epsH 
+	print("===DIAGNOSTIC===IPS2_A_KAPPA_DL===varyJepsH")
+	l_dLoop_newNonlin_epsH = load(
+		dLoop_newNonlin("UZ1"),#LP1 DELETED
+		IPS=2,ICP=[5,11,9,2], 
+		UZR={5:[1.5]},RL1=1.51,NMX=5000,  # UZR={5:[0.353,0.8,0.9,1.5]}
+		NTST=300,DSMAX=0.01)
+	dLoop_newNonlin_epsH = run(l_dLoop_newNonlin_epsH) + run(l_dLoop_newNonlin_epsH,DS="-")
+	plot(dLoop_newNonlin_epsH,top_title="dLoop_newNonlin_epsH",bifurcation_x="epsH",bifurcation_y="Amplitude",stability=True)
+	count = 0
+	size = len(dLoop_newNonlin_epsH("UZ"))
+	dLoop_newNonlin_newEpsH = []
+	for E in dLoop_newNonlin_epsH("UZ"):
+		#if count >= 4: break
+		count += 1
+		print("===DIAGNOSTIC===IPS2_A_KAPPA_SL===newNonlinWvariedEpsH=",count,"/",size)
+		l_dLoop_newNonlin_newEpsH = load(E,
+			ICP=[2,11,9,5],
+			RL1=10,NMX=5000,	
+			DS=-0.001,DSMAX=0.01)
+		dLoop_newNonlin_newEpsH += merge(run(l_dLoop_newNonlin_newEpsH) + run(l_dLoop_newNonlin_newEpsH,DS="-") )
+	plot(dLoop_newNonlin_newEpsH,top_title="dLoop_newNonlin_newEpsH after epsH change",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	#save(dLoop_newNonlin_newEpsH, "dLoop_newNonlin_newEpsH") #|Leaves no space; so commented
 
-#| Populate periodic sol bifur object
-try:IPS2 = IPS2 + dLoop_newNonlin + dLoop_steepen
-except: IPS2 = IPS2 + dLoop_newNonlin
-#|__|IPS2_A_KAPPA_SL|__
 
-#|>>|IPS2_A_KAPPA_PLOT|>>  WHOLE DIAGRAM 
-print("=====2AK_HHH___RELABEL___PLOT___SAVE")
-try:all_sideStudy2 = rl( IPS1+IPS2 )
-except:all_sideStudy2 = rl( IPS2 )
-p = plot(all_sideStudy2, stability=True, height=600, bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v")
-p.config(color_list="black red green blue violet orange gray brown teal turquoise purple")
-save(all_sideStudy2,"all_sideStudy2_kappaHomot")
-#|__|IPS2_A_KAPPA_PLOT|__
-try: 
-	Loop_newNonlin = sLoop_newNonlin + dLoop_newNonlin
-except: 
-	sLoop_newNonlin = loadbd('sLoop_newNonlin') #|saved in kappa-homotopy
-	dLoop_newNonlin = loadbd('dLoop_newNonlin') #|saved in kappa-homotopy
-	Loop_newNonlin = sLoop_newNonlin + dLoop_newNonlin
+	#| Now increase the contact steepness K : 0.01 => 3
+	# l_dLoop_steepen =load(dLoop_newNonlin("UZ"), #|One UZ will be enough.
+	#    IPS=2,ICP=[2,11,9] )
+	# dLoop_steepen = merge(run(l_dLoop_steepen)+run(l_dLoop_steepen,DS='-'))
+
+	#| Populate periodic sol bifur object
+	try:    IPS2 = IPS2 + dLoop_newNonlin_newEpsH + dLoop_steepen
+	except: IPS2 = IPS2 + dLoop_newNonlin_newEpsH
+	#|__|IPS2_A_KAPPA_DL|__
+
+	try:       Loop_newNonlin = dLoop_newNonlin_newEpsH #+ dLoop_newNonlin_newEpsH  #|Check if u need to include or not 
+	except:
+		try:    Loop_newNonlin = loadbd('sLoop_newNonlin_newEpsH')
+		except: Loop_newNonlin =                             loadbd('dLoop_newNonlin_newEpsH')
 #|__|IPS2_A_KAPPA|__
 
 
+
 #|>>|IPS2_A_FOLD|>> Fold of OMEG is fold-continD in KAPPA (Nt:Comment 2AL_KKK)
-# #|>>|IPS2_A_FOLD_SL|>> Single-loop
-# print("=====2A_FFF===CONTINUE_sLoop_MATLAB_ORBIT")
-# l_sLoop_dat = load(
-#    e="ZilliCubic11_datFileContin_zeta_1e-2",
-#    dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
-#    c="ZilliCubic11",
-#    IPS=2, ICP=[2,11,9],
-#    RL0=0,RL1=10,NMX=10000, #UZSTOP={2:[0.01,7.01]}, #10.0
-#    NTST=200,DS=+0.001,DSMAX=0.05,EPSL=1e-06,EPSU=1e-06,EPSS=1e-3)
-# sLoop_dat = merge( run(l_sLoop_dat)+run(l_sLoop_dat,DS="-") ) #|Solution family from .dat
-# sLoop_cubic = sLoop_dat #|Change name for clarity
-# IPS2 = sLoop_cubic #|Start Populating the bifurcation plot.
-# plot(sLoop_cubic,stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+if isFoldContin: #FOLD-CONTIN TOGGLE
+	#|>>|IPS2_A_FOLD_SL|>> Single-loop
+	print("=====2A_FFF===CONTINUE_sLoop_MATLAB_ORBIT")
+	l_sLoop_dat = load(
+	   e="ZilliCubic11_datFileContin_zeta_1e-2",
+	   dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
+	   c="ZilliCubic11",
+	   IPS=2, ICP=[2,11,9],
+	   RL0=0,RL1=10,NMX=10000, #UZSTOP={2:[0.01,7.01]}, #10.0
+	   NTST=200,DS=+0.001,DSMAX=0.05,EPSL=1e-06,EPSU=1e-06,EPSS=1e-3)
+	sLoop_dat = merge( run(l_sLoop_dat)+run(l_sLoop_dat,DS="-") ) #|Solution family from .dat
+	sLoop_cubic = sLoop_dat #|Change name for clarity
+	IPS2 = sLoop_cubic #|Start Populating the bifurcation plot.
+	plot(sLoop_cubic,stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
-# #| Fold continuation 
-# l_sLoop_foldContin = run(sLoop_cubic("LP1"),
-#    IPS=2, ICP=[8,2,11,9], ISW = 2, 
-#    RL0=0.0,RL1=1.01,NMX=10000,
-#    UZR={8:1.0}, #1.0
-#    NTST=200,DS=0.001,DSMAX=0.005,DSMIN = 1e-5) #|DSMIN didnot do the trick
-# print("DIAGNOSTICS HERE0")
-# sLoop_foldContin = run(l_sLoop_foldContin) #|free() invalid next size (fast)
-# print("DIAGNOSTICS HERE1") #|does not print this 
-# plot(sLoop_foldContin,stability=True,height= 600,bifurcation_x="kappa",bifurcation_y="Amplitude")
-# print("DIAGNOSTICS HERE2")
-# #| Populate IPS2 
-# IPS2 = IPS2 + sLoop_foldContin
-# print("DIAGNOSTICS HERE3")
+	#| Fold continuation 
+	l_sLoop_foldContin = run(sLoop_cubic("LP1"),
+	   IPS=2, ICP=[8,2,11,9], ISW = 2, 
+	   RL0=0.0,RL1=1.01,NMX=10000,
+	   UZR={8:1.0}, #1.0
+	   NTST=200,DS=0.001,DSMAX=0.005,DSMIN = 1e-5) #|DSMIN didnot do the trick
+	print("DIAGNOSTICS HERE0")
+	sLoop_foldContin = run(l_sLoop_foldContin) #|free() invalid next size (fast)
+	print("DIAGNOSTICS HERE1") #|does not print this 
+	plot(sLoop_foldContin,stability=True,height= 600,bifurcation_x="kappa",bifurcation_y="Amplitude")
+	print("DIAGNOSTICS HERE2")
+	#| Populate IPS2 
+	IPS2 = IPS2 + sLoop_foldContin
+	print("DIAGNOSTICS HERE3")
 
-# #| RUN tanh SL
-# l_sLoop_tanh = load(sLoop_foldContin("UZ1"),
-#    IPS=2, ICP=[2,11,8,9], ISW=1,
-#    RL0=0.0, RL1=10.0,NMX=10000,
-#    NTST=200,DS=0.001,DSMAX=0.005)
-# sLoop_tanh = merge( run(l_sLoop_tanh) + run(l_sLoop_tanh,DS='-') ) 
+	#| RUN tanh SL
+	l_sLoop_tanh = load(sLoop_foldContin("UZ1"),
+	   IPS=2, ICP=[2,11,8,9], ISW=1,
+	   RL0=0.0, RL1=10.0,NMX=10000,
+	   NTST=200,DS=0.001,DSMAX=0.005)
+	sLoop_tanh = merge( run(l_sLoop_tanh) + run(l_sLoop_tanh,DS='-') ) 
 
-# #| Populate IPS2
-# IPS2 = IPS2 + sLoop_tanh 
-# #|__|IPS2_A_FOLD_SL|__
+	#| Populate IPS2
+	IPS2 = IPS2 + sLoop_tanh 
+	#|__|IPS2_A_FOLD_SL|__
 
-# #|>>|IPS2_A_FOLD_DL|>>
-# l_dLoop_dat = load(
-#    e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
-#    dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
-#    c="ZilliCubic11",
-#    IPS=2,ICP=[2,11,9],
-#    RL0=0,RL1=7,NMX=2000, #UZSTOP={2:[0.01,7.01]}, #10.0
-#    NTST=200,DS=+0.001,DSMAX=0.05,EPSL=1e-07,EPSU=1e-07,EPSS=1e-4)
-# dLoop_dat = merge( run(l_dLoop_dat) + run(l_dLoop_dat,DS="-") ) #|Solution family from .dat
-# dLoop_cubic = dLoop_dat #|Change name for clarity
-# try:IPS2 = IPS2 + dLoop_cubic 
-# except:IPS2 = dLoop_cubic #|Start Populating the bifurcation plot.
-# plot(dLoop_cubic,stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	#|>>|IPS2_A_FOLD_DL|>>
+	l_dLoop_dat = load(
+	   e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
+	   dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
+	   c="ZilliCubic11",
+	   IPS=2,ICP=[2,11,9],
+	   RL0=0,RL1=7,NMX=2000, #UZSTOP={2:[0.01,7.01]}, #10.0
+	   NTST=200,DS=+0.001,DSMAX=0.05,EPSL=1e-07,EPSU=1e-07,EPSS=1e-4)
+	dLoop_dat = merge( run(l_dLoop_dat) + run(l_dLoop_dat,DS="-") ) #|Solution family from .dat
+	dLoop_cubic = dLoop_dat #|Change name for clarity
+	try:IPS2 = IPS2 + dLoop_cubic 
+	except:IPS2 = dLoop_cubic #|Start Populating the bifurcation plot.
+	plot(dLoop_cubic,stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
-# #| Fold continuation 
-# for dLoop_LP in dLoop_cubic("LP"):
-#    try: #|the LP1 first (then LP2)
-#       l_dLoop_foldContin = run(dLoop_LP,
-#          IPS=2,ICP=[8,2,11,9],ISW=2,
-#          UZR={8:1.0},RL0=0.0,RL1=1.01,NMX=5000,
-#          NTST=200,DS=0.001,DSMAX=0.005)
-#       try:dLoop_foldContin = dLoop_foldContin + run(l_dLoop_foldContin) #|Forward dir is enough
-#       except:dLoop_foldContin = run(l_dLoop_foldContin)
-#    except:
-#       continue #|to the LP2. 
+	#| Fold continuation 
+	for dLoop_LP in dLoop_cubic("LP"):
+	   try: #|the LP1 first (then LP2)
+	      l_dLoop_foldContin = run(dLoop_LP,
+	         IPS=2,ICP=[8,2,11,9],ISW=2,
+	         UZR={8:1.0},RL0=0.0,RL1=1.01,NMX=5000,
+	         NTST=200,DS=0.001,DSMAX=0.005)
+	      try:dLoop_foldContin = dLoop_foldContin + run(l_dLoop_foldContin) #|Forward dir is enough
+	      except:dLoop_foldContin = run(l_dLoop_foldContin)
+	   except:
+	      continue #|to the LP2. 
 
-# plot(dLoop_foldContin,stability=True,bifurcation_x="kappa",bifurcation_y="Amplitude")
+	plot(dLoop_foldContin,stability=True,bifurcation_x="kappa",bifurcation_y="Amplitude")
 
-# #| Populate IPS2 
-# IPS2 = IPS2 + dLoop_foldContin
+	#| Populate IPS2 
+	IPS2 = IPS2 + dLoop_foldContin
 
-# #| RUN tanh
-# l_dLoop_tanh = load(dLoop_foldContin("UZ1"),
-#    IPS=2, ICP=[2,11,9], ISW=1,
-#    RL0=0.0,RL1=10.0,NMX=5000,
-#    NTST=200,DS=0.001,DSMAX=0.005)
-# dLoop_tanh = merge( run(l_dLoop_tanh) + run(l_dLoop_tanh,DS='-') ) 
+	#| RUN tanh
+	l_dLoop_tanh = load(dLoop_foldContin("UZ1"),
+	   IPS=2, ICP=[2,11,9], ISW=1,
+	   RL0=0.0,RL1=10.0,NMX=5000,
+	   NTST=200,DS=0.001,DSMAX=0.005)
+	dLoop_tanh = merge( run(l_dLoop_tanh) + run(l_dLoop_tanh,DS='-') ) 
 
-# #| Populate IPS2
-# IPS2 = IPS2 + dLoop_tanh 
-# #|__|IPS2_A_FOLD_DL|__
+	#| Populate IPS2
+	IPS2 = IPS2 + dLoop_tanh 
+	#|__|IPS2_A_FOLD_DL|__
 
-# #|>>|IPS2_A_FOLD_PLOT|>>
-# try:all_sideStudy2 = rl( IPS1+IPS2 )
-# except:all_sideStudy2 = rl( IPS2 )
-# p = plot(all_sideStudy2,stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
-# p.config(color_list="black red green blue violet orange gray brown teal turquoise purple")
-# save(all_sideStudy2,"all_sideStudy2_foldContin")
-# #|__|IPS2_A_FOLD_PLOT|__
+	#|>>|IPS2_A_FOLD_PLOT|>>
+	try:all_sideStudy2 = rl( IPS1+IPS2 )
+	except:all_sideStudy2 = rl( IPS2 )
+	p = plot(all_sideStudy2,stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	p.config(color_list="black red green blue violet orange gray brown teal turquoise purple")
+	#save(all_sideStudy2,"all_sideStudy2_foldContin") #|VM no space left 
+	#|__|IPS2_A_FOLD_PLOT|__
 #|__|IPS2_A_FOLD|__
 #|__|IPS2_A|__
 
@@ -409,7 +440,7 @@ except:
 
 # #|>>|IPS2_PD_PLOT|>>
 # p=plot(Loop_newNonlin,stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
-# p.config(color_list="black red green blue violet gray orange brown teal turquoise purple")
+# p.config(color_list="black red green blue orange purple gray brown teal turquoise violet")
 # save(Loop_newNonlin,"Loop_newNonlin")
 # #|__|IPS2_PD_PLOT|__
 #|__|IPS2_PD|__
@@ -417,13 +448,14 @@ except:
 
 
 #|>>|PLOT|>> WHOLE DIAGRAM 
-try:       all_sideStudy2 = rl( IPS1+IPS2 + Loop_newNonlin)
+try:       all_sideStudy2 = rl( IPS1+IPS2 ) #+ Loop_newNonlin) this excluded part is already added into IPS2 
 except:
 	 try:   all_sideStudy2 = rl(      IPS2 + Loop_newNonlin)
 	 except:all_sideStudy2 = rl(             Loop_newNonlin)
 p=plot(all_sideStudy2,stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u", solution_y="v")
-p.config(color_list="black red green blue violet gray orange brown teal turquoise purple")
-save(all_sideStudy2,"all_sideStudy2")
+p.config(color_list="black red green blue orange purple gray brown teal turquoise violet")
+#save(all_sideStudy2,"all_sideStudy2")
+save(all_sideStudy2,"all_zeta1e-5_epsH1p5_DL")
 #|__|PLOT|__
 
 ########################################################################

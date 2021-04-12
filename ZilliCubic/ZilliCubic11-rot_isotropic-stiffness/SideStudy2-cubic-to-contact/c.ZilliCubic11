@@ -32,7 +32,7 @@ NBC = 0
 NINT= 0
 
 #output
-NPR = 1000
+NPR = 5000
 IID = 3
 
 MXBF= 5  
