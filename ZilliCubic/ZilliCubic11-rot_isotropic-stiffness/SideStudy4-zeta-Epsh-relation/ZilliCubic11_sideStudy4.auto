@@ -1,0 +1,134 @@
+# parnames={
+# 1:'gamma',
+# 2:'Omeg',
+# 3:'mH',
+# 4:'JpH',
+# 5:'epsH',
+# 6:'zeta',
+# 7:'OmegP',
+# 8:'kappa', 
+# 9:'Amplitude',
+# 10:"beta",
+# 13:'K',
+# 14:'KSI',
+# 15:'RHO'}
+
+########IMPORTS###########
+import time
+import numpy as np
+import re 
+
+startTime = time.time()
+
+
+#|>>|IPS2|>> IPS2 
+# sLoop_cubic = loadbd('sLoop_cubic');plot(sLoop_cubic)
+# dLoop_cubic = loadbd('dLoop_cubic')
+# sLoop_newNonlin = loadbd('sLoop_newNonlin')
+# dLoop_newNonlin = loadbd('dLoop_newNonlin')
+
+
+
+
+# l_sLoop_dat = load(
+# 	e="ZilliCubic11_datFileContin_zeta_1e-2",     # .f90
+# 	dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",  #
+# 	c="ZilliCubic11",
+# 	IPS=2, ICP=[2,11,9,6], #Print par6 = zeta |#par5=epsH 
+# 	UZR={2:[9]},RL0=0,RL1=10.01,NMX=10000, # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
+# 	NTST=200,DS=+0.01,DSMAX=0.01,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-4);
+# sLoop_dat = merge( run(l_sLoop_dat) + run(l_sLoop_dat,DS="-") ) #|Solution family from .dat
+# sLoop_cubic = sLoop_dat #|Change name for clarity
+# IPS2 = sLoop_cubic #|Start Populating the bifurcation plot.
+# plot(sLoop_cubic,top_title="sLoop_cubic",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+
+# for L in sLoop_cubic("LP"):
+# 	l_sLoop_cubic_zetaEpsH = run(L,
+# 		IPS=2,ICP=[5,6,11,9],ISW=2,
+# 		UZSTOP={5:0.01},RL0=0.0,RL1=2.5,NMX=10000,NPR=5)
+# 	sLoop_cubic_zetaEpsH = run(l_sLoop_cubic_zetaEpsH)+run(l_sLoop_cubic_zetaEpsH,DS="-") 
+# 	plot(sLoop_cubic_zetaEpsH)
+
+
+
+
+
+l_dLoop_dat = load(
+	e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",     # .f90
+	dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",  #
+	c="ZilliCubic11",
+	IPS=2, ICP=[2,11,9,6], #Print par6 = zeta |#par5=epsH 
+	UZR={2:[9]},RL0=0,RL1=10.01,NMX=10000, # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
+	NTST=200,DS=+0.01,DSMAX=0.01,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-4);
+dLoop_dat = merge( run(l_dLoop_dat) + run(l_dLoop_dat,DS="-") ) #|Solution family from .dat
+dLoop_cubic = dLoop_dat #|Change name for clarity
+IPS2 = dLoop_cubic #|Start Populating the bifurcation plot.
+plot(dLoop_cubic,top_title="dLoop_cubic",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+
+for L in dLoop_cubic("LP"):
+	l_dLoop_cubic_zetaEpsH = run(L,
+		IPS=2,ICP=[5,6,11,9],ISW=2,
+		UZSTOP={5:0.02},RL0=0.0,RL1=2.5,NMX=10000,NPR=5)
+	dLoop_cubic_zetaEpsH = run(l_dLoop_cubic_zetaEpsH)+run(l_dLoop_cubic_zetaEpsH,DS="-") 
+	plot(dLoop_cubic_zetaEpsH)
+
+
+
+
+
+
+
+#|__|IPS2|__ 
+
+
+#|>>|PLOT|>> WHOLE DIAGRAM 
+# p=plot(all_sideStudy2,stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u", solution_y="v")
+# p.config(color_list="black red green blue orange purple gray brown teal turquoise violet")
+#save(all_sideStudy2,"all_sideStudy2")
+# save(all_sideStudy2,"all_zeta1e-5_epsH1p5_DL")
+#|__|PLOT|__
+
+########################################################################
+
+endTime = time.time()
+elapsedTime = endTime-startTime
+print( "=====FINISH___elapsedTime: ",
+	 elapsedTime,    " sec"," | ",
+	 elapsedTime/60, " min" )
+clean
+
+#|___WWW> Write some output at 'UZ' points to "myDummyWriteFile.txt" 
+#| FAIL IN AUTO: Cannot close file >>SO RUN d BELOW IN pythonCodeTry.py  
+# f = open('b.all_sideStudy2','r')
+# content = f.read()
+# f.seek(0)
+# lines = f.readlines()
+# pattern = r"\n.{13}4.{7}(7.499).+?\n" #|ACTION REQ FOR WHAT TO WRITE
+# pat = re.compile(pattern)
+# matches = pat.finditer(content)
+#
+# spans = []
+# matchTexts = []
+# text = "" 
+# for i in matches: 
+#    spans.append(i.span(0))
+#    matchTexts.append(i.group(0))
+#    text = text + i.group(0)[:-1] #|Here w/ [:-1], no extra new line
+# f.close()
+#
+# f = open('myDummyWriteFile.txt', "w")
+# f.write(text)
+# f.close()   
+#|___WWW. Write 'UZ' data
+
+
+
+#| DEPOT
+# #| To plot externally, export the data (Refer to AUTO doc), FAIL YET
+# dLoop_zeta.writeRawFilename("myASCIIoutputFile") #|Fail
+# myArray = dLoop_zeta.toArray()
+# print("!!!!!!!!!!!size of myArray is, ", len(myArray[0]), len(myArray) )
+# with open("myDummFile.txt","w",encoding="utf-8") as f:
+#   for r in myArray:
+#     for q in r:
+#       f.write(str(r)+"\n") 
