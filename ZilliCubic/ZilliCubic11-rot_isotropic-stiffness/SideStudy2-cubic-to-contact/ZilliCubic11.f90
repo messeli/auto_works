@@ -85,7 +85,7 @@
         MH = 0.D0 !1st continue MH from 0 to 0.9
 
         EPSH =0.353D0
-        ZETA = 0.01D0 !0.01
+        ZETA = 1D-5 !0.01
         JPH  = 0.143D0
         OMEGP = 0.0D0
         KAPPA = 0.0D0  ! 1.D0

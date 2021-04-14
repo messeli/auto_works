@@ -43,12 +43,12 @@ IPS2 = sLoop_cubic #|Start Populating the bifurcation plot.
 plot(sLoop_cubic,top_title="sLoop_cubic",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
 #| SL_cubic epsH-zeta plane 
-# for L in sLoop_cubic("LP"):
-# 	l_sLoop_cubic_zetaEpsH = run(L,
-# 		IPS=2,ICP=[5,6,11,9],ISW=2,
-# 		UZSTOP={5:0.01},RL0=0.0,RL1=2.5,NMX=10000,NPR=5)
-# 	sLoop_cubic_zetaEpsH = run(l_sLoop_cubic_zetaEpsH)+run(l_sLoop_cubic_zetaEpsH,DS="-") 
-# 	plot(sLoop_cubic_zetaEpsH)
+for L in sLoop_cubic("LP"):
+	l_sLoop_cubic_zetaEpsH = run(L,
+		IPS=2,ICP=[5,6,11,9],ISW=2,
+		UZSTOP={5:0.01},RL0=0.0,RL1=2.5,NMX=10000,NPR=5)
+	sLoop_cubic_zetaEpsH = run(l_sLoop_cubic_zetaEpsH)+run(l_sLoop_cubic_zetaEpsH,DS="-") 
+	plot(sLoop_cubic_zetaEpsH)
 
 
 # #| Homotopy to newNonlin with kappa=0>1 OR rho=0>1 for tanh OR quintic, respectively (par8 OR par15)
@@ -110,25 +110,25 @@ plot(sLoop_cubic,top_title="sLoop_cubic",stability=True,height=600,bifurcation_x
 
 
 
-l_dLoop_dat = load(
-	e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",     # .f90
-	dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",  #
-	c="ZilliCubic11",
-	IPS=2, ICP=[2,11,9,6], #Print par6 = zeta |#par5=epsH 
-	UZR={2:[4]},RL0=0,RL1=10.01,NMX=10000, # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
-	NTST=200,DS=+0.01,DSMAX=0.01,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-4);
-dLoop_dat = merge( run(l_dLoop_dat) + run(l_dLoop_dat,DS="-") ) #|Solution family from .dat
-dLoop_cubic = dLoop_dat #|Change name for clarity
-IPS2 = dLoop_cubic #|Start Populating the bifurcation plot.
-plot(dLoop_cubic,top_title="dLoop_cubic",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+# l_dLoop_dat = load(
+# 	e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",     # .f90
+# 	dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",  #
+# 	c="ZilliCubic11",
+# 	IPS=2, ICP=[2,11,9,6], #Print par6 = zeta |#par5=epsH 
+# 	UZR={2:[4]},RL0=0,RL1=10.01,NMX=10000, # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
+# 	NTST=200,DS=+0.01,DSMAX=0.01,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-4);
+# dLoop_dat = merge( run(l_dLoop_dat) + run(l_dLoop_dat,DS="-") ) #|Solution family from .dat
+# dLoop_cubic = dLoop_dat #|Change name for clarity
+# IPS2 = dLoop_cubic #|Start Populating the bifurcation plot.
+# plot(dLoop_cubic,top_title="dLoop_cubic",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
-#| DL_cubic epsH-zeta plane 
-for L in dLoop_cubic("LP"):
-	l_dLoop_cubic_zetaEpsH = run(L,
-		IPS=2,ICP=[5,6,11,9],ISW=2,
-		UZSTOP={5:0.02},RL0=0.0,RL1=2.5,NMX=10000,NPR=5)
-	dLoop_cubic_zetaEpsH = run(l_dLoop_cubic_zetaEpsH)+run(l_dLoop_cubic_zetaEpsH,DS="-") 
-	plot(dLoop_cubic_zetaEpsH)
+# #| DL_cubic epsH-zeta plane 
+# # for L in dLoop_cubic("LP"):
+# # 	l_dLoop_cubic_zetaEpsH = run(L,
+# # 		IPS=2,ICP=[5,6,11,9],ISW=2,
+# # 		UZSTOP={5:0.02},RL0=0.0,RL1=2.5,NMX=10000,NPR=5)
+# # 	dLoop_cubic_zetaEpsH = run(l_dLoop_cubic_zetaEpsH)+run(l_dLoop_cubic_zetaEpsH,DS="-") 
+# # 	plot(dLoop_cubic_zetaEpsH)
 
 # #| Homotopy to newNonlin with kappa=0>1 OR rho=0>1 for tanh OR quintic, respectively (par8 OR par15)
 # count = 0 

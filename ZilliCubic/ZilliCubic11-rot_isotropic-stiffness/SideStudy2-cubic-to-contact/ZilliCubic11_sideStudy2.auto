@@ -25,7 +25,7 @@ isFoldContin   = False
 startTime = time.time()
 #|>>|IPS1|>>>IPS1
 #|>>|IPS1_FORW|>> FORWARD: Cont mH:0-0.9>>gamma:0-0.25>>Omeg:0-7 >> Kappa:0-1>>beta:0-10>>K:0-100>>Omeg:0-7
-if False:
+if True:
 	mH       = run( "ZilliCubic11" ) 
 	forward1 = run( mH("UZ1"), ICP=[ 2,9], UZSTOP={2:0.1},NMX=1000, DS=0.01,DSMAX=0.01 ) 
 	kappa    = run( forward1("UZ1"), ICP=[ 8,9,2], UZSTOP={8:1.0} ) 
@@ -35,13 +35,13 @@ if False:
 	for epsH_val in [1.5]: #epsH_val in [0.8,0.9,1.5] | epsH=0.353 is left to the backward cont just below.
 		print("<===DIAGNOSTIC===IPS1_FORW===> epsHval is ",epsH_val)
 		new   = run( K("UZ1"), ICP=[ 5,9,13], UZSTOP={5:epsH_val} ) # OPT(IPS1_FORW) Increase epsH | UZSTOP={5:10e-1 })
-		forw += run( new("UZ1"), ICP=[ 2,9,6], UZSTOP={2:10},NMX=200000, \
-			NTST=200,DS=0.01,DSMAX=0.05,EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4,ITMX=8,ITNW=7,NWTN=6 )
+		forw += run( new("UZ1"), ICP=[ 2,9,6], UZSTOP={2:10},NMX=900, \
+			NTST=200,DS=0.01,DSMAX=0.05,EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4,ITMX=8,ITNW=7,NWTN=6 ) #NMX=200000
 	#save(forw,"forw") 
 #|__|IPS1_FORW|__
 
 #|>>|IPS1_BACK_B|>>  METHOD B: All-MATLAB startPoints (ONLY for smaller zeta)
-if True: 
+if True : 
 	print("===DIAGNOSTIC===IPS1_BACK_B")
 	zetaList   = ["1e-2"] #,"8e-3","5e-3","1e-3","1e-4","1e-5"]
 	eqFileName = ["ZilliCubic11_givenBackwards_zeta_"+x for x in zetaList]
@@ -50,7 +50,7 @@ if True:
 			e=eqFileName[i],
 			c="ZilliCubic11",
 			ICP=[2,9],
-			NMX=1000000,RL0=0.01,RL1=10.0,
+			NMX=4000,RL0=0.01,RL1=10.0, #NMX=1000000
 			NTST=200,DS=-0.01,DSMAX=0.01,EPSL= 1e-06,EPSU = 1e-06,EPSS =1e-4)
 		back = merge( run(l_back) + run(l_back,DS='-') )
 	#save(back,"back")
