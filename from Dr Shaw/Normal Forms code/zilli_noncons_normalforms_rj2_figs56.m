@@ -40,7 +40,7 @@ zmdl = CreateZilliMdl( mass, Jp, zeta, k , m, epsln, beta, rc ,cs);
 
 %% linear system critical speed and syncronous response- stationary and rotating coords
 %campbell diag
-Omvals=3.9;%5.8:0.02:10;%3.8%:0.05:5.0;%3.37:0.0005:3.39;%2:0.01:2.5;%2.2:0.01:2.5;% 3.2:0.01:4.5;%3.7:0.01:3.9;   %0.2:0.2:6.4;%
+Omvals=3.2:0.01:3.3;3.9;%5.8:0.02:10;%3.8%:0.05:5.0;%3.37:0.0005:3.39;%2:0.01:2.5;%2.2:0.01:2.5;% 3.2:0.01:4.5;%3.7:0.01:3.9;   %0.2:0.2:6.4;%
 nOmvals=length(Omvals);
 [ omfw , ombw ] = zillWhirlSpeeds_Stationary( M,G,C,K,Omvals );
 [ omfw_ , ombw_ ] = zillWhirlSpeeds_Rotating( M,G,C,K,Omvals );
@@ -222,7 +222,7 @@ for ii =1:(nguess*nOmvals)
     % evaluate P and then p
     P=H;
     for jj=1:NResTerms
-        P(Sk(jj),mod(Sl(jj),Nft)+1)=U(jj); %copy the resonant terms into P
+        P(Sk(jj),mod(Sl(jj),Nft)+1)=U(jj); %copy the resonant terms into P %|P=U+H, Hij=0 for nonres terms 
     end
     p = ifft(P,Nft,2)*Nft;
     
