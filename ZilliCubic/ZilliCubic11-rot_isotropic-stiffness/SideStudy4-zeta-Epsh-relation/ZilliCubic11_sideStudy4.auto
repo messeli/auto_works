@@ -17,8 +17,8 @@ clean
 
 
 endTime = time.time()
-elapsedTime = endTime-startTime
-print( "=====FINISH___elapsedTime: ",elapsedTime," sec"," | ",elapsedTime/60, " min" )
+elapsed = endTime-startTime
+print( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> FINISHED IN: {:.2f} sec OR {:.2f} min.".format(elapsed,elapsed/60) )
 
 
 

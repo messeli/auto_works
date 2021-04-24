@@ -1,5 +1,7 @@
-Here the bifurcation diagrams sLoop_cubic, sLoop_newNonlin, dLoop_cubic, and dLoop_newNonlin are calculated in the sideStudy2. 
 The file ZilliCubic11_sideStudy2.auto has become too long. 
+
 So I generated the sideStudy4 folder for : 
-	the fold continuation, of of fold wtr Omeg, in zeta and epsH. 
-	
+
+1 - the fold continuation in zeta and epsH  of d fold wtr Omeg. 
+2 - one param periodic continuation in "Omeg from dat >> zeta >> epsH >> Omeg"
+3 - 

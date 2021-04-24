@@ -64,6 +64,7 @@ except:
 plot(IPS1,top_title="IPS1",bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v",height=600,stability=True) 
 #save(IPS1,"IPS1")
 
+
 #| Kappa Homotopy
 # A = load(back,ICP=[8,9],NTST=200,DS=0.01,DSMAX=0.05, 
 #     RL0=-0.01,RL1=1.01,UZSTOP={8:[0,1]} )
@@ -72,14 +73,22 @@ plot(IPS1,top_title="IPS1",bifurcation_x="Omeg",bifurcation_y="Amplitude",soluti
 #      solution_x="u",solution_y="v",height=600,stability=True)
 #|__|IPS1|__.
 
+
 ########################################################################
 
+
 #|>>|IPS2|>> IPS2 
+
 #|>>|IPS2_A|>> METHOD A : ~PURE AUTO 
+
 #|>>|IPS2_A_KAPPA|>> Only kappa continuation
+
 if isKappaContin: #KAPPA-CONTIN TOOGLE (Omeg=cnst)
+
 	#|>>|IPS2_A_KAPPA_SL|>>
 	print("===DIAGNOSTIC===IPS2_A_KAPPA_SL")
+
+
 	#| OPT(IPS2_A_KAPPA_SL) Decrease zeta first
 	l_sLoop_dat_initHomotInEpsH = load(
 	    e="ZilliCubic11_datFileContin_zeta_1e-2",
@@ -89,7 +98,9 @@ if isKappaContin: #KAPPA-CONTIN TOOGLE (Omeg=cnst)
 	    UZR={6:[1e-2]},UZSTOP={5:2.0},NMX=2000, # was 1e-5 for epsH changing study.
 	    NTST=200,DS=+0.001,DSMAX=0.005,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-4) # 6 6 3s
 	IPS2_sLoop = merge( run(l_sLoop_dat_initHomotInEpsH) + run(l_sLoop_dat_initHomotInEpsH,DS="-") )
+	
 	plot(IPS2_sLoop,top_title="zeta on cubic dat",stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+
 
 	#| Use Matlab-generated orbit at thetaP=2.91(dLoop)/4.05(sLoop) once.
 	l_sLoop_dat = load(
@@ -101,10 +112,12 @@ if isKappaContin: #KAPPA-CONTIN TOOGLE (Omeg=cnst)
 		UZR={2:[9]},RL0=0,RL1=10.01,NMX=10000, # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
 		NTST=200,DS=+0.001,DSMAX=0.05,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-4);
 	sLoop_dat = merge( run(l_sLoop_dat) + run(l_sLoop_dat,DS="-") ) #|Solution family from .dat
+	
 	sLoop_cubic = sLoop_dat #|Change name for clarity
 	save(sLoop_cubic,"sLoop_cubic")
 	IPS2 = sLoop_cubic #|Start Populating the bifurcation plot.
 	plot(sLoop_cubic,top_title="sLoop_cubic",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+
 
 	#| Homotopy to newNonlin with kappa=0>1 OR rho=0>1 for tanh OR quintic, respectively (par8 OR par15)
 	count = 0 
@@ -113,18 +126,24 @@ if isKappaContin: #KAPPA-CONTIN TOOGLE (Omeg=cnst)
 		count+=1
 		print("===DIAGNOSTIC===IPS2_A_KAPPA_SL===Homotopy2newNonlin=",count,"/",size,)
 		# if count>=2: break
+
 		try:
 			l_sLoop_homot = load(Z,
 				IPS=2, ICP=[8,11,9,2], # In d case of RHO(quintic): IPS=2, ICP=[15,11,9],
 				UZR={8:[1.0]},RL1=1.01,NMX=5000, #|NMX=60000 | UZR={8:[1.0,0.985]} | UZR={15:[0.987]}, | UZSTOP={15:[1.0]}
 				NTST=200,DS=0.001,DSMAX=0.01) 
+
 			try:   sLoop_homot = sLoop_homot + merge( run(l_sLoop_homot) + run(l_sLoop_homot,DS="-") )
 			except:sLoop_homot =               merge( run(l_sLoop_homot) + run(l_sLoop_homot,DS="-") )
+
 			if sLoop_homot("UZ"):
 				break
+		
 		except:
 				continue
+
 	plot(sLoop_homot,top_title="sLoop_homot",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+
 
 	#| SolFam of sLoop with newNonlin
 	count = 0
@@ -134,41 +153,51 @@ if isKappaContin: #KAPPA-CONTIN TOOGLE (Omeg=cnst)
 		count+=1 
 		print("===DIAGNOSTIC===IPS2_A_KAPPA_SL===newNonlinSolFam=",count,"/",size,)
 		if count>=2: break
+
 		try: #|this try could be unnecessary
 			l_sLoop_newNonlin = load(X,  #'UZ1'
 				IPS=2,ICP=[2,11,9,8],NPR=1000,
 				UZR={2:9.5},RL0=0,RL1=10.1,NMX=60000,
 				NTST=300,DS=-0.001,DSMAX=0.01) #|NEW SAMPLING FOR CONTACT STEEPNESS INCREASE, K.
 			sLoop_newNonlin = sLoop_newNonlin + merge(run(l_sLoop_newNonlin)+run(l_sLoop_newNonlin,DS="-"))
+		
 		except: 
 			continue
+	
 	plot(sLoop_newNonlin,top_title="sLoop_newNonlin before epsH change",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 	save(sLoop_newNonlin, "sLoop_newNonlin") 
 
 
+
 	#| OPT(IPS2_A_KAPPA_SL) Increase epsH 
 	print("===DIAGNOSTIC===IPS2_A_KAPPA_SL===varyJepsH")
+
 	l_sLoop_newNonlin_epsH = load(
 		sLoop_newNonlin("UZ1"),#LP1 DELETED
 		IPS=2,ICP=[5,11,9,2], 
 		UZR={5:[1.5]},NMX=55000,  # UZR={5:[0.353,0.8,0.9,1.5]}
 		NTST=300,DSMAX=0.01)
 	sLoop_newNonlin_epsH = run(l_sLoop_newNonlin_epsH) + run(l_sLoop_newNonlin_epsH,DS="-")
+
 	plot(sLoop_newNonlin_epsH,top_title="epsH on newNonlin",bifurcation_x="epsH",bifurcation_y="Amplitude",stability=True)
+
 	count = 0
 	size = len(sLoop_newNonlin_epsH("UZ"))
 	sLoop_newNonlin_newEpsH = []
 	for E in sLoop_newNonlin_epsH("UZ"):
-		if count >= 4: break
 		count += 1
 		print("===DIAGNOSTIC===IPS2_A_KAPPA_SL===newNonlinWvariedEpsH=",count,"/",size)
+		if count >= 4: break
+
 		l_sLoop_newNonlin_newEpsH = load(E,
 			ICP=[2,11,9,5],
 			RL1=10,NMX=30000,	
 			DS=0.001,DSMAX=0.01)
 		sLoop_newNonlin_newEpsH += merge(run(l_sLoop_newNonlin_newEpsH) + run(l_sLoop_newNonlin_newEpsH,DS="-") )
+
 	plot(sLoop_newNonlin_newEpsH,top_title="sLoop_newNonlin_newEpsH after epsH change",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 	save(sLoop_newNonlin_newEpsH, "sLoop_newNonlin_newEpsH") 	
+
 	#| Add fold contin line :FAIL with  free(): invalid next size (fast)
 	# print("===DIAGNOSTIC===IPS2_A_KAPPA_SL===newNonlinWvariedEpsH=",count,"/",size,)
 	# l_sLoop_newNonlin_epsHfoldContin = run(
@@ -185,11 +214,16 @@ if isKappaContin: #KAPPA-CONTIN TOOGLE (Omeg=cnst)
 	try:    IPS2 = IPS2 + sLoop_newNonlin_newEpsH + sLoop_steepen
 	except: IPS2 = IPS2 + sLoop_newNonlin_newEpsH
 	# wholebifur(IPS1,IPS2)
+
 	#|__|IPS2_A_KAPPA_SL|__
 
 
+
+
 	#|>>|IPS2_A_KAPPA_DL|>>
+
 	print("===DIAGNOSTIC===IPS2_A_KAPPA_DL")
+
 	#| OPT(IPS2_A_KAPPA_DL) Decrease zeta first
 	l_dLoop_dat_initHomotInEpsH = load(
 	    e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",

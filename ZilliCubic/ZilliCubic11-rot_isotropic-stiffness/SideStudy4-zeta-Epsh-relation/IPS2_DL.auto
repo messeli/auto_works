@@ -1,3 +1,4 @@
+import numpy as n 
 # parnames={
 # 1:'gamma',
 # 2:'Omeg',
@@ -13,6 +14,12 @@
 # 14:'KSI',
 # 15:'RHO'}
 
+######NOTES#####
+# Nt: D "Get state" & "Record" parts r adD t nt perform contin in d same parameters. 
+# ...Ds decrD d time frm ~28 min t ~4 min $ d size f b.* at a similar rate.
+
+
+
 #|>>|IPS2_DL|>> 
 
 ###<CONTROLS>###
@@ -20,57 +27,154 @@ isOnCubic = True
 ################
 
 l_dLoop_dat = load(
-	e="eqs/ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",     # .f90
-	dat="dats/onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",  # .dat
+	e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",     # .f90
+	dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",  # .dat
 	c="ZilliCubic11", 
-	IPS=2, ICP=[2,11,9,6], #Print par6 = zeta |#par5=epsH 
-	UZR={2:[3,4,5,6]},RL0=0,RL1=10.01,NMX=5000, # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
-	NTST=200,DS=+0.01,DSMAX=0.01,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-4);
+	IPS=2, ICP=[2,11,9,5,6], #Print par6 = zeta |#par5=epsH 
+	UZR={2:[3,4,5,6]},RL0=0,RL1=7.01,NMX=400, # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
+	NTST=150,DS=+0.01,DSMAX=0.1,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-3);
 dLoop_dat = merge( run(l_dLoop_dat) + run(l_dLoop_dat,DS="-") ) #|Solution family from .dat
 dLoop_cubic = dLoop_dat #|Change name for clarity
-IPS2 = dLoop_cubic #|Start Populating the bifurcation plot.
+#IPS2 = dLoop_cubic #|Start Populating the bifurcation plot.
 plot(dLoop_cubic,top_title="dLoop_cubic",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
-
-
 
 if isOnCubic:
 
-	# #| DL_cubic epsH-zeta plane 
-	# try: #fold contin, if it issues free() error 
-	# 	for L in dLoop_cubic("LP"):
-			
-	# 		l_dLoop_cubic_zetaEpsH = run(L,
-	# 			IPS=2,ICP=[5,6,11,9],ISW=2,
-	# 			UZSTOP={5:0.02},RL0=0.0,RL1=2.5,NMX=10000,NPR=5)
-	# 		dLoop_cubic_zetaEpsH = run(l_dLoop_cubic_zetaEpsH)+run(l_dLoop_cubic_zetaEpsH,DS="-") 
-			
-	# 		plot(dLoop_cubic_zetaEpsH)
+	#| DL_cubic fold contin
+	# try:		
+	if True:#2-param contin
+		l_dLoop_cubic_zetaEpsH = run(dLoop_cubic("LP1"),
+			IPS=2,ICP=[5,6,11,9],ISW=2,
+			UZSTOP={5:0.02},RL0=0.0,RL1=2.5,NMX=100000,NPR=5)
+		dLoop_cubic_zetaEpsH = run(l_dLoop_cubic_zetaEpsH)+run(l_dLoop_cubic_zetaEpsH,DS="-") 
+		
+		plot(dLoop_cubic_zetaEpsH,top_title="2param fold cont",stability=True,bifurcation_x="epsH",bifurcation_y="zeta",)
+
+	else: 
+		#3-param contin #CODIM 2 bifurcation is needed (?)
+		l_dLoop_cubic_epsHzetaOmeg = run(dLoop_cubic("LP1"),
+			IPS=2,ICP=[5,6,2,11,9],ISW=3,
+			UZSTOP={5:0.01},RL0=0.0,RL1=4,NMX=10000,NPR=5)
+		dLoop_cubic_zetaEpsH = run(l_dLoop_cubic_epsHzetaOmeg)+run(l_dLoop_cubic_epsHzetaOmeg,DS="-") 
+
+		plot(dLoop_cubic_zetaEpsH,top_title="3param fold cont",stability=True,bifurcation_x="Omeg",bifurcation_y="epsH",bifurcation_z="zeta",)
 
 	# except: 
-	# 	print(">>> ERROR : Fold contin attempt issued the free() error")
+		# print(">>> ERROR : FOLDCONT FAIL")
 
 
-	#| DL_cubic zeta contin and sample
+
+
+	#1/4| Zeta Contin the DL_cubic, and sample
 	DL_cubic_zeta = [] 
-	for X in dLoop_cubic("UZ"):
-		print("=====================================================DIAGNOSTIC[1]")
-		l_DL_cubic_zeta = load(X,
-			IPS=2,ICP=[6,11,9],
-			UZ={6:[1e-5,1e-4,1e-3,0.02,0.05,0.08]},UZSTOP={6:10},RL0=-0.01,RL1=0.1,NMX=1000,NPR=1000
-			)
-		DL_cubic_zeta += merge(run(l_DL_cubic_zeta) + run(l_DL_cubic_zeta,DL="-"))
-	
-	#| DL_cubic epsH contin from the sampled zeta contin, and sample
-	DL_cubic_zeta_epsH = [] 
-	for Y in DL_cubic_zeta("UZ"): 
+	size = len(dLoop_cubic('UZ'))
+	# used_epsHzetaOmeg = n.zeros((size,1))
+	used_epsH = n.zeros(size) ; used_zeta = n.zeros(size) ; used_Omeg = n.zeros(size)
+	#
+	for X in dLoop_cubic('UZ'):
+		#Get state
+		[curr_epsH,curr_zeta,curr_Omeg] = [X.__getstate__()["PAR"].values()[par-1] for par in [5,6,2]]
+		print("Currern epsH:{} , zeta:{} , Omeg:{}".format(curr_epsH,curr_zeta,curr_Omeg))
+		if min(abs(  used_Omeg-curr_Omeg  ))<=1e-3:
+			continue
 		
+		#Contin if not done before 
+		l_DL_cubic_zeta = load(X,
+			IPS=2,ICP=[6,11,9,5,2],ISW=1,
+			UZR={6:[1e-6,1e-5,1e-4,8e-3,5e-3,1e-3,1e-2,0.0125,0.02,0.05,0.08]},UZSTOP={6:10},RL0=-0.001,RL1=0.1,NMX=1000,NPR=1000) #UZR={6:[1e-5,1e-4,8e-3,5e-3,1e-3,1e-2,0.0125,0.02,0.05,0.08]}
+		DL_cubic_zeta += merge(run(l_DL_cubic_zeta) + run(l_DL_cubic_zeta,DS="-"))
+		
+		#Record
+		used_epsH = n.append(used_epsH,curr_epsH) ; used_zeta = n.append(used_zeta,curr_zeta) ; used_Omeg = n.append(used_Omeg,curr_Omeg)
+
+
+	plot(DL_cubic_zeta,bifurcation_x="zeta",bifurcation_y="Amplitude",stability=True)
+
+
+
+	#2/4| epsH Contin DL_cubic at sampled zeta, and sample
+	DL_cubic_zeta_epsH = [] 
+	size = len(DL_cubic_zeta('UZ'))
+	used_epsH = n.zeros(size) ; used_zeta = n.zeros(size) ; used_Omeg = n.zeros(size)
+	#
+	for Y in DL_cubic_zeta("UZ"): 
+		#Get State
+		[curr_epsH,curr_zeta,curr_Omeg] = [Y.__getstate__()["PAR"].values()[par-1] for par in [5,6,2]]
+		print("Currern epsH:{} , zeta:{} , Omeg:{}".format(curr_epsH,curr_zeta,curr_Omeg))
+		if  min(abs(used_zeta-curr_zeta))<=1e-6 and min(abs(used_Omeg-curr_Omeg))<=1e-3:			
+			continue
+		
+		#Contin if not done before 
 		l_DL_cubic_zeta_epsH = load(Y,
 			IPS=2,ICP=[5,11,9,2,6],
-			UZSTOP={5:[0.353,0.8,0.9,1.5]},RL0=0.0,RL1=2.0,NMX=1000,NPR=1000
-			)
+			UZR={5:[0,1e-5,1e-4,1e-3,5e-3,8e-3,1e-2,2e-2,5e-2,0.1,0.2,0.25,0.353,0.5,0.8,1.0,1.5,1,8]},RL0=0.0,RL1=2.0,NMX=100,NPR=1000)
 		DL_cubic_zeta_epsH += run(l_DL_cubic_zeta_epsH) + run(l_DL_cubic_zeta_epsH,DS="-")
 
-	plot(DL_cubic_zeta_epsH,bifurcation_x="Omeg",bifurcation_y="zeta",bifurcation_z="epsH",stability=True)
+		#Record
+		used_epsH = n.append(used_epsH,curr_epsH) ; used_zeta = n.append(used_zeta,curr_zeta) ; used_Omeg = n.append(used_Omeg,curr_Omeg)
+
+
+	plot(DL_cubic_zeta_epsH,bifurcation_x="zeta",bifurcation_y="Omeg",bifurcation_z="epsH",stability=True)
+
+
+	#3/4| Omeg contin DL_cubic from all UZ points generated above with various zeta and epsH values. 
+	DL_all = DL_cubic_zeta + DL_cubic_zeta_epsH
+	count = 0 ;
+	size = len(DL_all("UZ")) 
+	used_epsH = n.zeros(size) ; used_zeta = n.zeros(size) ; used_Omeg = n.zeros(size)
+	#
+	for Z in DL_all("UZ"):
+		count += 1 
+		print("============================================================",count,"/",size,"===")
+		#Get state
+		[curr_epsH,curr_zeta,curr_Omeg] = [Z.__getstate__()["PAR"].values()[par-1] for par in [5,6,2]]
+		print("Currern epsH:{} , zeta:{} , Omeg:{}".format(curr_epsH,curr_zeta,curr_Omeg))
+		if min(abs(used_epsH-curr_epsH))<=1e-6 and min(abs(used_zeta-curr_zeta))<=1e-6 and min(abs(used_Omeg-curr_Omeg))<=1e-3:
+			count -=1
+			continue
+
+		#Contin if not done before 
+		l_DL_all = load(Z,
+			IPS=2,ICP=[2,11,9,5,6],
+			UZR=[],UZSTOP=[],STOP="LP",RL0=0.01,RL1=10.0,NMX=1000,NPR=10000)
+		DL_all += run(l_DL_all) + run(l_DL_all,DS="-")
+
+		#Record
+		used_epsH = n.append(used_epsH,curr_epsH) ; used_zeta = n.append(used_zeta,curr_zeta) ; used_Omeg = n.append(used_Omeg,curr_Omeg)
+
+
+	plot(DL_all,letter_symbols=False,stability=True,bifurcation_x="Omeg",bifurcation_y="epsH",bifurcation_z="Amplitude")
+	save(DL_all, "DL_all")
+
+
+	#4/4| Add fold contins as much as possible
+	# try: 
+	foldContins = []
+	size = len(DL_all("UZ")) 
+	used_epsH = n.zeros(size) ; used_zeta = n.zeros(size) ; used_Omeg = n.zeros(size)
+	#
+	for T in DL_all("LP"):
+		#Get state
+		[curr_epsH,curr_zeta,curr_Omeg] = [T.__getstate__()["PAR"].values()[par-1] for par in [5,6,2]]
+		print("Currern epsH:{} , zeta:{} , Omeg:{}".format(curr_epsH,curr_zeta,curr_Omeg))
+		if min(abs(  used_epsH-curr_epsH  ))<=5e-6 and min(abs(  used_zeta-curr_zeta  ))<=1e-5 and min(abs(  used_Omeg-curr_Omeg  ))<=1e-3:
+			continue
+
+		#Contin if not done before 
+		l_foldContins = run(T,ICP=[5,2,11,9,6],ISW=2,UZR={},UZSTOP={})
+		try:       foldContins += merge( run(l_foldContins)+ run(l_foldContins,DS="-") )
+		except: 
+			try:   foldContins +=        run(l_foldContins)
+			except:foldContins +=                            run(l_foldContins,DS="-")
+
+		#Record
+		used_epsH = n.append(used_epsH,curr_epsH) ; used_zeta = n.append(used_zeta,curr_zeta) ; used_Omeg = n.append(used_Omeg,curr_Omeg)
+
+	# except:
+	# 	pass
+
+	plot(foldContins,bifurcation_x="Omeg",bifurcation_z="Amp",bifurcation_y="epsH",stability=True,color_list="black red green blue violet orange gray brown teal turquoise purple")
+
 
 
 
@@ -133,3 +237,46 @@ else: #if isOnTanhContacts:
 		dLoop_newNonlin_zetaEpsH = run(l_dLoop_newNonlin_zetaEpsH)+run(l_dLoop_newNonlin_zetaEpsH,DS="-") 
 		
 		plot(dLoop_newNonlin_zetaEpsH)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# DEPOT
+#1
+
+	#for X in dLoop_cubic('UZ'): 
+		# print(type(X)) #<class 'auto.parseS.AUTOSolution'>
+		# print(dir(X))
+		# print(X.data) #print(X.data_keys) for the keys
+		#print(X.items) #fail
+		#print(X.keys()) #fail
+		#print(X.values) #fail
+		#for i in X.iteritems(): print(i) #dat file like content in order.
+		#for i in X.iterkeys(): print(i) #u,v,u_dot,v_dot
+		#for i in X.itervalues(): print(i) #dat file like content printed in order.
+		#print(X.todict()) #dat file like content in a dictionary.
+		#print(X.info()) #short view of todict content 
+		# print(X.__getstate__()) #prints epsH and zeta, a dictionary.
+		# print(X.__getstate__()["PAR"])
+		# print(type(X.__getstate__()["PAR"])) #<class 'auto.parseS.AUTOParameters'>
+		# print(X.__getstate__()["PAR"].values()[6-1]) #.items() .values() .keys()
+
+#2
+
+# print("=====================================================DIAGNOSTIC[0.0]")
+# curr_data = dLoop_cubic.getIndex(10)["data"] #<class 'auto.parseB.BDPointData'>
+# curr_epsH = curr_data[-2]
+# curr_zeta = curr_data[-1]
+# print("=====================================================DIAGNOSTIC[0.1]")
+
+
