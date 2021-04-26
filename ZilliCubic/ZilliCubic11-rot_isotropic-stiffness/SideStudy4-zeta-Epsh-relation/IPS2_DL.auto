@@ -45,10 +45,11 @@ if isOnCubic:
 	if True:#2-param contin
 		l_dLoop_cubic_zetaEpsH = run(dLoop_cubic("LP1"),
 			IPS=2,ICP=[5,6,11,9],ISW=2,
-			UZSTOP={5:0.02},RL0=0.0,RL1=2.5,NMX=100000,NPR=5)
+			STOP="LP",UZSTOP={5:-0.1},RL0=0.0,RL1=3.5,NMX=80000,NPR=5,
+			DSMAX=0.01)
 		dLoop_cubic_zetaEpsH = run(l_dLoop_cubic_zetaEpsH)+run(l_dLoop_cubic_zetaEpsH,DS="-") 
 		
-		plot(dLoop_cubic_zetaEpsH,top_title="2param fold cont",stability=True,bifurcation_x="epsH",bifurcation_y="zeta",)
+		plot(dLoop_cubic_zetaEpsH,top_title="2param fold cont",stability=True,bifurcation_x="epsH",bifurcation_y="zeta",color_list="black red green blue violet orange gray brown teal turquoise purple")
 
 	else: 
 		#3-param contin #CODIM 2 bifurcation is needed (?)
@@ -57,7 +58,7 @@ if isOnCubic:
 			UZSTOP={5:0.01},RL0=0.0,RL1=4,NMX=10000,NPR=5)
 		dLoop_cubic_zetaEpsH = run(l_dLoop_cubic_epsHzetaOmeg)+run(l_dLoop_cubic_epsHzetaOmeg,DS="-") 
 
-		plot(dLoop_cubic_zetaEpsH,top_title="3param fold cont",stability=True,bifurcation_x="Omeg",bifurcation_y="epsH",bifurcation_z="zeta",)
+		plot(dLoop_cubic_zetaEpsH,top_title="3param fold cont",stability=True,bifurcation_x="Omeg",bifurcation_y="epsH",bifurcation_z="zeta",color_list="black red green blue violet orange gray brown teal turquoise purple")
 
 	# except: 
 		# print(">>> ERROR : FOLDCONT FAIL")
@@ -88,7 +89,7 @@ if isOnCubic:
 		used_epsH = n.append(used_epsH,curr_epsH) ; used_zeta = n.append(used_zeta,curr_zeta) ; used_Omeg = n.append(used_Omeg,curr_Omeg)
 
 
-	plot(DL_cubic_zeta,bifurcation_x="zeta",bifurcation_y="Amplitude",stability=True)
+	plot(DL_cubic_zeta,bifurcation_x="zeta",bifurcation_y="Amplitude",stability=True,color_list="black red green blue violet orange gray brown teal turquoise purple")
 
 
 
@@ -114,7 +115,7 @@ if isOnCubic:
 		used_epsH = n.append(used_epsH,curr_epsH) ; used_zeta = n.append(used_zeta,curr_zeta) ; used_Omeg = n.append(used_Omeg,curr_Omeg)
 
 
-	plot(DL_cubic_zeta_epsH,bifurcation_x="zeta",bifurcation_y="Omeg",bifurcation_z="epsH",stability=True)
+	plot(DL_cubic_zeta_epsH,bifurcation_x="zeta",bifurcation_y="Omeg",bifurcation_z="epsH",stability=True,color_list="black red green blue violet orange gray brown teal turquoise purple")
 
 
 	#3/4| Omeg contin DL_cubic from all UZ points generated above with various zeta and epsH values. 
@@ -143,7 +144,7 @@ if isOnCubic:
 		used_epsH = n.append(used_epsH,curr_epsH) ; used_zeta = n.append(used_zeta,curr_zeta) ; used_Omeg = n.append(used_Omeg,curr_Omeg)
 
 
-	plot(DL_all,letter_symbols=False,stability=True,bifurcation_x="Omeg",bifurcation_y="epsH",bifurcation_z="Amplitude")
+	plot(DL_all,letter_symbols=False,stability=True,bifurcation_x="Omeg",bifurcation_y="epsH",bifurcation_z="Amplitude",color_list="black red green blue violet orange gray brown teal turquoise purple")
 	save(DL_all, "DL_all")
 
 
@@ -161,7 +162,7 @@ if isOnCubic:
 			continue
 
 		#Contin if not done before 
-		l_foldContins = run(T,ICP=[5,2,11,9,6],ISW=2,UZR={},UZSTOP={})
+		l_foldContins = run(T,ICP=[5,2,11,9,6],ISW=2 , UZR={},UZSTOP={},RL0=0.1,RL1=10 , DSMAX=0.1)
 		try:       foldContins += merge( run(l_foldContins)+ run(l_foldContins,DS="-") )
 		except: 
 			try:   foldContins +=        run(l_foldContins)
