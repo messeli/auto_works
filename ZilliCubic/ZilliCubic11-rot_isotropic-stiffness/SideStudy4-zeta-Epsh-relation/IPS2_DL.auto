@@ -42,16 +42,16 @@ if isOnCubic:
 
 	#| DL_cubic fold contin
 	# try:		
-	if True:#2-param contin
+	if False:#2-param contin
 		l_dLoop_cubic_zetaEpsH = run(dLoop_cubic("LP1"),
 			IPS=2,ICP=[5,6,11,9],ISW=2,
-			STOP="LP",UZSTOP={5:-0.1},RL0=0.0,RL1=3.5,NMX=80000,NPR=5,
+			STOP="LP",UZSTOP={5:0.02},RL0=0.0,RL1=4.5,NMX=80000,NPR=5,
 			DSMAX=0.01)
 		dLoop_cubic_zetaEpsH = run(l_dLoop_cubic_zetaEpsH)+run(l_dLoop_cubic_zetaEpsH,DS="-") 
 		
 		plot(dLoop_cubic_zetaEpsH,top_title="2param fold cont",stability=True,bifurcation_x="epsH",bifurcation_y="zeta",color_list="black red green blue violet orange gray brown teal turquoise purple")
 
-	else: 
+	elif False: 
 		#3-param contin #CODIM 2 bifurcation is needed (?)
 		l_dLoop_cubic_epsHzetaOmeg = run(dLoop_cubic("LP1"),
 			IPS=2,ICP=[5,6,2,11,9],ISW=3,
@@ -144,7 +144,7 @@ if isOnCubic:
 		used_epsH = n.append(used_epsH,curr_epsH) ; used_zeta = n.append(used_zeta,curr_zeta) ; used_Omeg = n.append(used_Omeg,curr_Omeg)
 
 
-	plot(DL_all,letter_symbols=False,stability=True,bifurcation_x="Omeg",bifurcation_y="epsH",bifurcation_z="Amplitude",color_list="black red green blue violet orange gray brown teal turquoise purple")
+	plot(DL_all,letter_symbols=True,stability=True,bifurcation_x="Omeg",bifurcation_y="epsH",bifurcation_z="Amplitude",color_list="black red green blue violet orange gray brown teal turquoise purple")
 	save(DL_all, "DL_all")
 
 
