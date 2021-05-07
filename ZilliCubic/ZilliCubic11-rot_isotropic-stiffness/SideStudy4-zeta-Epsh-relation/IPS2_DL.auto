@@ -19,163 +19,206 @@ import numpy as n
 # ...Ds decrD d time frm ~28 min t ~4 min $ d size f b.* at a similar rate.
 
 
-
-#|>>|IPS2_DL|>> 
-
 ###<CONTROLS>###
 isOnCubic = True
 ################
 
+
+#|>>|IPS2_DL|>> 
+print("============================================================ IPS2_DL")
+print("============================================================ IPS2_DL : Matlab(cubic)>Omeg")
+
+Omeg_list = n.array([3,4,5,6]) # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
 l_dLoop_dat = load(
 	e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",     # .f90
 	dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",  # .dat
 	c="ZilliCubic11", 
 	IPS=2, ICP=[2,11,9,5,6], #Print par6 = zeta |#par5=epsH 
-	UZR={2:[3,4,5,6]},RL0=0,RL1=7.01,NMX=400, # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
+	UZR={2:[3,4,5,6]},RL0=0,RL1=7.01,NMX=400, 
 	NTST=150,DS=+0.01,DSMAX=0.1,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-3);
+
 dLoop_dat = merge( run(l_dLoop_dat) + run(l_dLoop_dat,DS="-") ) #|Solution family from .dat
 dLoop_cubic = dLoop_dat #|Change name for clarity
+
 #IPS2 = dLoop_cubic #|Start Populating the bifurcation plot.
+
 plot(dLoop_cubic,top_title="dLoop_cubic",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
-if isOnCubic:
 
+if isOnCubic:
+	print("============================================================ IPS2_DL : Matlab(cubic)>Omeg>")
 	#| DL_cubic fold contin
 	# try:		
 	if False:#2-param contin
+		print("============================================================ IPS2_DL : Matlab(cubic)>Omeg>epsH(first try with Fold Contin)")
 		l_dLoop_cubic_zetaEpsH = run(dLoop_cubic("LP1"),
-			IPS=2,ICP=[5,6,11,9],ISW=2,
-			STOP="LP",UZSTOP={5:0.02},RL0=0.0,RL1=4.5,NMX=80000,NPR=5,
+			IPS=	2,ICP=[5,6,11,9],ISW=2,
+			STOP="LP",UZSTOP={5:0.00},RL0=0.0,RL1=5,NMX=80000,NPR=10000,
 			DSMAX=0.01)
-		dLoop_cubic_zetaEpsH = run(l_dLoop_cubic_zetaEpsH)+run(l_dLoop_cubic_zetaEpsH,DS="-") 
 		
+		dLoop_cubic_zetaEpsH_forw = run(l_dLoop_cubic_zetaEpsH)
+		# wait()
+		dLoop_cubic_zetaEpsH_back = run(l_dLoop_cubic_zetaEpsH,DS="-") 
+		dLoop_cubic_zetaEpsH = dLoop_cubic_zetaEpsH_forw+ dLoop_cubic_zetaEpsH_back	
+
 		plot(dLoop_cubic_zetaEpsH,top_title="2param fold cont",stability=True,bifurcation_x="epsH",bifurcation_y="zeta",color_list="black red green blue violet orange gray brown teal turquoise purple")
+		
 
 	elif False: 
 		#3-param contin #CODIM 2 bifurcation is needed (?)
 		l_dLoop_cubic_epsHzetaOmeg = run(dLoop_cubic("LP1"),
 			IPS=2,ICP=[5,6,2,11,9],ISW=3,
-			UZSTOP={5:0.01},RL0=0.0,RL1=4,NMX=10000,NPR=5)
+			UZSTOP={5:0.0},RL0=0.0,RL1=4,NMX=10000,NPR=5)
+
 		dLoop_cubic_zetaEpsH = run(l_dLoop_cubic_epsHzetaOmeg)+run(l_dLoop_cubic_epsHzetaOmeg,DS="-") 
 
 		plot(dLoop_cubic_zetaEpsH,top_title="3param fold cont",stability=True,bifurcation_x="Omeg",bifurcation_y="epsH",bifurcation_z="zeta",color_list="black red green blue violet orange gray brown teal turquoise purple")
-
-	# except: 
-		# print(">>> ERROR : FOLDCONT FAIL")
 
 
 
 
 	#1/4| Zeta Contin the DL_cubic, and sample
-	DL_cubic_zeta = [] 
+	print("============================================================ IPS2_DL : Matlab(cubic)>Omeg>zeta")
+	DL_cubic_zeta = [] #init bifur-diag-obj(bdo) as a list, as list cn b adD t bdo 
 	size = len(dLoop_cubic('UZ'))
-	# used_epsHzetaOmeg = n.zeros((size,1))
-	used_epsH = n.zeros(size) ; used_zeta = n.zeros(size) ; used_Omeg = n.zeros(size)
-	#
+	count = 0 ; pos = 0
+	zeta_list = n.array([5e-3,0.01,0.011]) #UZR={6:[1e-6,1e-5,1e-4,8e-3,5e-3,1e-3,1e-2,0.0125,0.02,0.05,0.08]}
+	used_Omeg_indexes = []
+	
 	for X in dLoop_cubic('UZ'):
+		count += 1 ; pos += 1 
+
 		#Get state
 		[curr_epsH,curr_zeta,curr_Omeg] = [X.__getstate__()["PAR"].values()[par-1] for par in [5,6,2]]
-		print("Currern epsH:{} , zeta:{} , Omeg:{}".format(curr_epsH,curr_zeta,curr_Omeg))
-		if min(abs(  used_Omeg-curr_Omeg  ))<=1e-3:
-			continue
-		
+		print("============================================================ IPS2_DL : Matlab>Omeg>zeta : ", "{}/{}/{} on epsH:{}, zeta:{}, Omeg:{}".format(count,pos,size,curr_epsH,curr_zeta,curr_Omeg))
+
+		check = abs(  (Omeg_list-curr_Omeg)/curr_Omeg  )
+		Omeg_index = n.argmin(check)
+		if min(check)<=1e-2:  #used_Omeg
+			#If done before ?
+			if Omeg_index in used_Omeg_indexes: 
+				count -= 1 
+				continue	
+			#Record	
+			used_Omeg_indexes.append(Omeg_index)
+			
 		#Contin if not done before 
 		l_DL_cubic_zeta = load(X,
 			IPS=2,ICP=[6,11,9,5,2],ISW=1,
-			UZR={6:[1e-6,1e-5,1e-4,8e-3,5e-3,1e-3,1e-2,0.0125,0.02,0.05,0.08]},UZSTOP={6:10},RL0=-0.001,RL1=0.1,NMX=1000,NPR=1000) #UZR={6:[1e-5,1e-4,8e-3,5e-3,1e-3,1e-2,0.0125,0.02,0.05,0.08]}
+			UZR={6:zeta_list},UZSTOP={6:10},RL0=-0.001,RL1=0.1,NMX=1000,NPR=1000) 
+		
 		DL_cubic_zeta += merge(run(l_DL_cubic_zeta) + run(l_DL_cubic_zeta,DS="-"))
 		
-		#Record
-		used_epsH = n.append(used_epsH,curr_epsH) ; used_zeta = n.append(used_zeta,curr_zeta) ; used_Omeg = n.append(used_Omeg,curr_Omeg)
 
-
-	plot(DL_cubic_zeta,bifurcation_x="zeta",bifurcation_y="Amplitude",stability=True,color_list="black red green blue violet orange gray brown teal turquoise purple")
-
+	plot(DL_cubic_zeta,top_title="DL zeta contin",bifurcation_x="zeta",bifurcation_y="Amplitude",stability=True,color_list="black red green blue violet orange gray brown teal turquoise purple")
 
 
 	#2/4| epsH Contin DL_cubic at sampled zeta, and sample
+	print("============================================================ IPS2_DL : Matlab>Omeg>zeta>epsH")
+
 	DL_cubic_zeta_epsH = [] 
 	size = len(DL_cubic_zeta('UZ'))
-	used_epsH = n.zeros(size) ; used_zeta = n.zeros(size) ; used_Omeg = n.zeros(size)
-	#
+	count = 0 ; pos = 0
+	epsH_list = n.array([0.1,0.353,0.75]) #UZR={5:[0,1e-5,1e-4,1e-3,5e-3,8e-3,1e-2,2e-2,5e-2,0.1,0.2,0.25,0.353,0.5,0.8,1.0,1.5,1,8]}
+	used_zetaOmeg_indexes = []
+
 	for Y in DL_cubic_zeta("UZ"): 
+		count += 1 ; pos += 1
+
 		#Get State
 		[curr_epsH,curr_zeta,curr_Omeg] = [Y.__getstate__()["PAR"].values()[par-1] for par in [5,6,2]]
-		print("Currern epsH:{} , zeta:{} , Omeg:{}".format(curr_epsH,curr_zeta,curr_Omeg))
-		if  min(abs(used_zeta-curr_zeta))<=1e-6 and min(abs(used_Omeg-curr_Omeg))<=1e-3:			
-			continue
+		print("============================================================ IPS2_DL : Matlab>Omeg>zeta>epsH : ", "{}/{}/{} on epsH:{}, zeta:{}, Omeg:{}".format(count,pos,size,curr_epsH,curr_zeta,curr_Omeg))
 		
+		[check_zeta,check_Omeg] = [abs(  (zeta_list-curr_zeta)/curr_zeta  )	, abs(  (Omeg_list-curr_Omeg)/curr_Omeg  )]
+		(zeta_index,Omeg_index) = ( n.argmin(check_zeta), n.argmin(check_Omeg) )
+		if min(check_zeta)<=1e-2 and min(check_Omeg)<=1e-2:  #used_Omeg
+			#If done before ?
+			if (zeta_index,Omeg_index) in used_zetaOmeg_indexes: 
+				count -= 1 
+				continue		
+			#Record 
+			used_zetaOmeg_indexes.append((zeta_index,Omeg_index))
+
 		#Contin if not done before 
 		l_DL_cubic_zeta_epsH = load(Y,
 			IPS=2,ICP=[5,11,9,2,6],
-			UZR={5:[0,1e-5,1e-4,1e-3,5e-3,8e-3,1e-2,2e-2,5e-2,0.1,0.2,0.25,0.353,0.5,0.8,1.0,1.5,1,8]},RL0=0.0,RL1=2.0,NMX=100,NPR=1000)
+			UZR={5:epsH_list},RL0=0.0,RL1=2.0,NMX=100,NPR=1000) 
+		
 		DL_cubic_zeta_epsH += run(l_DL_cubic_zeta_epsH) + run(l_DL_cubic_zeta_epsH,DS="-")
 
-		#Record
-		used_epsH = n.append(used_epsH,curr_epsH) ; used_zeta = n.append(used_zeta,curr_zeta) ; used_Omeg = n.append(used_Omeg,curr_Omeg)
 
-
-	plot(DL_cubic_zeta_epsH,bifurcation_x="zeta",bifurcation_y="Omeg",bifurcation_z="epsH",stability=True,color_list="black red green blue violet orange gray brown teal turquoise purple")
+	plot(DL_cubic_zeta_epsH,top_title="epsH contin ",bifurcation_x="zeta",bifurcation_y="Omeg",bifurcation_z="epsH",stability=True,color_list="black red green blue violet orange gray brown teal turquoise purple")
 
 
 	#3/4| Omeg contin DL_cubic from all UZ points generated above with various zeta and epsH values. 
+	print("============================================================ IPS2_DL : Matlab>Omeg>zeta>epsH>Omeg")
 	DL_all = DL_cubic_zeta + DL_cubic_zeta_epsH
-	count = 0 ;
+	count = 0 ; pos = 0
 	size = len(DL_all("UZ")) 
-	used_epsH = n.zeros(size) ; used_zeta = n.zeros(size) ; used_Omeg = n.zeros(size)
-	#
+	used_epsHzetaOmeg_indexes = []
+	
 	for Z in DL_all("UZ"):
-		count += 1 
-		print("============================================================",count,"/",size,"===")
+		count += 1 ; pos += 1 
+			
 		#Get state
 		[curr_epsH,curr_zeta,curr_Omeg] = [Z.__getstate__()["PAR"].values()[par-1] for par in [5,6,2]]
-		print("Currern epsH:{} , zeta:{} , Omeg:{}".format(curr_epsH,curr_zeta,curr_Omeg))
-		if min(abs(used_epsH-curr_epsH))<=1e-6 and min(abs(used_zeta-curr_zeta))<=1e-6 and min(abs(used_Omeg-curr_Omeg))<=1e-3:
-			count -=1
-			continue
-
+		print("============================================================ IPS2_DL : Matlab>Omeg>zeta>epsH>Omeg : ", "{}/{}/{} on epsH:{}, zeta:{}, Omeg:{}".format(count,pos,size,curr_epsH,curr_zeta,curr_Omeg))
+		
+		[check_epsH,check_zeta,check_Omeg] = [abs(  (epsH_list-curr_epsH)/curr_epsH  )  ,  abs(  (zeta_list-curr_zeta)/curr_zeta  )	, abs(  (Omeg_list-curr_Omeg)/curr_Omeg  )]
+		(epsH_index,zeta_index,Omeg_index) = ( n.argmin(check_epsH), n.argmin(check_zeta), n.argmin(check_Omeg) )
+		if min(check_epsH)<=1e-2 and min(check_zeta)<=1e-2 and min(check_Omeg)<=1e-2:  #used_Omeg
+			#If done before ?
+			if (epsH_index,zeta_index,Omeg_index) in used_epsHzetaOmeg_indexes: 
+				count -= 1 
+				continue		
+			#Record 
+			used_epsHzetaOmeg_indexes.append((epsH_index,zeta_index,Omeg_index))
+		
 		#Contin if not done before 
 		l_DL_all = load(Z,
 			IPS=2,ICP=[2,11,9,5,6],
 			UZR=[],UZSTOP=[],STOP="LP",RL0=0.01,RL1=10.0,NMX=1000,NPR=10000)
 		DL_all += run(l_DL_all) + run(l_DL_all,DS="-")
 
-		#Record
-		used_epsH = n.append(used_epsH,curr_epsH) ; used_zeta = n.append(used_zeta,curr_zeta) ; used_Omeg = n.append(used_Omeg,curr_Omeg)
 
-
-	plot(DL_all,letter_symbols=True,stability=True,bifurcation_x="Omeg",bifurcation_y="epsH",bifurcation_z="Amplitude",color_list="black red green blue violet orange gray brown teal turquoise purple")
 	save(DL_all, "DL_all")
-
+	plot(DL_all,letter_symbols=True,stability=True,bifurcation_x="epsH",bifurcation_y="Omeg",bifurcation_z="Amplitude",color_list="black red green blue violet orange gray brown teal turquoise purple")
+	wait()
 
 	#4/4| Add fold contins as much as possible
-	# try: 
-	foldContins = []
-	size = len(DL_all("UZ")) 
-	used_epsH = n.zeros(size) ; used_zeta = n.zeros(size) ; used_Omeg = n.zeros(size)
-	#
+	print("============================================================ IPS2_DL : Matlab>Omeg>zeta>epsH>Omeg>fold")
+
+	#DL_all = loadbd("DL_all")
+	foldContins = [] ; foldContins_forw = [] ; foldCOntins_back= []
+	size = len(DL_all("LP")) 
+	count = 0 ; pos = 0 
+	[used_epsH, used_zeta, used_Omeg] = [n.zeros(size), n.zeros(size), n.zeros(size)] #|used fold point data will be recorded in these 
+	
 	for T in DL_all("LP"):
+		count += 1 ; pos += 1
+	
 		#Get state
 		[curr_epsH,curr_zeta,curr_Omeg] = [T.__getstate__()["PAR"].values()[par-1] for par in [5,6,2]]
-		print("Currern epsH:{} , zeta:{} , Omeg:{}".format(curr_epsH,curr_zeta,curr_Omeg))
-		if min(abs(  used_epsH-curr_epsH  ))<=5e-6 and min(abs(  used_zeta-curr_zeta  ))<=1e-5 and min(abs(  used_Omeg-curr_Omeg  ))<=1e-3:
+		print("============================================================ IPS2_DL : Matlab>Omeg>zeta>epsH>Omeg>fold : ", "{}/{}/{} on epsH:{}, zeta:{}, Omeg:{}".format(count,pos,size, curr_epsH,curr_zeta,curr_Omeg))
+		if min(abs(  (used_epsH-curr_epsH)/used_epsH  ))<=1e-2 and min(abs(  (used_zeta-curr_zeta)/used_zeta  ))<=1e-2 and min(abs(  (used_Omeg-curr_Omeg)/used_Omeg  ))<=1e-2:
+			count -= 1
 			continue
-
+		# if count >= 30:break
+		
 		#Contin if not done before 
-		l_foldContins = run(T,ICP=[5,2,11,9,6],ISW=2 , UZR={},UZSTOP={},RL0=0.1,RL1=10 , DSMAX=0.1)
-		try:       foldContins += merge( run(l_foldContins)+ run(l_foldContins,DS="-") )
-		except: 
-			try:   foldContins +=        run(l_foldContins)
-			except:foldContins +=                            run(l_foldContins,DS="-")
+		l_foldContins = run(T,ICP=[5,2,11,9,6],ISW=2 , UZR={},UZSTOP={2:10},RL0=0.0,RL1=1.7 , DSMAX=0.1,NPR=10000)
+		try: foldContins_forw = run(l_foldContins)
+		except: pass
+		try: foldContins_back = run(l_foldContins,DS="-") 
+		except: pass
+		foldContins += merge( foldContins_forw + foldContins_back )
 
 		#Record
-		used_epsH = n.append(used_epsH,curr_epsH) ; used_zeta = n.append(used_zeta,curr_zeta) ; used_Omeg = n.append(used_Omeg,curr_Omeg)
+		used_epsH[count-1] = curr_epsH ; used_zeta[count-1] = curr_zeta ; used_Omeg[count-1] = curr_Omeg
 
-	# except:
-	# 	pass
-
-	plot(foldContins,bifurcation_x="Omeg",bifurcation_z="Amp",bifurcation_y="epsH",stability=True,color_list="black red green blue violet orange gray brown teal turquoise purple")
-
+	save(foldContins,"foldContins")
+	plot(foldContins,top_title="fold contins on all LPs of Omeg",bifurcation_x="epsH",bifurcation_y="Amplitude",bifurcation_z="zeta",stability=True,color_list="black red green blue violet orange gray brown teal turquoise purple")
+	plot(DL_all+foldContins,top_title="DL_all+foldContins",bifurcation_x="epsH",bifurcation_y="Amplitude",bifurcation_z="zeta",stability=True,color_list="black red green blue violet orange gray brown teal turquoise purple")
 
 
 
@@ -233,8 +276,8 @@ else: #if isOnTanhContacts:
 	for L in dLoop_newNonlin("LP"):
 		
 		l_dLoop_newNonlin_zetaEpsH = run(L,
-			IPS=2,ICP=[5,6,11,9],ISW=2,
-			UZSTOP={5:0.01},RL0=0.0,RL1=3.5,NMX=10000,NPR=5)
+			IPS=2,ICP=[5,6,11,9,2],ISW=2,
+			UZSTOP={5:0.01},RL0=0.0,RL1=3.5,NMX=10000,NPR=1000)
 		dLoop_newNonlin_zetaEpsH = run(l_dLoop_newNonlin_zetaEpsH)+run(l_dLoop_newNonlin_zetaEpsH,DS="-") 
 		
 		plot(dLoop_newNonlin_zetaEpsH)

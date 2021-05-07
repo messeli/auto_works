@@ -12,7 +12,7 @@ print("=============================================|IPS2_DL.auto|==============
 try:auto("IPS2_DL.auto")
 except:print(">>>ERROR : IPS2_DL.auto did not finish ")
 
-clean
+# clean #|I will use fort.9 to see if there is a problem with the calculation of EV that its deallocation causes the free problem 
 
 
 
