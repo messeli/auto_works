@@ -10,11 +10,11 @@ clc
 %Define system matrices - Stationary system
 mass=1;  % nondimensionalised -remember this is an effective mass, = Id+a^2 mdisc
 Jp=0.14;
-zeta=0.01;
+zeta= 1e-10;1e-5;0.01; %|was 0.01
 k=1;
 [M,G,C,K] = zillStationaryMatrices( mass, Jp , zeta, k );%mass, Jp, zeta, k
 m=3.67e-1;   % out of balance mass
-epsln=  0.353/2;  % out of balance distance
+epsln=  1e-10;1e-5;0.353/2;  % out of balance distance %|was 0.353/2 
 f=m*epsln;
 
 J=[ 0 -1;
@@ -40,7 +40,7 @@ zmdl = CreateZilliMdl( mass, Jp, zeta, k , m, epsln, beta, rc ,cs);
 
 %% linear system critical speed and syncronous response- stationary and rotating coords
 %campbell diag
-Omvals=3.2:0.01:3.3;3.9;%5.8:0.02:10;%3.8%:0.05:5.0;%3.37:0.0005:3.39;%2:0.01:2.5;%2.2:0.01:2.5;% 3.2:0.01:4.5;%3.7:0.01:3.9;   %0.2:0.2:6.4;%
+Omvals=3:0.1:3.9;%5.8:0.02:10;%3.8%:0.05:5.0;%3.37:0.0005:3.39;%2:0.01:2.5;%2.2:0.01:2.5;% 3.2:0.01:4.5;%3.7:0.01:3.9;   %0.2:0.2:6.4;%
 nOmvals=length(Omvals);
 [ omfw , ombw ] = zillWhirlSpeeds_Stationary( M,G,C,K,Omvals );
 [ omfw_ , ombw_ ] = zillWhirlSpeeds_Rotating( M,G,C,K,Omvals );
@@ -120,7 +120,7 @@ omrs=zeros(1,nguess*nOmvals);
 Omvals=[Omvals Omvals Omvals Omvals];
 % pick resonant terms - hard coded for now
 Sk = [ 1 2 ];  %the kth modes
-Sl = [ -2 -1 ];      % the lth harmonics of omega_r
+Sl = [ -2 -1 ];      % the lth harmonics of omega_r %|bw = -2*wr;  fw = -1*wr (see line ~150 below)
 NResTerms=length(Sk);  %number of resonant terms
 
 forb=gmfigure;
@@ -138,31 +138,39 @@ for ii =1:(nguess*nOmvals)
     A_ = [   zeros(2)    ,  eye(2)  ;
         -M\K_        ,  -Omega*(M\G_)];
     % nonlinear function
-    ny = @(y) [   zeros(Ndof,size(y,2));  M\nq0(y(1:Ndof,:)) ]  ...
+    ny = @(y) [   zeros(Ndof,size(y,2));  M\nq0(y(1:Ndof,:)) ]  ...  %|":" goes t d time length
         + [ zeros(Ndof,2*Ndof) ; -M\Kc_,    -M\C    ] * y ...
-        + [ zeros(Ndof,size(y,2));  M\nqzeta(y([1,2],:),y([3,4],:)) ] ...
+        + [ zeros(Ndof,size(y,2));  M\nqzeta(y([1,2],:),y([3,4],:)) ] ... %|":" goes t d time length
         + [ zeros(Ndof,size(y,2));  -M\b_*ones(1,size(y,2)) ];
+    %|:size(y,2) is the time data length (whc is set to be the same as fourier serier data length)
     
+     
     %modal transformation matrices
     [Phi_2n,Lambda_2n]=eig(A_);
     %pick out eigenvalues of form [ a, -ja , ..]'
     flt = imag(   Phi_2n(2,:) ./ ( Phi_2n(1,:) )   ) < 0;
     Phi = Phi_2n(:,flt);
     Lambda = Lambda_2n( flt , flt) ;
-    %sort eigenvalues/vectors
+    %sort eigenvalues/vectors %|min lambda comes first: ie BW_mode is first, then FW_mode.  
     [~,ix]=sort(abs(imag(diag(Lambda))+Omega));  %sorted by magnitude of stationary systen whirl speed
-    Phi = Phi(:,ix);
+    Phi = Phi(:,ix);%|size(Phi) is 4*2
     Lambda = Lambda(ix,ix);
     %reassemble full size matrices
     Phi_2n = [ Phi conj(Phi) ];
     Lambda_2n = [ Lambda    ,   zeros(2);
         zeros(2)  ,   conj(Lambda) ];
-    
+
+     
     %create (modally transformed) nonlinear functions
     Phinv_2n = inv(Phi_2n);
-    np = @(p) Phinv_2n(1:Ndof,:) * ny( 2*real(Phi*p) );
+    np = @(p) Phinv_2n(1:Ndof,:) * ny( 2*real(Phi*p) );%|one func s givn input & usD t def odr func
+    %|:In 1st order form (:stateSpace form) we have one orig and one conj eigvec for each mode, 
+    %|...So, 2*real(Phi*p) comes frm d time data,v(t)=Phi*p(t), adD to its conj
+    %|:np is 2*1 (: "1" here is timeLength) , ny is 4*1 , Phi is 4*2 , p is 2*1
+    %|:Nt:Defining these functions is what enables to not use symbolic. 
+    %|...Instead f double(vpa(simplify(subs(...)))), you simply call d func when d input s available
     
-    
+
     %create NF transformed/reduced system variables
     % note - I am sure some precalculation could speed up this bit but this
     % method will hopefully get something working!
@@ -170,10 +178,13 @@ for ii =1:(nguess*nOmvals)
     uflt = false(NResTerms,Ndof); % a matrix to pull out just the resonant modes from modally transformed funcs
     for jj=1:NResTerms
         uflt(jj,Sk(jj))=true;
+        %|::::for 3:2 , NResTerms s still 2, and Sk is still [1,2], standJ fr modes 1 & 2 
+        %|: so the same for each case: not used here for Zilli (for mdof, Sk changes)
     end
     
     % set up HO
     Y0=-[X_(:,mod(ii-1,nOmvals)+1); 0;0 ]; %the linear out of balance response in rotating coords
+    %|:only the linear(: no ny, yes dampJ) response (whc s datum, nt periodic) fr d handlD Omval  
     P0=Phinv_2n(1:Ndof,:)*Y0;
     H0 = zeros(Ndof,Nft);
     H0(:,1) = P0;  %note - we use the Matlab convention for FFT harmonics i.e.
@@ -185,53 +196,60 @@ for ii =1:(nguess*nOmvals)
         H0(Sk(jj),mod(Sl(jj),Nft)+1)=0;
     end
     
+    %| Initial estimate of amplitudes of the u-modes : U1 and U2 
+    %| :Used to start the nonlinear eq solver given the initial H0 estimate.
+    %| :U1 is assumD t hav no im part, as a cond t set d in-mode phase(:d phase btw d two modes)
     fctr=1.5;
     switch floor((ii-1)/nOmvals)
         case 0
-            Uin0 = fctr*[ 1 -1 0  ]';
+            Uin0 = fctr*[ 1 -1 0  ]';%|Uin0 = fctr*[ 1+0j -1+0j  ]' 
         case 1
-            Uin0 = fctr*[ 1 0 -1  ]';
+            Uin0 = fctr*[ 1 0 -1  ]';%|Uin0 = fctr*[ 1+0j  0-1j  ]'
         case 2
-            Uin0 = fctr*[ 1 1 0   ]';
+            Uin0 = fctr*[ 1 1 0   ]';%|Uin0 = fctr*[ 1+0j  1+0j  ]'
         case 3
-            Uin0 = fctr*[ 1 0 1   ]';
+            Uin0 = fctr*[ 1 0 1   ]';%|Uin0 = fctr*[ 1+0j  0+1j  ]'
         otherwise
             Uin0 = [ 0 0 0   ]'; %shouldn't get here!
     end
-    for kk=1:3
+    for kk=1:3 %|THE HEART OF THE CALCULATION
         opt= optimoptions('fsolve','Display','none','useparallel',true,'FunctionTolerance',1e-8);
-        NFHB = @(Uin) NF_AFT_target( Uin, Lambda_u, np , H0, Sk, Sl , 2 ,2 );
+        NFHB = @(Uin) NF_AFT_target( Uin, Lambda_u, np , H0, Sk, Sl , 2 ,2 );%|aFunc&itsInputs r gvn as input to odr func 
         [U_,~,solvecodes(ii)]=fsolve( NFHB , Uin0 ,opt);
+        %|Now , for the H0 , harmonic balance is minimised.
         %     solvecodes(ii)=sc;
         U = [ U_(1);
             U_(2)+1j*U_(3); ];
-        Us(:,ii)=U;
+        Us(:,ii)=U; %|for iith Omval the u modes' amplitudes Us(:,ii)=[U1;U2]
         [~,omrs(ii),Np0]=NFHB(U_);
         
         %evaluate H (note H0 is just a guess at H or a previous iteration)
         Psidiag  = [ 0 1:(Nft/2-1) (-Nft/2:-1) ]*1j*omrs(ii)  ;  %i.e. a row matrix of the diagonal of Psi
         Beta = zeros(size(Np0));
         for jj=1:Ndof
-            Beta(jj,:) = Psidiag-Lambda(jj,jj);
+            Beta(jj,:) = Psidiag-Lambda(jj,jj);%|":" for all the freq components, [beta]=2*1024
         end
         H = Np0 ./ Beta; %note this will include some large values at the resonant terms - but these are about to be overwritten
+        %|:CleverY, dealW d large terms (res terms) in H as you calc P inside Np_AFT_target func
+        %|... and fr d kk=3 (last iteration), dss done right after ds loop below.
         
         H0=H;  %iterate H to get a better sol
         Uin0=U_;
     end
+    
     % evaluate P and then p
     P=H;
     for jj=1:NResTerms
-        P(Sk(jj),mod(Sl(jj),Nft)+1)=U(jj); %copy the resonant terms into P %|P=U+H, Hij=0 for nonres terms 
+        P(Sk(jj),mod(Sl(jj),Nft)+1)=U(jj); %copy the resonant terms into P
     end
     p = ifft(P,Nft,2)*Nft;
     
     % translate back to spatial coordinates
-    y = 2*real(Phi *p);
+    y = 2*real(Phi *p);%|See my comments on np func around line 166
     x = y(1:Ndof,:);
     
     %plot orbit - if it is interesting!
-    if abs(U(2))> 0.001 && abs(U(1))> 0.001 && solvecodes(ii)>0
+    if solvecodes(ii)>0 %|was if abs(U(2))> 0.001 && abs(U(1))> 0.001 && solvecodes(ii)>0
         
         
        fg=gmfigure;
