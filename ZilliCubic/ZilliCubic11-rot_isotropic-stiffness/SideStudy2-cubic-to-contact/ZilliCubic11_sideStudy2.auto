@@ -25,7 +25,7 @@ isFoldContin   = False
 startTime = time.time()
 #|>>|IPS1|>>>IPS1
 #|>>|IPS1_FORW|>> FORWARD: Cont mH:0-0.9>>gamma:0-0.25>>Omeg:0-7 >> Kappa:0-1>>beta:0-10>>K:0-100>>Omeg:0-7
-if True:
+if False:
 	mH       = run( "ZilliCubic11" ) 
 	forward1 = run( mH("UZ1"), ICP=[ 2,9], UZSTOP={2:0.1},NMX=1000, DS=0.01,DSMAX=0.01 ) 
 	kappa    = run( forward1("UZ1"), ICP=[ 8,9,2], UZSTOP={8:1.0} ) 
@@ -93,13 +93,13 @@ if isKappaContin: #KAPPA-CONTIN TOOGLE (Omeg=cnst)
 
 	#| Use Matlab-generated orbit at thetaP=2.91(dLoop)/4.05(sLoop) once.
 	l_sLoop_dat = load(
-		IPS2_sLoop("UZ1"),                             #  OPT(IPS2_A_KAPPA_SL) | UZ1 for zeta=1e-5
-		# e="ZilliCubic11_datFileContin_zeta_1e-2",    # ~OPT(IPS2_A_KAPPA_SL)
-		# dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2", # ~OPT(IPS2_A_KAPPA_SL)
+		#IPS2_sLoop("UZ1"),                             #  OPT(IPS2_A_KAPPA_SL) | UZ1 for zeta=1e-5
+		e="ZilliCubic11_datFileContin_zeta_1e-2",    # ~OPT(IPS2_A_KAPPA_SL)
+		dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2", # ~OPT(IPS2_A_KAPPA_SL)
 		c="ZilliCubic11",
 		IPS=2, ICP=[2,11,9,6], #Print par6 = zeta |#par5=epsH 
-		UZR={2:[9]},RL0=0,RL1=10.01,NMX=10000, # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
-		NTST=200,DS=+0.001,DSMAX=0.05,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-4);
+		UZR={},RL0=0,RL1=7.0,NMX=10000, # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
+		NTST=200,DS=+0.001,DSMAX=0.05,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4);
 	sLoop_dat = merge( run(l_sLoop_dat) + run(l_sLoop_dat,DS="-") ) #|Solution family from .dat
 	sLoop_cubic = sLoop_dat #|Change name for clarity
 	save(sLoop_cubic,"sLoop_cubic")
