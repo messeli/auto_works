@@ -8,7 +8,7 @@
 #| 06  "#|Nt:"     - note nt strictly relatD t precidJ line; deducTn
 #| 07  "#|:Nt:"    - note strictly relatD t precidJ line: cd b deducTn
 #| 08  "#|XXX>"    - block f code starts, also cl b "#|___XXX>"
-#| 09  "#|X_YYY>"  - block f code under d block "XXX" 
+#| 09  "#|X_YYY>"  - block f code under d block "XXX" :diff styles r implmnD
 #| 10  "#|XY_ZZZ>" - block f code under d block "X_YYY"
 #| 11  "#|XXX."    - block f code ends here, old versions:"XXX END"
 #| 12  "#|..."     - continD frm ["#|:","#|::","#|Nt:","#|..."] or other
@@ -41,270 +41,302 @@ startTime = time.time()
 
 
 #|>>|IPS1|>> IPS=1 , zeta=0.01
-print("=====111===IPS1")
+print("============================================================ IPS1")
+
+
 #|>>|IPS1_FORW|>> FORWARD: Cont mH:0-0.9>gamma:0-0.25>Omeg:0-7.0
-print("=====1_FFF===FORWARD_SYNCH")
-print("=====1_FFF===CONTINUE_mH")
+print("============================================================ IPS1_FORW")
+print("============================================================ IPS1_FORW : mH contin")
+
 mH = run("ZilliCubic11") 
 
-print("=====1_FFF===CONTINUE_gamma")
+
+print("============================================================ IPS1_FORW : mH> gamma contin")
+
 gam = run(mH("UZ1"),
     ICP=[1,9],
     UZSTOP={1:0.25},NMX=1000,
     DS=0.001,DSMAX=0.5) 
 
-#| OPT(IPS1_FOR) Bfr anything, Inc epsH to see if it makes the IPS2 sols join in a way !?
-eH = run(gam("UZ1"),
-    ICP=[5,9],
-    UZR={5:8.99e-1},UZSTOP={5:2.0},NMX=1000,
-    DS=0.001,DSMAX=0.5) 
-gam = gam + eH
-print("HERE\nHERE\nHERE\nHERE here")
-plot(gam,bifurcation_x="epsH",bifurcation_y="Amplitude")
+
+#| OPT  98yj3 Inc epsH to see if it makes the IPS2 sols join in a way !?
+print("============================================================ IPS1_FORW : mH>gamma>epsH (98yj3 OPT is ON)")
+
+if False: 
+    eH = run(gam("UZ1"),
+        ICP=[5,9],
+        UZR={5:8.99e-1},UZSTOP={5:2.0},NMX=1000,
+        DS=0.001,DSMAX=0.5) 
+    gam = gam + eH
+    plot(gam,bifurcation_x="epsH",bifurcation_y="Amplitude")
 
 
-print("=====1_FFF===CONTINUE_Omeg_FORWARD")
-forward = run(gam("UZ2"),
+print("============================================================ IPS1_FORW : mH>gamma>epsH(98yj3)>Omeg . ")
+forward = run(gam("UZ1"), #| if ~OPT 98yj3 : "UZ1"
     ICP=[2,9,5],
     UZSTOP={2:7},NMX=1000,
     DS=0.001,DSMAX=0.05)
-#|___1_FFF.
+#|__|IPS1_FORW|__
+
 
 
 #|>>|IPS1_BACK|>> BACKWARDS (:lowAmp family) , W/ DIFFERENT ZETA
-print("=====1_BBB===BACKWARD_SYNCH")
+print("============================================================ IPS1_BACK")
+
 #|>>|IPS1_BACK_A|>>  METHOD A: ~PURE AUTO: Once frm Matlab datum,dn zeta contin
-print("=====1B_AAA===METHOD_A")
+print("============================================================ IPS1_BACK_A")
 
 
+# OPT 0j9fd Increase epsH 
+is_0j9fd = False
+if is_0j9fd: 
+    print("============================================================ IPS1_BACK_A : Matlab datum>epsH(0j9fd ON)")
+    back = run(
+        e="ZilliCubic11_givenBackwards_zeta_1e-2",
+        c="ZilliCubic11",
+        ICP=[5,9],
+        NTST=50,
+        DS=+0.01,DSMAX=0.05, 
+        UZSTOP={5:0.899})
+else: 
+    print("============================================================ IPS1_BACK_A : Matlab datum>epsH(0j9fd OFF)")
 
-# OPT(IPS1_BACK_A) Increase epsH 
-print("=====1B_AAA===epsH increased before FIRST_RUN_W/_MATLAB_DATUM")
-back = run(
-    e="ZilliCubic11_givenBackwards_zeta_1e-2",
-    c="ZilliCubic11",
-    ICP=[5,9],
-    NTST=50,
-    DS=+0.01,DSMAX=0.05, 
-    UZSTOP={5:0.899})
-
-
-print("=====1B_AAA===FIRST_RUN_W/_MATLAB_DATUM")
-back = back + run( # OPT(IPS1_BACK_A) Remove second "back"
-    back("UZ1"),                                 #  OPT(IPS1_BACK_A) 
-    # e="ZilliCubic11_givenBackwards_zeta_1e-2", # ~OPT(IPS1_BACK_A) 
-    # c="ZilliCubic11",                          # ~OPT(IPS1_BACK_A) 
+print("============================================================ IPS1_BACK_A : Matlab>"+"epsH(0j9fd)>"*is_0j9fd+"Omeg")
+if not(is_0j9fd) : back = []
+back = back + run( 
+    #back("UZ1"),                                 #  OPT 0j9fd 
+    e="ZilliCubic11_givenBackwards_zeta_1e-2",    # ~OPT 0j9fd 
+    c="ZilliCubic11",                             # ~OPT 0j9fd
     ICP=[2,9,5],
-    NTST=50,
-    DS=-0.01,DSMAX=0.05, 
-    UZR={2:7.0},
-    UZSTOP={2:[0.01,7.01]})
+    UZR={2:7.0},UZSTOP={2:[0.01,7.01]},
+    NTST=50,DS=-0.01,DSMAX=0.05, )
 
 
-print("===IPS1_BACK_A===SAMPLE_ZETA") 
+print("============================================================ IPS1_BACK_A : Matlab>"+"epsH(0j9fd)>"*is_0j9fd+"Omeg>zeta")
 l_IPS1_zeta = load(
-    back("UZ1"),                                 # OPT(IPS1_BACK_A) switch btwn e,c and this line.
-    # e="ZilliCubic11_givenBackwards_zeta_1e-2", # ~OPT(IPS1_BACK_A)
-    # c="ZilliCubic11",                          # ~OPT(IPS1_BACK_A)
+    # back("UZ1"),                                 #  OPT 0j9fd
+    e="ZilliCubic11_givenBackwards_zeta_1e-2", # ~OPT 0j9fd
+    c="ZilliCubic11",                          # ~OPT 0j9fd
     ICP=[6,9,2], # 2:omeg should be 7.0, with 9amp=0.9
-    NMX=500,
-    NTST=150,
-    DS=+0.001,DSMAX=0.001,
-    UZR={6:[8e-3,5e-3,1e-3,1e-4, 0.02,0.03,0.05,0.7,0.10,0.15]},
-    UZSTOP={6:[1e-5,0.20]},
-    RL0=-0.001) #|Does not sample all the requested(UZR) zeta ??
-IPS1_zeta = merge( run(l_IPS1_zeta) + 
-                   run(l_IPS1_zeta,DS="-") )
-plot(IPS1_zeta,stability=True,
-   bifurcation_x="zeta",bifurcation_y="Amplitude",height=600)
+    UZR={6:[8e-3,5e-3,1e-3,1e-4,1e-5, 0.02,0.03,0.05,0.70,0.10,0.15,0.20]},RL0=-0.001,NMX=500,
+    NTST=150,DS=+0.001,DSMAX=0.001) #|Does not sample all the requested(UZR) zeta ??
 
-print("=====1B_AAA===RUN_ZetaSamples_STARTED")
+IPS1_zeta = merge( run(l_IPS1_zeta) + run(l_IPS1_zeta,DS="-") )
+
+plot(IPS1_zeta,stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude",height=600)
+
+
+print("============================================================ IPS1_BACK_A : Matlab>"+"epsH(0j9fd)>"*is_0j9fd+"Omeg>zeta>Omeg")
 for zetaSample in IPS1_zeta('UZ'):
     back = back + run(zetaSample,
-        ICP=[2,9],
+        ICP=[2,9,6],
         NTST=50,
         DS=-0.01,DSMAX=0.05,
         UZSTOP={2:[0.01,7.01]},
         ITNW=9,NWTN=5)
 
-#|___1B_AAA. METHOD A
+#|__|IPS1_BACK_A|__ METHOD A
 
 
-#|___1B_BBB> METHOD B: All-MATLAB startPoints (ONLY for smaller zeta)
-print("=====1B_BBB===METHOD_B")
-zetaList   = ["1e-2","8e-3","5e-3","1e-3","1e-4","1e-5"]
-eqFileName = ["ZilliCubic11_givenBackwards_zeta_"+x for x in zetaList]
-for i in range(0,len(zetaList)):
-    l_back = load(
-                e=eqFileName[i],
-                c="ZilliCubic11",
-                ICP=[2,9],
-                NTST=50,
-                DS=-0.05,DSMAX=0.05, 
-                EPSL=1e-6,EPSU=1e-6,EPSS=1e-3,
-                UZSTOP={2:[0.01,7.01]} ) 
-    try:
-        back = back + run(l_back)
-    except:
-        back = run(l_back)
-#|___1B_BBB. METHOD B
-#|___1_BBB. BACKWARDS IPS1
+
+
+#|>>|IPS1_BACK_B|>> METHOD B: All-MATLAB startPoints (ONLY for smaller zeta)
+print("============================================================ IPS1_BACK_B : Matlabs_for_zeta>Omeg>")
+
+# zetaList   = ["1e-2","8e-3","5e-3","1e-3","1e-4","1e-5"]
+# eqFileName = ["ZilliCubic11_givenBackwards_zeta_"+x for x in zetaList]
+
+# for i in range(0,len(zetaList)):
+    # l_back = load(
+    #             e=eqFileName[i],
+    #             c="ZilliCubic11",
+    #             ICP=[2,9],
+    #             UZSTOP={2:[0.01,7.01]},
+    #             NTST=50,DS=-0.05,DSMAX=0.05, EPSL=1e-6,EPSU=1e-6,EPSS=1e-3) 
+
+#     try:    back = back + run(l_back)
+#     except: back = run(l_back)
+
+#|__|IPS1_BACK_B|__
+#|__|IPS1_BACK|__
+
 
 print("=====MERGE_FORW_&_BACK")
 IPS1 = merge(forward + back)
-# plot(IPS1,stability=True,
-#     bifurcation_x="Omeg",bifurcation_y="Amplitude")
-#|___111. IPS1
+plot(IPS1,stability=True,bifurcation_x="Omeg",bifurcation_y="Amplitude")
+
+#|__|IPS1|__
+
+
 
 
 #|>>|IPS2|>> IPS=2 
-print("\n\n=====222===IPS2")
+print("============================================================ IPS2")
+
+
 #|>>|IPS2_A|>> METHOD A : ~PURE AUTO:Once Matlab dat, dn zeta contin 
+
 #|>>|IPS2_A_SL|>> SingleLoop periodic solutions
-print("=====2A_SSS")
-print("=====2A_SSS===CONTINUE_MATLAB_ORBIT")
+print("============================================================ IPS2_A")
 
 
-#| OPT(IPS2_A_SL) Bfr anything, Inc epsH to see if it makes the IPS2 sols join in a way !?
-l_sLoop_dat_initHomotInEpsH = load(
-    e="ZilliCubic11_datFileContin_zeta_1e-2",
-    c="ZilliCubic11",
-    dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
-    IPS=2,ICP=[5,11,9], # 2:'Omeg',5:'epsH',6:'zeta'
-    DS=+0.001,DSMAX=0.005, 
-    UZR={5:0.899},
-    UZSTOP={5:[8*0.353]}, 
-    EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4, # 6 6 3
-    NTST=200,NMX=5000)
-IPS2_sLoop = merge( run(l_sLoop_dat_initHomotInEpsH) + 
-              run(l_sLoop_dat_initHomotInEpsH,DS="-") )
-print("MY POINT IS HERE\nMY POINT IS HERE\nMY POINT IS HERE")
-plot(IPS2_sLoop,stability=True,bifurcation_x="epsH",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+#| OPT y3dn1 Bfr anything, Inc epsH to see if it makes the IPS2 sols join in a way !?
+is_y3dn1 = False
+if is_y3dn1: 
+    print("============================================================ IPS2_A_SL : Matlab orbit > epsH(y3dn1 ON)")
+
+    l_sLoop_dat_initHomotInEpsH = load(
+        e="ZilliCubic11_datFileContin_zeta_1e-2",
+        c="ZilliCubic11",
+        dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
+        IPS=2,ICP=[5,11,9,6], # 2:'Omeg',5:'epsH',6:'zeta'
+        UZR={5:0.899},UZSTOP={5:[8*0.353]},NMX=5000,
+        NTST=200,DS=+0.001,DSMAX=0.005,EPSL=1e-07,EPSU=1e-07,EPSS=1e-4) # 6 6 3
+        
+    IPS2_sLoop = merge( run(l_sLoop_dat_initHomotInEpsH) + run(l_sLoop_dat_initHomotInEpsH,DS="-") )
+
+    plot(IPS2_sLoop,stability=True,bifurcation_x="epsH",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+else:
+    print("============================================================ IPS2_A_SL : Matlab orbit > epsH(y3dn1 is OFF)")
 
 
 #| Now Cont from where u left in epsH contin.
+print("============================================================ IPS2_A_SL : Matlab >" + " epsH(y3dn1) >"*is_y3dn1 + " Omeg ")
+
+
 l_sLoop_dat = load(
-    IPS2_sLoop("LP1"),                           #  OPT(IPS2_A_SL)
-    # e="ZilliCubic11_datFileContin_zeta_1e-2",  # ~OPT(IPS2_A_SL)
-    # c="ZilliCubic11",                          # ~OPT(IPS2_A_SL)
+    #IPS2_sLoop("LP1"),                           #  OPT y3dn1
+    e="ZilliCubic11_datFileContin_zeta_1e-2",  # ~OPT y3dn1
+    c="ZilliCubic11",                          # ~OPT y3dn1
     dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
-    IPS=2,ICP=[2,11,9,5],
+    IPS=2,ICP=[2,11,9,6,5],
     DS=+0.005,DSMAX=0.005, 
     UZSTOP={2:[0.01,7.01]}, 
     EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4, # 6 6 3
     NTST=200)
+
+if not is_y3dn1 : IPS2_sLoop = []
 IPS2_sLoop = IPS2_sLoop + merge( run(l_sLoop_dat) + 
               run(l_sLoop_dat,DS="-") )
+
 #plot(IPS2_sLoop,stability=True,bifurcation_x="epsH",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
-#| Sample orbits at diff zeta in a contin frm a tip f d periodic orbit
 
-print("=====2A_SSS===SAMPLE_ZETA")
+
+#| Sample orbits at diff zeta in a contin frm a tip f d periodic orbit
+print("============================================================ IPS2_A_SL : Matlab >" + " epsH(y3dn1) >"*is_y3dn1 + " Omeg >" + " zeta ")
 l_sLoop_zeta = load(IPS2_sLoop('UZ1'),
     NMX=20000,
-    IPS=2, ICP=[6,11,9],
-    NTST=200,
-    DS=+0.0005,DSMAX=0.0005, #|Continuation in zeta !!!
-    UZR={6:[8e-3,5e-3,1e-3,1e-5,0.00, 0.05,0.075,0.082,0.10,0.15]}, #
+    IPS=2, ICP=[6,11,9,2,5],
+    UZR={6:[8e-3,5e-3,1e-3,1e-5,0.00, 0.05,0.075,0.082,0.10,0.15,0.2]},RL0=-0.01,
+    NTST=200,DS=+0.0005,DSMAX=0.0005) #|Continuation in zeta !!!)
     #|:(-) zetas give the same branches as positive ones.
-    RL0=-0.01) 
     #|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??
-sLoop_zeta = merge( run(l_sLoop_zeta) + 
-                  run(l_sLoop_zeta,DS="-") )
+
+sLoop_zeta = merge( run(l_sLoop_zeta) + run(l_sLoop_zeta,DS="-") )
+
 save(sLoop_zeta,"sLoop_zeta")
-plot(sLoop_zeta,stability=True,
-    bifurcation_x="zeta",bifurcation_y="Amplitude",height=600)
+plot(sLoop_zeta,stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude",height=600)
+
 
 #| Run all different zetaOrbits(:Z) made right above
-print("=====2A_SSS===RUN_zetaOrbits_STARTED")
+print("============================================================ IPS2_A_SL : Matlab >" + " epsH(y3dn1) >"*is_y3dn1 + " Omeg >" + " zeta >" + " Omeg")
 counter = 0
+size = len(sLoop_zeta("UZ"))
 for Z in sLoop_zeta('UZ'):
     counter+=1
-    print("=====2A_SSS===ZETA_RUN:",counter,"/",len(sLoop_zeta('UZ')))
+    print("============================================================ IPS2_A_SL : Matlab >"+" epsH(y3dn1) >"*is_y3dn1+" Omeg >"+" zeta >"+" Omeg ",counter,"/",size )
     IPS2_sLoop = IPS2_sLoop + run(Z,
-        NTST=200,
-        IPS=2,ICP=[2,11,9,6],
-        DS=-0.005,DSMAX=0.005,
-        EPSL=1e-7,EPSU=1e-7,EPSS=1e-4, 
-        UZSTOP={2:[0.01,7.01]} )
-try: 
-    IPS2 = IPS2 + IPS2_sLoop
-except: 
-    IPS2 = IPS2_sLoop
+        IPS=2,ICP=[2,11,9,5,6],
+        UZSTOP={2:[0.01,7.01]} ,
+        NTST=200,DS=-0.005,DSMAX=0.005,EPSL=1e-7,EPSU=1e-7,EPSS=1e-4, )
+
+try:    IPS2 = IPS2 + IPS2_sLoop
+except: IPS2 = IPS2_sLoop
 #|__|IPS2_A_SL|__
 
 
-#|>>|IPS2_A_DL|>> DoubleLoop periodic solutions
-print("=====2A_DDD")
-#| Use Matlab-generated orbit at Omeg=2.91 once.
-print("=====2A_DDD===CONTINUE_MATLAB_ORBIT")
 
-#| OPT(IPS2_A_DL)  Bfr anything, Inc epsH to see if it makes the IPS2 sols join in a way !?
-l_dLoop_dat_initHomotInEpsH = load(
-    e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
-    c="ZilliCubic11",
-    dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
-    IPS=2,ICP=[5,11,9], # 2:'Omeg',5:'epsH',6:'zeta'
-    DS=+0.001,DSMAX=0.005, 
-    UZSTOP={5:[8*0.353]}, 
-    EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4, # 6 6 3
-    NTST=200)
-IPS2_dLoop = merge( run(l_dLoop_dat_initHomotInEpsH) + 
-              run(l_dLoop_dat_initHomotInEpsH,DS="-") )
-plot(IPS2_dLoop,stability=True,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+#|>>|IPS2_A_DL|>> DoubleLoop periodic solutions
+print("============================================================ IPS2_A_DL")
+
+#| OPT g120h8  Bfr anything, Inc epsH to see if it makes the IPS2 sols join in a way !?
+is_g120h8 = False
+if is_g120h8: 
+    print("============================================================ IPS2_A_DL : Matlab orbit > epsH(g120h8)")
+
+    l_dLoop_dat_initHomotInEpsH = load(
+        e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
+        c="ZilliCubic11",
+        dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
+        IPS=2,ICP=[5,11,9], # 2:'Omeg',5:'epsH',6:'zeta'
+        DS=+0.001,DSMAX=0.005, 
+        UZSTOP={5:[8*0.353]}, 
+        EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4, # 6 6 3
+        NTST=200)
+
+    IPS2_dLoop = merge( run(l_dLoop_dat_initHomotInEpsH) + run(l_dLoop_dat_initHomotInEpsH,DS="-") )
+
+    plot(IPS2_dLoop,stability=True,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
 
 #| Now Cont from where u left in epsH contin.
-l_dLoop_dat = load(
-    IPS2_dLoop("LP1"),                                     #  OPT(IPS2_A_DL)
-    # e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop", # ~OPT(IPS2_A_DL)
-    # c="ZilliCubic11",                                    # ~OPT(IPS2_A_DL)
-    dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
-    IPS=2,ICP=[2,11,9,5],
-    DS=+0.005,DSMAX=0.005, 
-    UZSTOP={2:[0.01,7.01]},
-    UZR={2:3.0},
-    EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4, # 6 6 3
-    NTST=200)
-IPS2_dLoop = merge( run(l_dLoop_dat) + 
-                    run(l_dLoop_dat,DS="-") )
+print("============================================================ IPS2_A_DL : Matlab>"+"epsH(g120h8)>"*is_g120h8+"Omeg")
+
+# eval(
+# 'l_dLoop_dat = load( '
+# +'IPS2_dLoop("LP1"), '*is_g120h8
+# +'e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop", '*bool(not(is_g120h8)) 
+# +'c="ZilliCubic11", '*bool(not(is_g120h8)) 
+# +'dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop", '*bool(not(is_g120h8)) 
+# +'IPS=2,ICP=[2,11,9,5], '
+# +'UZR={2:3.0}, UZSTOP={2:[0.01,7.01]}, '
+# +'NTST=200,DS=+0.005,DSMAX=0.005, EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4) ' )
+
+l_dLoop_dat = load( 
+    #IPS2_dLoop("LP1"), #g120h8
+    e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",  #~g120h8
+    c="ZilliCubic11",  #~g120h8
+    dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop", 
+    IPS=2,ICP=[2,11,9,5,6], 
+    UZR={2:3.0}, UZSTOP={2:[0.01,7.01]}, 
+    NTST=200,DS=+0.005,DSMAX=0.005, EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4) 
+
+IPS2_dLoop = merge( run(l_dLoop_dat) + run(l_dLoop_dat,DS="-") )
+
 
 #| Vary zeta at one of the tips of the periodic orbit.
-print("=====2A_DDD===SAMPLE_ZETA")
+print("============================================================ IPS2_A_DL : Matlab>"+"epsH(g120h8)>"*is_g120h8+"Omeg>"+"zeta")
 l_dLoop_zeta = load(IPS2_dLoop('UZ1'),
-    IPS=2, ICP=[6,11,9],
-    NTST=200,
-    DS=+0.001,DSMAX=0.001, #|Continuation in zeta !!!
-    UZR={6:[8e-3,5e-3,1e-3,1e-4,1e-5, 0.00, 0.011,0.0116]}
-    ,RL0=-0.001) #|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??
-dLoop_zeta = merge( run(l_dLoop_zeta) +
-                    run(l_dLoop_zeta,DS="-") )
+    IPS=2, ICP=[6,11,9,2,5],
+    UZR={6:[8e-3,5e-3,1e-3,1e-4,1e-5, 0.00, 0.011,0.0116]},RL0=-0.001,
+    NTST=200,DS=+0.001,DSMAX=0.001) #|zeta  1e-5 and 0.0 not sampled ??
+
+dLoop_zeta = merge( run(l_dLoop_zeta) + run(l_dLoop_zeta,DS="-") )
+
 save(dLoop_zeta,"dLoop_zeta")
-plot(dLoop_zeta,stability=True,
-    bifurcation_x="zeta",bifurcation_y="Amplitude",height=600)
-try:
-    sdLoop_zeta = sLoop_zeta+dLoop_zeta 
-    plot(sdLoop_zeta,height=600,stability=True)
-except:pass
+plot(dLoop_zeta,stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude",height=600)
+
 
 #| Run all different zetaOrbits(:Z) made right above
-print("=====2A_DDD===RUN_zetaOrbits_STARTED")
+print("============================================================ IPS2_A_DL : Matlab>"+"epsH(g120h8)>"*is_g120h8+"Omeg>"+"zeta>"+"Omeg")
+size = len(dLoop_zeta("UZ"))
 counter = 0
+
 for Z in dLoop_zeta('UZ'):
     counter+=1
-    print("=====2A_DDD===ZETA_RUN:",counter,"/",len(dLoop_zeta('UZ')))
+    print("============================================================ IPS2_A_DL : Matlab>"+"epsH(g120h8)>"*is_g120h8+"Omeg>"+"zeta>"+"Omeg",counter,"/",size ) 
     IPS2_dLoop = IPS2_dLoop + run(Z,
-        NTST=200,
-        IPS=2,ICP=[2,11,9],
-        DS=-0.005,DSMAX=0.005,
-        # ITNW=9,NWTN=7,
-        UZSTOP={2:[0.01,7.01]} )
-try:
-    IPS2 = IPS2 + IPS2_dLoop
-except:
-    IPS2 = IPS2_dLoop
+        IPS=2,ICP=[2,11,9,5,6],
+        UZSTOP={2:[0.01,7.01]}, 
+        NTST=200,DS=-0.005,DSMAX=0.005 ) # ITNW=9,NWTN=7,
+
+try:    IPS2 = IPS2 + IPS2_dLoop
+except: IPS2 =        IPS2_dLoop
 #|__|IPS2_A_DL|__
+
 #|__|IPS2_A|__
+
 
 
 #|>>|IPS2_B|>> METHOD B : All-MATLAB startOrbits (ONLY for smaller zeta)
@@ -422,6 +454,7 @@ print("=====FINISH===elapsedTime: ",
     elapsedTime,    " sec"," | ", 
     elapsedTime/60, " min")
 clean
+
 
 #|___TTT> NOTES=========================================================
 #|Nt: U dnt know d lable f UZR point:

@@ -18,11 +18,11 @@ l_dLoop_dat = load(
 dLoop_dat = run(l_dLoop_dat) # merge( run(l_dLoop_dat) +
              #      run(l_dLoop_dat,DS="-") )
 
-#| Vary zeta at one of the tips of the periodic orbit.
+#| Vary zeta to 1e-5 at the UZ1 user point sampled right above 
 print("=====2A_DDD===SAMPLE_ZETA")
 l_dLoop_zeta = load(dLoop_dat('UZ1'),
     IPS=2, ICP=[6,11,9],
-    UZR={6:[1e-5,0.0]},
+    UZR={6:[1e-5]},
     RL0=-0.001,
     NTST=200,
     DS=+0.001, DSMAX=0.001) 
@@ -40,10 +40,10 @@ with open("myDummFile.txt","w",encoding="utf-8") as f:
     for q in r:
       f.write(str(r)+"\n")
 
-#| Run all different zetaOrbits made right above.
+#| Contin in Omeg with new zeta 
 print("=====2A_DDD===DIFFERENT_ZETA_RUNS_STARTED")
 counter = 0
-for Z in dLoop_zeta('UZ'):
+for Z in dLoop_zeta('UZ'): #|only one value is there.
     counter+=1
     print( "=====2A_DDD===ZETA_RUN:",counter,"/",len(dLoop_zeta('UZ')) )
     try: 
@@ -59,21 +59,23 @@ for Z in dLoop_zeta('UZ'):
             UZR={2:[2.3045]},
             UZSTOP={2:[0.01,7.01]})
 
-#|___IPS2_A_DL_HOMOT> eH Homotopy 
+#| Change eH Homotopy 
 l_eH_homot = load(IPS2("LP1"),
 	ICP=[5,11,9],
     NMX=2000,NTST=500, 
     RL0=0.01,RL1=1.0, # RL0=0.09
     DS=-0.003,DSMAX=0.005,  
-    UZR={5:[0.05]})
+    UZR={5:[0.092, 0.110]}) #|d 0.092 one s d one dt s givn in d paper1 N d recorded one s ds as well.
 eH_homot = run(l_eH_homot)
-l_low_eH_bd = load(eH_homot("UZ1"),
-	ICP=[2,11,9],
-	 NMX=2000,NTST=500, 
-    RL0=0.01,RL1=10.0, # RL0=0.09
-    DS=+0.002,DSMAX=0.005  )
-low_eH_bd = merge(run(l_low_eH_bd) + run(l_low_eH_bd,DS="-"))
-IPS2 = IPS2 + low_eH_bd 
+for i in ["UZ1", "UZ2"]:
+    l_low_eH_bd = load(eH_homot(i),
+        ICP=[2,11,9,5],
+        NMX=2000,NTST=500, 
+        RL0=0.01,RL1=10.0, # RL0=0.09
+        DS=+0.002,DSMAX=0.005  )
+    low_eH_bd = merge(run(l_low_eH_bd) + run(l_low_eH_bd,DS="-"))
+    IPS2 = IPS2 + low_eH_bd 
+
 
 #|___IPS2_A_DL_HOMOT_ZETA-FOLD>
 # print("I AM HERE !")
@@ -82,39 +84,41 @@ IPS2 = IPS2 + low_eH_bd
 # IPS2 += t
 #|___IPS2_A_DL_HOMOT_ZETA-FOLD.
 
-#|___IPS2_A_DL_EH> eH-foldContinuation
+#| eH-foldContinuation
 print("=====EEE===eH-foldContinuation")
 #| Load the fold continuation with run(), not load()
 x = run(IPS2("LP1"),
     ICP=[5,2,11,9],
     ISW=2,
     NMX=2000,NTST=500, 
-    RL0=0.01,RL1=1.0, # RL0=0.09
-    UZR={5:[0.09,0.092,0.4]})  #|free() error below 0.092 !!!??? 
+    RL0=0.02,RL1=1.0, # RL0=0.09
+    UZR={5:[0.092, 0.110]})  #|free() error below 0.092 !!!??? 
 
 eH_fold = merge(run(x) + run(x,DS="-"))
 plot(eH_fold,stability=True,height=600)
 save(eH_fold,"eH_fold")
 
-#| Family of sol form user point on eH-foldContinuation
-print("=====EEE===Family of sol from user point on eH-foldContin")
-y = load(eH_fold("UZ1"),     
-    c='ZilliCubic11',
-    IPS=2,ICP=[2,11,9],
-    NTST=200,
-    UZR={2:[1,2]},
-    UZSTOP={2:[0.01,7.01]})
+#| SolFams from UZ on eH-foldContin
+if False: 
+    print("=====EEE===Family of sol from user point on eH-foldContin")
+    y = load(eH_fold("UZ1"),     
+        c='ZilliCubic11',
+        IPS=2,ICP=[2,11,9,5],
+        NTST=200,
+        UZR={2:[1,2]},
+        UZSTOP={2:[0.01,7.01]})
 
-low_eH_bd_fold = merge( run(y) + run(y,DS="-") )
-IPS2 = IPS2 + low_eH_bd_fold
+    low_eH_bd_fold = merge( run(y) + run(y,DS="-") )
+    IPS2 = IPS2 + low_eH_bd_fold
 
 
 
 
 #| Switching the branch of the fold continuation
-for BP in eH_fold("BP"):
-	eH_fold = eH_fold + run(BP,ISW=-1,ICP=[5,2,11,9],RL0=0.01,RL1=1.1) 
-plot(eH_fold)
+if False: 
+    for BP in eH_fold("BP"):
+        eH_fold = eH_fold + run(BP,ISW=-1,ICP=[5,2,11,9],RL0=0.01,RL1=1.1) 
+        plot(eH_fold)
 
 #|___IPS2_A_DL_EH.
 #|___IPS2_A_DL.
