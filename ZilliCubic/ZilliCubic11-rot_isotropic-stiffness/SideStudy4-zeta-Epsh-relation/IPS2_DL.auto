@@ -181,26 +181,27 @@ if isOnCubic:
 			used_epsHzetaOmeg_indexes.append((epsH_index,zeta_index,Omeg_index))
 
 
-
-
-		#| Write the solution point data to file in a "dat file like" form 
-		#| :Only to save the solution point data 
-		if epsH_list[epsH_index] == 0.1:
-			mydict = Z.todict()
-			f1 = open("orbit_from_regular_sample_at_epsH1e-1_zeta1e-5_Omeg4","w")
-			for i in range(0, len(mydict)) :
-				f1.write(  str(mydict["u"][i]) +","+ str(mydict["v"][i])  +","+  str(mydict["u_dot"][i]) +","+ str(mydict["v_dot"][i])  )
-			f1.close() 
-
-
 		#| Contin if not done before 
 		l_DL_cubic_zeta_epsH_Omeg = load(Z,
 			IPS=2,ICP=[2,11,9,5,6],
-			UZR=[],UZSTOP=[],STOP=["LP2"],RL0=0.01,RL1=10.0,NMX=1000,NPR=10000)
+			UZR={2:5.0},UZSTOP=[],STOP=["LP2"],RL0=0.01,RL1=10.0,NMX=1000,NPR=10000)
 		DL_cubic_zeta_epsH_Omeg += run(l_DL_cubic_zeta_epsH_Omeg) + run(l_DL_cubic_zeta_epsH_Omeg,DS="-")
 
-	# save(DL_cubic_zeta_epsH_Omeg,"DL_cubic_zeta1e-5_epsH1e-1_Omeg") #|Only for saving epsH=1e-1 Omeg solFam
-	plot(DL_cubic_zeta_epsH_Omeg, top_title="DL_cubic_zeta_epsH_Omeg",use_symbols=False,letter_symbols=True,stability=True,bifurcation_x="epsH",bifurcation_y="Omeg",bifurcation_z="Amplitude",color_list="black red green blue violet orange gray brown teal turquoise purple",bg="beige")
+	save(rl(merge(DL_cubic_zeta_epsH_Omeg)),"DL_cubic_zeta1e-5_epsH1e-1_Omeg") #|Only for saving epsH=1e-1 Omeg solFam
+	plot(rl(merge(DL_cubic_zeta_epsH_Omeg)), top_title="DL_cubic_zeta_epsH_Omeg",use_symbols=False,letter_symbols=True,stability=True,bifurcation_x="epsH",bifurcation_y="Omeg",bifurcation_z="Amplitude",color_list="black red green blue violet orange gray brown teal turquoise purple",bg="beige")
+
+
+
+	#| Write the solution point data to file in a "dat file like" form 
+	#| :Only to save the solution point data 
+	# mydict = DL_cubic_zeta_epsH_Omeg("UZ2").todict()
+	# f1 = open("orbit_from_regular_sample_at_epsH1e-1_zeta1e-5_Omeg5_UZ2","w")
+	# for i in range(0, len(mydict)) :
+	# 	f1.write(  str(mydict["u"][i]) +","+ str(mydict["v"][i])  +","+  str(mydict["u_dot"][i]) +","+ str(mydict["v_dot"][i])  )
+	# f1.close() 
+
+
+	wait()
 
 
 	#4/4| foldContins
@@ -279,11 +280,11 @@ if isOnCubic:
 		# 	used_epsHzeta_indexes.append((epsH_index,zeta_index))
 
 
-		l_foldContins_Omeg = load(E, ICP=[2,11,9,5,6],STOP=[],UZR={2:4.0},UZSTOP={2:10},RL0=0, RL1=10,DSMAX=0.1, NMX = 10000)
+		l_foldContins_Omeg = load(E, ICP=[2,11,9,5,6],STOP=[],UZR={2:5.0},UZSTOP={2:10},RL0=0, RL1=10,DSMAX=0.1, NMX = 10000)
 		foldContins_Omeg += run(l_foldContins_Omeg) + run(l_foldContins_Omeg,DS="-")
 
-	save(foldContins_Omeg,"DL_cubic_zeta1e-5_epsH1e-1_weirdFold_Omeg")#|Only for saving epsH=1e-1 weird_fold>>Omeg solFam.
-	plot(foldContins_Omeg, top_title="foldContins_Omeg", stability=True, bifurcation_x="epsH", bifurcation_y="Omeg", bifurcation_z="Amplitude",bg="beige")
+	save(rl(merge(foldContins_Omeg)),"DL_cubic_zeta1e-5_epsH1e-1_weirdFold_Omeg")#|Only for saving epsH=1e-1 weird_fold>>Omeg solFam.
+	plot(rl(merge(foldContins_Omeg)), top_title="foldContins_Omeg", stability=True, bifurcation_x="epsH", bifurcation_y="Omeg", bifurcation_z="Amplitude",bg="beige")
 	plot(DL_cubic_zeta_epsH_Omeg+foldContins+foldContins_Omeg, top_title="DL_cubic_zeta_epsH_Omeg+foldContins+foldContins_Omeg", stability=True,bifurcation_x="epsH", bifurcation_y="Omeg",bifurcation_z="Amplitude",bg="beige")
 	#|:Weird fold continuations yield all-unstable Omeg solFams !!! That means that these might have a different phase than that would normally be there.
 	#|:Whatsmore, when these sampled fold loci are continued in Omeg, they are not on any LP what so ever. 
@@ -292,8 +293,8 @@ if isOnCubic:
 
 	#| Write the solution point data to file in a "dat file like" form
 	#| :Only to save the solution point data 
-	mydict = foldContins_Omeg("UZ1").todict()
-	f2 = open("orbit_from_weird_foldContin_sample_at_epsH1e-1_zeta1e-5_Omeg4","w")
+	mydict = foldContins_Omeg("UZ2").todict()
+	f2 = open("orbit_from_weird_foldContin_sample_at_epsH1e-1_zeta1e-5_Omeg5_UZ2","w")
 	for i in range(0, len(mydict)):
 		f2.write(  str(mydict["u"][i]) +","+ str(mydict["v"][i])  +","+  str(mydict["u_dot"][i]) +","+ str(mydict["v_dot"][i])  )
 	f2.close()

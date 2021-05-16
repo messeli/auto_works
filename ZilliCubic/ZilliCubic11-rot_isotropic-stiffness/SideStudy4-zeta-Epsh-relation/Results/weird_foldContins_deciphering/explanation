@@ -1,8 +1,9 @@
 
 
-The weird fold contins are the "outliers" in the fold continuations with lower epsH (eg 0.010 11 12 15 20) and lower zeta(1e-5 here only). 
+The "weird" fold contins are the "outliers" in the fold continuations with lower epsH (eg 0.010 11 12 15 20) and lower zeta(1e-5 here only). 
 
-The narrative after this:
+The narrative is as follows:
+
 These fold contins are sampled at epsH = 0.1 
 Then the sample is continued in Omeg to get a whole solFam. 
 
@@ -11,8 +12,15 @@ But the stability was as expected before the fold continuaiton (ie the regular e
 
 The hypothesis is that the orbits can have different direction ?? in the whole-unstable cases...
 
-So the TASK now is to get an orbit from the weird-foldContin one, and another orbit from the regular one at the same epsH=1e-1 and zeta=1e-5 values, and plot them in time lets say in MATLAB with pause(10 ms)
+So the TASK now is to get an orbit from the weird-foldContin one, and another orbit from the regular one at the same epsH=1e-1 and zeta=1e-5 values, and plot them in time lets say in MATLAB with pause(10 ms).
 
+
+The orbits to see their orientation are
+orbit_from_weird_foldContin_sample_at_epsH1e-1_zeta1e-5_Omeg5
+orbit_from_weird_foldContin_sample_at_epsH1e-1_zeta1e-5_Omeg5_UZ2
+orbit_from_regular_sample_at_epsH1e-1_zeta1e-5_Omeg5
+orbit_from_regular_sample_at_epsH1e-1_zeta1e-5_Omeg5_UZ2
+There is a possibility that they point to upper or lower sides of their respective solFams. 
 
 [
 As a side note, when continuing in Omeg from the weird fold contins, it does not start from a fold!??
