@@ -29,13 +29,15 @@ print("============================================================ IPS2_DL")
 print("============================================================ IPS2_DL : Matlab(cubic)>Omeg")
 
 #|0/4| Dat>Omeg , sample Omeg
-Omeg_list = n.array([3,4,5,6]) # UZR={2:[3,4,5,6]}
+# Omeg_list = n.array([3,4,5,6]) # UZR={2:[3,4,5,6]}
+Omeg_list = 4 ; #Its unnecessary t sample mor dn 1 Omeg here, as its done >>zeta>>epsH>>Omeg contins on. So we get d Omeg info fr each pair f (epsH,zeta)  below at part 3/4 
+#|:Use an Omeg with the widest range of zeta values in the part 1/4 below! 
 l_dLoop_dat = load(
 	e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",     # .f90
 	dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",  # .dat
 	c="ZilliCubic11", 
 	IPS=2, ICP=[2,11,9,5,6], #Print par6 = zeta |#par5=epsH 
-	UZR={2:4},RL0=0,RL1=7.01,NMX=400, 
+	UZR={2:Omeg_list},RL0=0,RL1=7.01,NMX=400, 
 	NTST=150,DS=+0.01,DSMAX=0.1,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-3);
 
 dLoop_dat = merge( run(l_dLoop_dat) + run(l_dLoop_dat,DS="-") ) #|Solution family from .dat
@@ -58,7 +60,7 @@ if isOnCubic:
 			DSMAX=0.01)
 		
 		dLoop_cubic_zetaEpsH_forw = run(l_dLoop_cubic_zetaEpsH)
-		# wait()
+		# wait() 
 		dLoop_cubic_zetaEpsH_back = run(l_dLoop_cubic_zetaEpsH,DS="-") 
 		dLoop_cubic_zetaEpsH = dLoop_cubic_zetaEpsH_forw+ dLoop_cubic_zetaEpsH_back	
 
@@ -93,17 +95,17 @@ if isOnCubic:
 		[curr_epsH,curr_zeta,curr_Omeg] = [X.__getstate__()["PAR"].values()[par-1] for par in [5,6,2]]
 		print("============================================================ IPS2_DL : Matlab>Omeg>zeta : ", "{}/{}/{} on epsH:{}, zeta:{}, Omeg:{}".format(count,pos,size,curr_epsH,curr_zeta,curr_Omeg))
 
-		check = abs(  (Omeg_list-curr_Omeg)/curr_Omeg  )
-		Omeg_index = n.argmin(check)
-		if min(check)<=1e-2:  #used_Omeg
-			#If done before ?
-			if Omeg_index in used_Omeg_indexes: 
-				count -= 1 
-				continue	
-			#Record	
-			used_Omeg_indexes.append(Omeg_index)
-			
-		#Contin if not done before 
+		[check_Omeg] = [ abs(  (Omeg_list-curr_Omeg)/curr_Omeg  ) ]
+		(Omeg_index) = ( n.argmin(check_Omeg) )
+		print("(Omeg_index)",(Omeg_index))
+		print("used_Omeg_indexes",used_Omeg_indexes)
+
+		if (Omeg_index) in used_Omeg_indexes: 
+			print("PASSED") ; count -= 1 ; continue
+		elif (Omeg_index) not in used_Omeg_indexes: 
+			used_Omeg_indexes.append((Omeg_index))
+
+
 		l_DL_cubic_zeta = load(X,
 			IPS=2,ICP=[6,11,9,5,2],ISW=1,
 			UZR={6:1e-5},UZSTOP={6:10},RL0=-0.001,RL1=0.1,NMX=1000,NPR=1000) #zeta_list
@@ -116,12 +118,10 @@ if isOnCubic:
 
 	#2/4| Matlab>Omeg>zeta>epsH at (Omeg,zeta) sample pairs
 	print("============================================================ IPS2_DL : Matlab>Omeg>zeta>epsH")
-	for Y in DL_cubic_zeta("UZ"):
-		[curr_epsH,curr_zeta,curr_Omeg] = [Y.__getstate__()["PAR"].values()[par-1] for par in [5,6,2]]
-		print("==== (Omeg,zeta) pairs for epsH contin (part 2/4) ========== IPS2_DL : Matlab>Omeg>zeta>epsH : ", "{}/{}/{} on epsH:{}, zeta:{}, Omeg:{}".format(count,pos,size,curr_epsH,curr_zeta,curr_Omeg))
 
-	# epsH_list = n.array([0,1e-5,1e-4,1e-3,5e-3,8e-3,1e-2,2e-2,5e-2,0.1,0.2,0.25,0.353,0.5,0.8,1.0,1.5,1,8]) #UZR={5:[0.1,0.353,0.75]}  #n.array([0.01,0.1,0.2,0.353])
-	epsH_list = n.array([1e-2,1.1e-2,1.2e-2,1.5e-2,2e-2])	
+	# epsH_list = n.array([0,1e-5,1e-4,1e-3,5e-3,8e-3,1e-2,2e-2,5e-2,0.1,0.2,0.25,0.353,0.5,0.8,1.0,1.5,1,8])
+	epsH_list = n.array([1e-2,1.1e-2,1.2e-2,1.5e-2,1.8e-2,2e-2,1e-1])	#|last regular list I used. 
+	# epsH_list = 1e-1 #|Only for saving epsH=1e-1 Omeg solFam
 
 	DL_cubic_zeta_epsH = [] 
 	used_zetaOmeg_indexes = []
@@ -130,30 +130,30 @@ if isOnCubic:
 	for Y in DL_cubic_zeta("UZ"): 
 		count += 1 ; pos += 1
 
-		#Get State
+		# Get State
 		[curr_epsH,curr_zeta,curr_Omeg] = [Y.__getstate__()["PAR"].values()[par-1] for par in [5,6,2]]
-		print("============================================================ IPS2_DL : Matlab>Omeg>zeta>epsH : ", "{}/{}/{} on epsH:{}, zeta:{}, Omeg:{}".format(count,pos,size,curr_epsH,curr_zeta,curr_Omeg))
-		
-		[check_zeta,check_Omeg] = [abs(  (zeta_list-curr_zeta)/curr_zeta  )	, abs(  (Omeg_list-curr_Omeg)/curr_Omeg  )]
+		[check_zeta,check_Omeg] = [ abs(  (zeta_list-curr_zeta)/curr_zeta  )	, abs(  (Omeg_list-curr_Omeg)/curr_Omeg  )]
 		(zeta_index,Omeg_index) = ( n.argmin(check_zeta), n.argmin(check_Omeg) )
-		if min(check_zeta)<=1e-2 and min(check_Omeg)<=1e-2:  #|Fr low check_zeta/check_epsH,samples fr dsame zeta llb so much mor distant dn 1%, so fr low vals its mor like 5e-2 (??)
-			#If done before ?
-			if (zeta_index,Omeg_index) in used_zetaOmeg_indexes: 
-				count -= 1 
-				continue		
-			#Record 
+		print("============================================================ IPS2_DL : Matlab>Omeg>zeta>epsH : ", "{}/{}/{} on epsH:{}, zeta:{}, Omeg:{}".format(count,pos,size,curr_epsH,curr_zeta,curr_Omeg))
+		print("(zeta_index,Omeg_index)",(zeta_index,Omeg_index))
+		print("used_zetaOmeg_indexes",used_zetaOmeg_indexes)
+		
+		#| Decision: Pass or cont? (comment out if you want to run from all sampled solPoints)
+		if (zeta_index,Omeg_index) in used_zetaOmeg_indexes: 
+			print("PASSED") ; count -= 1 ; continue
+		elif (zeta_index,Omeg_index) not in used_zetaOmeg_indexes: #check further
 			used_zetaOmeg_indexes.append((zeta_index,Omeg_index))
 
 		#Contin if not done before 
 		l_DL_cubic_zeta_epsH = load(Y, 
 			IPS=2,ICP=[5,11,9,2,6],
-			UZR={5:epsH_list},RL0=0.0,RL1=1.0,NMX=300,NPR=1000, #epsH_list
-			DS = -0.01) 
+			UZR={5:epsH_list}, RL0=0.0, RL1=1.0, NMX=300, NPR=1000, #epsH_list
+			DS = -0.01, DSMAX=0.05) 
 		
 		DL_cubic_zeta_epsH += run(l_DL_cubic_zeta_epsH) #+ run(l_DL_cubic_zeta_epsH,DS="-")
 
 
-	plot(DL_cubic_zeta_epsH,top_title="DL_cubic_zeta_epsH",bifurcation_x="epsH",bifurcation_y="Amplitude",stability=True,color_list="black red green blue violet orange gray brown teal turquoise purple",bg="beige")
+	plot(DL_cubic_zeta_epsH, top_title="DL_cubic_zeta_epsH", bifurcation_x="epsH",bifurcation_y="Amplitude",stability=True,color_list="black red green blue violet orange gray brown teal turquoise purple",bg="beige")
 
 
 	#3/4| Matlab>Omeg>zeta>epsH>Omeg at (Omeg,zeta,epsH) pairs
@@ -161,111 +161,89 @@ if isOnCubic:
 	DL_cubic_zeta_epsH_Omeg = [] #|OmegVsAmp solFams of all different combinations of zeta and epsH . 
 	count = 0 ; pos = 0
 	size = len(DL_cubic_zeta_epsH("UZ")) 
-	used_epsHzetaOmeg_indexes = []
+	used_epsHzetaOmeg_indexes = [] #Fr each val of Omeg(should be one,see part0/4), drs a set f (epsH,zeta) pairs. (Omeg could be omitted as it is only one value see part 0/4)
 	
 	for Z in DL_cubic_zeta_epsH("UZ"):
 		count += 1 ; pos += 1 
 			
-		#Get state
+		#| Get state
 		[curr_epsH,curr_zeta,curr_Omeg] = [Z.__getstate__()["PAR"].values()[par-1] for par in [5,6,2]]
-		print("============================================================ IPS2_DL : Matlab>Omeg>zeta>epsH>Omeg : ", "{}/{}/{} on epsH:{}, zeta:{}, Omeg:{}".format(count,pos,size,curr_epsH,curr_zeta,curr_Omeg))
-		
 		[check_epsH,check_zeta,check_Omeg] = [abs(  (epsH_list-curr_epsH)/curr_epsH  )  ,  abs(  (zeta_list-curr_zeta)/curr_zeta  )	, abs(  (Omeg_list-curr_Omeg)/curr_Omeg  )]
 		(epsH_index,zeta_index,Omeg_index) = ( n.argmin(check_epsH), n.argmin(check_zeta), n.argmin(check_Omeg) )
+		print("============================================================ IPS2_DL : Matlab>Omeg>zeta>epsH>Omeg : ", "{}/{}/{} on epsH:{}, zeta:{}, Omeg:{}".format(count,pos,size,curr_epsH,curr_zeta,curr_Omeg))
+		print("(epsH_index,zeta_index,Omeg_index)",(epsH_index,zeta_index,Omeg_index))
+		print("used_epsHzetaOmeg_indexes",used_epsHzetaOmeg_indexes)
 
+		#| Decision: Pass or cont? (comment out if you want to run from all sampled solPoints)
 		if (epsH_index,zeta_index,Omeg_index) in used_epsHzetaOmeg_indexes: 
-			print("PASSED")
-			print("(epsH_index,zeta_index,Omeg_index)",(epsH_index,zeta_index,Omeg_index))
-			print("used_epsHzetaOmeg_indexes",used_epsHzetaOmeg_indexes)
-			print(min(check_epsH), n.argmin(check_epsH))
-			print(max(check_zeta), n.argmin(check_zeta))
-			count -= 1
-			continue
-		elif (epsH_index,zeta_index,Omeg_index) not in used_epsHzetaOmeg_indexes: #check further
+			print("PASSED") ; count -= 1 ; continue
+		elif (epsH_index,zeta_index,Omeg_index) not in used_epsHzetaOmeg_indexes:
 			used_epsHzetaOmeg_indexes.append((epsH_index,zeta_index,Omeg_index))
-			# if min(check_epsH)<=0.01 and min(check_zeta)<=0.01 and min(check_Omeg)<=0.01:  #|Fr low check_zeta/check_epsH,samples fr dsame zeta llb so much mor distant dn 1%, so fr low vals its mor like 5e-2 (??)			
-			# 	print("PASSED - 1")
-			# 	count -= 1 
-			# 	continue
-			# elif min(check_epsH)<=0.01 and min(check_zeta)<=0.40 and min(check_Omeg)<=0.01: #|small zeta vals can differ up to 40 percent yet they are the same 
-			# 	print("PASSED - 2")
-			# 	print(check_zeta)
-			# 	count -= 1
-			# 	continue
 
-		# if min(check_epsH)<=1e-2 and min(check_zeta)<=1e-2 and min(check_Omeg)<=1e-2:  #|Fr low check_zeta/check_epsH,samples fr dsame zeta llb so much mor distant dn 1%, so fr low vals its mor like 5e-2 (??)
-		# 	#Is done before?  
-		# 	if (epsH_index,zeta_index,Omeg_index) in used_epsHzetaOmeg_indexes: 
-		# 		print("PASSED - 1 ")
-		# 		count -= 1 
-		# 		continue
-		# 	#Record 
-		# 	used_epsHzetaOmeg_indexes.append((epsH_index,zeta_index,Omeg_index))
 
-		# elif min(check_epsH)<=0.4 and min(check_zeta)<=0.4 and min(check_Omeg)<=0.4: #|small vals can differ up to 40 percent
-		# 	if (epsH_index,zeta_index,Omeg_index) in used_epsHzetaOmeg_indexes: 
-		# 		print("PASSED - 2 ")
-		# 		count -= 1 
-		# 		continue
-		# 	#Record 
-		# 	used_epsHzetaOmeg_indexes.append((epsH_index,zeta_index,Omeg_index))
-		
-		#Contin if not done before 
+
+
+		#| Write the solution point data to file in a "dat file like" form 
+		#| :Only to save the solution point data 
+		if epsH_list[epsH_index] == 0.1:
+			mydict = Z.todict()
+			f1 = open("orbit_from_regular_sample_at_epsH1e-1_zeta1e-5_Omeg4","w")
+			for i in range(0, len(mydict)) :
+				f1.write(  str(mydict["u"][i]) +","+ str(mydict["v"][i])  +","+  str(mydict["u_dot"][i]) +","+ str(mydict["v_dot"][i])  )
+			f1.close() 
+
+
+		#| Contin if not done before 
 		l_DL_cubic_zeta_epsH_Omeg = load(Z,
 			IPS=2,ICP=[2,11,9,5,6],
 			UZR=[],UZSTOP=[],STOP=["LP2"],RL0=0.01,RL1=10.0,NMX=1000,NPR=10000)
 		DL_cubic_zeta_epsH_Omeg += run(l_DL_cubic_zeta_epsH_Omeg) + run(l_DL_cubic_zeta_epsH_Omeg,DS="-")
 
-	print("===DIAGNOSTICS===",type(DL_cubic_zeta_epsH_Omeg))
-	plot(DL_cubic_zeta_epsH_Omeg,top_title="DL_cubic_zeta_epsH_Omeg",use_symbols=False,letter_symbols=True,stability=True,bifurcation_x="epsH",bifurcation_y="Omeg",bifurcation_z="Amplitude",color_list="black red green blue violet orange gray brown teal turquoise purple",bg="beige")
+	# save(DL_cubic_zeta_epsH_Omeg,"DL_cubic_zeta1e-5_epsH1e-1_Omeg") #|Only for saving epsH=1e-1 Omeg solFam
+	plot(DL_cubic_zeta_epsH_Omeg, top_title="DL_cubic_zeta_epsH_Omeg",use_symbols=False,letter_symbols=True,stability=True,bifurcation_x="epsH",bifurcation_y="Omeg",bifurcation_z="Amplitude",color_list="black red green blue violet orange gray brown teal turquoise purple",bg="beige")
 
 
 	#4/4| foldContins
 	print("============================================================ IPS2_DL : Matlab>Omeg>zeta>epsH>Omeg>fold")
 
-	foldContins = [] ; foldContins_forw = [] ; foldCOntins_back= []
-	size = len(DL_cubic_zeta_epsH_Omeg("LP")) 
-	count = 0 ; pos = 0 
-	[used_epsH, used_zeta, used_Omeg] = [n.ones(size)*-100]*3 #|used fold point data will be recorded in these 
-	used_epsHzeta_indexes = []
-	#|: Checking used_Omeg might be unnecessary bcz fr each LP drs only one Omeg possible, ie its nt like samplJ at any Omeg then it samples at stable&unstable parts of the solFam. 
+	foldContins = [] ; foldContins_forw = [] ; foldCOntins_back= [] ; size = len(DL_cubic_zeta_epsH_Omeg("LP")) ; count = 0 ; pos = 0 
+	# [used_epsH, used_zeta, used_Omeg] = [n.ones(size)*-100]*3  ;  #|used fold point data will be recorded in these 
+	epsH_newList = 0.1
+	used_epsHzeta_indexes = [] #|Folds are wrt Omeg, So Omeg will be different for each fold. 
+	#|:These Omegs could be "check_Omeg"ed and filled to an Omeg_list so that it can be added to the index checks below. 
+	#|...But each fold is to be bound with a certain pair of (epsH,zeta).
+	#|:We do not sample-continue at Omeg, so no need to check it anyway.
+	#|:Let it not ck zeta if you do not want to skip the upper LP points' fold cont.
+
 	
 	for T in DL_cubic_zeta_epsH_Omeg("LP"):
 		count += 1 ; pos += 1
 	
-		#Get state
-		[curr_epsH,curr_zeta,curr_Omeg] = [T.__getstate__()["PAR"].values()[par-1] for par in [5,6,2]]
-		print("============================================================ IPS2_DL : Matlab>Omeg>zeta>epsH>Omeg>fold : ", "{}/{}/{} on epsH:{}, zeta:{}, Omeg:{}".format(count,pos,size, curr_epsH,curr_zeta,curr_Omeg))
-		
+		#| Get state 
+		[curr_epsH,curr_zeta,curr_Omeg] = [T.__getstate__()["PAR"].values()[par-1] for par in [5,6,2]]		
 		[check_epsH,check_zeta] = [ abs(  (epsH_list-curr_epsH)/curr_epsH  )  ,  abs(  (zeta_list-curr_zeta)/curr_zeta  ) ]
 		(epsH_index,zeta_index) = ( n.argmin(check_epsH), n.argmin(check_zeta) )
-		if min(check_epsH)<=1e-2 and min(check_zeta)<=1e-2:  #|Fr low check_zeta/check_epsH,samples fr dsame zeta llb so much mor distant dn 1%, so fr low vals its mor like 5e-2 (??)
-			#If done before ?
-			if (epsH_index,zeta_index) in used_epsHzeta_indexes: 
-				count -= 1 
-				continue		
-			#Record 
-			used_epsHzeta_indexes.append((epsH_index,zeta_index,Omeg_index))
-
-		[check_epsH,check_zeta] = [ abs(  (used_epsH-curr_epsH)/curr_epsH  )  ,  abs(  (used_zeta-curr_zeta)/curr_zeta  ) ]
-		if min(check_epsH)<=1e-2 and min(check_epsH)<=1e-2 : 
-			count -= 1 
-			continue
-
+		print("============================================================ IPS2_DL : Matlab>Omeg>zeta>epsH>Omeg>fold : ", "{}/{}/{} on epsH:{}, zeta:{}, Omeg:{}".format(count,pos,size, curr_epsH,curr_zeta,curr_Omeg))
+		print("(epsH_index,zeta_index)",(epsH_index,zeta_index))
+		print("used_epsHzeta_indexes",used_epsHzeta_indexes)
 		
-		#Contin if not done before 
+		#| Decision: Pass or cont? (comment out if you want to run from all sampled solPoints)
+		if (epsH_index,zeta_index) in used_epsHzeta_indexes: 
+			print("PASSED") ; count -= 1 ; continue
+		elif (epsH_index,zeta_index) not in used_epsHzeta_indexes: #check further
+			used_epsHzeta_indexes.append((epsH_index,zeta_index))
+
+			
+		#| Contin if not done before 
 		l_foldContins = run(T,
 			ICP=[5,2,11,9,6],ISW=2 , 
-			STOP=[],UZR={5:0.1},UZSTOP={2:7},RL0=0.0,RL1=1.0,NMX=7000 ,   #STOP=["R110","BR40"]
+			STOP=[],UZR={5:epsH_newList},UZSTOP={2:7},RL0=0.0,RL1=1.0,NMX=7000 ,   #STOP=["R110","BR40"]
 			DS=0.001,DSMAX=0.001,NPR=100000)
 		try: foldContins_forw = run(l_foldContins)
 		except: pass
 		try: foldContins_back = run(l_foldContins,DS="-") 
 		except: pass
 		foldContins += merge( foldContins_forw + foldContins_back )
-
-		#Record
-		used_epsH[count-1] = curr_epsH ; used_zeta[count-1] = curr_zeta ; used_Omeg[count-1] = curr_Omeg
 
 	
 	save(foldContins,"foldContins")
@@ -277,13 +255,51 @@ if isOnCubic:
 	# plot(DL_all,top_title="DL_all+foldContins",use_symbols=False,bifurcation_x="epsH",bifurcation_y="Amplitude",bifurcation_z="zeta",stability=True,color_list="black red green blue violet orange gray brown teal turquoise purple")
 
 
-	#5/4| is the bizarre fold contins allright? in Omeg back??
-	foldContins_Omeg = []
-	for E in foldContins("UZ"):
-		l_foldContins_Omeg = load(E, ICP=[2,11,9,5,6],UZSTOP={2:10},RL0=0, RL1=15,DSMAX=0.1, NMX = 10000)
+	#5/4| Yet Omeg at epsH samples of foldContins ; Is the bizarre fold contins allright? in Omeg back??
+	foldContins_Omeg = [] ; size = len(foldContins("UZ")) ; count = 0 ; pos = 0
+	used_epsHzeta_indexes = []
+
+	# for E in foldContins("UZ"): 
+	if True :                  #|Only for saving epsH=1e-1 weird_fold>>Omeg solFam.
+		E = foldContins("UZ3") #|Only for saving epsH=1e-1 weird_fold>>Omeg solFam.
+		count += 1 ; pos += 1
+
+		#| Get State 
+		[curr_epsH,curr_zeta,curr_Omeg] = [E.__getstate__()["PAR"].values()[par-1] for par in [5,6,2]]
+		[check_epsH,check_zeta] = [abs(  (epsH_newList-curr_epsH)/curr_epsH  )  ,  abs(  (zeta_list-curr_zeta)/curr_zeta )]
+		(epsH_index,zeta_index) = ( n.argmin(check_epsH) , n.argmin(check_zeta))
+		print("================================================== IPS2_DL : Matlab>Omeg>zeta>epsH>Omeg>fold>Omeg : ", "{}/{}/{} on epsH:{}, zeta:{}, Omeg:{}".format(count,pos,size,curr_epsH,curr_zeta,curr_Omeg))
+		print("(epsH_index,zeta_index)",(epsH_index,zeta_index))
+		print("used_epsHzeta_indexes",used_epsHzeta_indexes)
+		
+		#| Decision: Pass or cont? (comment out if you want to run from all sampled solPoints)
+		# if (epsH_index,zeta_index) in used_epsHzeta_indexes: 
+		# 	print("PASSED") ; count -= 1 ; continue
+		# elif (epsH_index, zeta_index) not in used_epsHzeta_indexes: #check further
+		# 	used_epsHzeta_indexes.append((epsH_index,zeta_index))
+
+
+		l_foldContins_Omeg = load(E, ICP=[2,11,9,5,6],STOP=[],UZR={2:4.0},UZSTOP={2:10},RL0=0, RL1=10,DSMAX=0.1, NMX = 10000)
 		foldContins_Omeg += run(l_foldContins_Omeg) + run(l_foldContins_Omeg,DS="-")
+
+	save(foldContins_Omeg,"DL_cubic_zeta1e-5_epsH1e-1_weirdFold_Omeg")#|Only for saving epsH=1e-1 weird_fold>>Omeg solFam.
 	plot(foldContins_Omeg, top_title="foldContins_Omeg", stability=True, bifurcation_x="epsH", bifurcation_y="Omeg", bifurcation_z="Amplitude",bg="beige")
 	plot(DL_cubic_zeta_epsH_Omeg+foldContins+foldContins_Omeg, top_title="DL_cubic_zeta_epsH_Omeg+foldContins+foldContins_Omeg", stability=True,bifurcation_x="epsH", bifurcation_y="Omeg",bifurcation_z="Amplitude",bg="beige")
+	#|:Weird fold continuations yield all-unstable Omeg solFams !!! That means that these might have a different phase than that would normally be there.
+	#|:Whatsmore, when these sampled fold loci are continued in Omeg, they are not on any LP what so ever. 
+
+
+
+	#| Write the solution point data to file in a "dat file like" form
+	#| :Only to save the solution point data 
+	mydict = foldContins_Omeg("UZ1").todict()
+	f2 = open("orbit_from_weird_foldContin_sample_at_epsH1e-1_zeta1e-5_Omeg4","w")
+	for i in range(0, len(mydict)):
+		f2.write(  str(mydict["u"][i]) +","+ str(mydict["v"][i])  +","+  str(mydict["u_dot"][i]) +","+ str(mydict["v_dot"][i])  )
+	f2.close()
+
+
+
 
 
 

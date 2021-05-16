@@ -9,10 +9,10 @@ startTime = time.time()
 # except:print(">>>ERROR : IPS2_SL.auto did not finish ")
 
 print("=============================================|IPS2_DL.auto|=============================================")
-try:auto("IPS2_DL.auto")
-except:print(">>>ERROR : IPS2_DL.auto did not finish ")
+try:   auto("IPS2_DL.auto")
+except:print(">>>MYERROR : IPS2_DL.auto did not finish ")
 
-# clean #|I will use fort.9 to see if there is a problem with the calculation of EV that its deallocation causes the free problem 
+#clean #|I will use fort.9 to see if there is a problem with the calculation of EV that its deallocation causes the free problem: so comment this out  
 
 
 
