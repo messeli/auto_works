@@ -1,0 +1,95 @@
+
+#================================
+# AUTO demo abcb
+# BPCONT for generic periodic BVP
+#================================
+
+pgm="abcb"
+ld(pgm)
+
+print "\n***"+pgm+": run 1: equilibrium continuation***"
+r1=run(sv=pgm+'.1') #save d output file as "abcb.1"
+
+
+plot(r1,bifurcation_x="PAR(1)",bifurcation_y="MAX U(3)",top_title="equilibrium continuation")
+
+
+
+
+
+print "\n***"+pgm+": run 2: cycle continuation***"
+r2=run(r1('HB1'),IPS=2,ICP=[1,11],IPLT=1,sv=pgm+'.2')
+
+
+r = r1+r2
+plot(r,bifurcation_x="PAR(1)",bifurcation_y="MAX U(3)",top_title="cycle continuation ")
+
+
+
+
+
+
+print "\n***"+pgm+": run 3: switch to LP continuation***"
+sw3=run(r2('LP1'),ICP=[1,2,11],ISW=2,IPLT=0,NPR=10,sv=pgm+'.3.sw')
+plot(r+sw3,bifurcation_x="PAR(1)",bifurcation_y="MAX U(3)",top_title="switch to LP continuation",color_list="black red green blue violet orange gray brown teal turquoise purple")
+
+print "\n***"+pgm+": run 3: LP continuation (fw)***"
+l_sw3=load(sw3,ICP=[2,1,11],NMX=50,RL1=10.0)
+sf3 = run(l_sw3,sv=pgm+'.3.fw')
+plot(r+sw3+sf3,bifurcation_x="PAR(1)",bifurcation_y="MAX U(3)",top_title="LP continuation fw",color_list="black red green blue violet orange gray brown teal turquoise purple")
+
+print "\n***"+pgm+": run 3: LP continuation (bw)***"
+sb3=run(l_sw3,DS='-',sv=pgm+'.3.bw')
+plot(r+sw3+sf3+sb3,bifurcation_x="PAR(1)",bifurcation_y="MAX U(3)",top_title="LP continuation bw",color_list="black red green blue violet orange gray brown teal turquoise purple")
+
+rs = r + merge(sf3+sb3) 
+plot(rs,bifurcation_x="PAR(1)",bifurcation_y="MAX U(3)",top_title="LP continuation",color_list="black red green blue violet orange gray brown teal turquoise purple")
+
+
+
+
+
+
+print "\n***"+pgm+": run 4: cycle continuation (bw)***"
+sb4=run(sb3('LP1'),ICP=[1,11],ISW=1,NMX=10,NPR=2,sv=pgm+'.4.bw')
+
+print "\n***"+pgm+": run 4: cycle continuation (fw)***"
+sf4=run(sb4('EP1'),ITMX=10,DS='-',sv=pgm+'.4.fw')
+
+
+rs += merge(sb4+sf4)
+plot(rs,bifurcation_x="PAR(1)",bifurcation_y="MAX U(3)",top_title="again cycle continuation")
+
+
+
+
+
+
+print "\n***"+pgm+": run 5: switch to BP continuation***"
+sw5=run(sf4('BP1'),ICP=[1,2,3,11],ISW=3,NMX=50,NPR=10,ISP=1,
+  DS=0.001,DSMAX=0.01,sv=pgm+'.5.sw')
+rs += sw5 
+plot(rs,bifurcation_x="PAR(1)",bifurcation_y="MAX U(3)",top_title="switch to BP contin with run(...ISW=3...) ; ICP=[1,2,3,11]")
+
+
+print "\n***"+pgm+": run 5: BP continuation (fw)***"
+run(sw5,sv=pgm+'.5.fw')
+abcb5fw = loadbd("abcb.5.fw")
+
+print "\n***"+pgm+": run 5: BP continuation (bw)***"
+run(sw5,DS='-',sv=pgm+'.5.bw')
+abcb5bw = loadbd("abcb.5.bw")
+
+
+rs += merge(abcb5fw + abcb5bw)
+plot(rs,bifurcation_x="PAR(1)",bifurcation_y="MAX U(3)",top_title="BP continuation")
+plot(merge(abcb5fw + abcb5bw),bifurcation_x="PAR(1)",bifurcation_y="MAX U(3)",top_title="only BP continuation")
+
+
+
+
+
+
+
+print "\n***Clean the directory***"
+cl()

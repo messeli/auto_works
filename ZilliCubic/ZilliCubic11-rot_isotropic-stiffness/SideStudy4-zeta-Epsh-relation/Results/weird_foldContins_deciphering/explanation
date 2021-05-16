@@ -1,0 +1,43 @@
+
+
+The "weird" fold contins are the "outliers" in the fold continuations with lower epsH (eg 0.010 11 12 15 20) and lower zeta(1e-5 here only). 
+
+The narrative is as follows:
+
+These fold contins are sampled at epsH = 0.1 
+Then the sample is continued in Omeg to get a whole solFam. 
+
+It turns out that the whole solFam is now UNSTABLE. 
+But the stability was as expected before the fold continuaiton (ie the regular epsH=0.1 with zeta=1e-5 Omeg solFam is stable above the LP and unstable below the LP.)
+
+THE HYPOTHESIS is that the orbits can have different direction ?? in the whole-unstable cases...
+
+So the TASK now is to get an orbit from the weird-foldContin one, and another orbit from the regular one at the same epsH=1e-1 and zeta=1e-5 values, and plot them in time lets say in MATLAB with pause(10 ms).
+
+
+The orbits to see their orientation are
+	orbit_from_weird_foldContin_sample_at_epsH1e-1_zeta1e-5_Omeg5
+	orbit_from_weird_foldContin_sample_at_epsH1e-1_zeta1e-5_Omeg5_UZ2
+	orbit_from_regular_sample_at_epsH1e-1_zeta1e-5_Omeg5
+	orbit_from_regular_sample_at_epsH1e-1_zeta1e-5_Omeg5_UZ2
+
+See the label 2-4 's of the 
+	b.DL_cubic_zeta1e-5_epsH1e-1_weirdFold_Omeg 
+	b.DL_cubic_zeta1e-5_epsH1e-1_Omeg branches
+Indeed the weird (all unstable) one has its labels with a "5" like "5x". See the screenShots in 
+	weird-foldContin_Omeg-before_foldContin-2D-OmegAmp-zeta1e-5epsH0.1Omeg5-labelShosSameSolutions.png 
+	weird-foldContin_Omeg-before_foldContin-2D-OmegAmp-zeta1e-5epsH0.1Omeg5-labelShosSameSolutions-2.png
+# 
+Label 3 of the weird one is of "55" (R1) type which is a 1:1 Resonance solution according to Table 4.6 of doc Auto (codim 2 table). See the data from the b.xxx in the screenShot 
+	weird-foldContin_Omeg-before_foldCintin-2D-OmegAmp-zeta1e-5epsH0.1Omeg5-3rdLabel-R1-or-LP.png
+
+BACK TO THE HYPOTHESIS ABOVE: The fact is seen with the Libre office plots: the directions are the same.
+
+
+[
+As a side note, when continuing in Omeg from the weird fold contins, it does not start from a fold!??
+So this is not a continuation of a fold at all!??
+Regardless, the above hypothesis is what to answer first!
+]
+
+
