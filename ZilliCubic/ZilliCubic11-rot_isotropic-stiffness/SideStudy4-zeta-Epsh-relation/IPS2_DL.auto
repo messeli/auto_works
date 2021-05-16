@@ -187,17 +187,17 @@ if isOnCubic:
 			UZR={2:5.0},UZSTOP=[],STOP=["LP2"],RL0=0.01,RL1=10.0,NMX=1000,NPR=10000)
 		DL_cubic_zeta_epsH_Omeg += run(l_DL_cubic_zeta_epsH_Omeg) + run(l_DL_cubic_zeta_epsH_Omeg,DS="-")
 
-	save(rl(merge(DL_cubic_zeta_epsH_Omeg)),"DL_cubic_zeta1e-5_epsH1e-1_Omeg") #|Only for saving epsH=1e-1 Omeg solFam
+	# save(rl(merge(DL_cubic_zeta_epsH_Omeg)),"DL_cubic_zeta1e-5_epsH1e-1_Omeg") #|Only for saving epsH=1e-1 Omeg solFam
 	plot(rl(merge(DL_cubic_zeta_epsH_Omeg)), top_title="DL_cubic_zeta_epsH_Omeg",use_symbols=False,letter_symbols=True,stability=True,bifurcation_x="epsH",bifurcation_y="Omeg",bifurcation_z="Amplitude",color_list="black red green blue violet orange gray brown teal turquoise purple",bg="beige")
 
 
 
 	#| Write the solution point data to file in a "dat file like" form 
 	#| :Only to save the solution point data 
-	# mydict = DL_cubic_zeta_epsH_Omeg("UZ2").todict()
-	# f1 = open("orbit_from_regular_sample_at_epsH1e-1_zeta1e-5_Omeg5_UZ2","w")
-	# for i in range(0, len(mydict)) :
-	# 	f1.write(  str(mydict["u"][i]) +","+ str(mydict["v"][i])  +","+  str(mydict["u_dot"][i]) +","+ str(mydict["v_dot"][i])  )
+	# mydict = DL_cubic_zeta_epsH_Omeg("UZ1").todict()
+	# f1 = open("orbit_from_regular_sample_at_epsH1e-1_zeta1e-5_Omeg5_UZ1","w")
+	# for i in range(0, len(mydict["u"])) :
+	# 	f1.write( str(mydict["t"][i]) + ","+ str(mydict["u"][i]) +","+ str(mydict["v"][i])  +","+  str(mydict["u_dot"][i]) +","+ str(mydict["v_dot"][i]) +"\n" )
 	# f1.close() 
 
 
@@ -293,10 +293,10 @@ if isOnCubic:
 
 	#| Write the solution point data to file in a "dat file like" form
 	#| :Only to save the solution point data 
-	mydict = foldContins_Omeg("UZ2").todict()
-	f2 = open("orbit_from_weird_foldContin_sample_at_epsH1e-1_zeta1e-5_Omeg5_UZ2","w")
-	for i in range(0, len(mydict)):
-		f2.write(  str(mydict["u"][i]) +","+ str(mydict["v"][i])  +","+  str(mydict["u_dot"][i]) +","+ str(mydict["v_dot"][i])  )
+	mydict = foldContins_Omeg("UZ1").todict()
+	f2 = open("orbit_from_weird_foldContin_sample_at_epsH1e-1_zeta1e-5_Omeg5_UZ1","a")
+	for i in range(0, len(mydict["u"])):
+		f2.write( str(mydict["t"][i]) +","+ str(mydict["u"][i]) +","+ str(mydict["v"][i])  +","+  str(mydict["u_dot"][i]) +","+ str(mydict["v_dot"][i]) +"\n" )
 	f2.close()
 
 
