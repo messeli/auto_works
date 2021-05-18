@@ -75,7 +75,7 @@
         DOUBLE PRECISION OMEGP,MH,EPSH,JPH,BETA,TPI,KSI,RHO!WN,F_M,K3_M,OMEG,
 
         !| .DAT file data from MATLAB has gamma Omeg mh epsh zeta JpH OmegP as below:
-        GAMMA = 0.25D0 !2nd continue gamma from 0 to 0.25 !|0-0.25: Cubic stiffness ratio, (k_3*r^2)/k_r
+        GAMMA = 0.25D0 !2nd continue gamma from 0 to 0.25 >>> or else start with 0.25!|0-0.25: Cubic stiffness ratio, (k_3*r^2)/k_r
         OMEG  = 4.05D0 !The speed the .dat file is generated at, in Matlab ode45
         MH    = 0.9D0 !1st continue MH from 0 to 0.9
         EPSH  = 0.353D0
@@ -127,7 +127,7 @@
       SUBROUTINE PVLS(NDIM,U,PAR)
         IMPLICIT NONE
         INTEGER, INTENT(IN) :: NDIM
-        DOUBLE PRECISION, INTENT(IN) :: U(NDIM)
+        DOUBLE PRECISION, INTENT(IN) :: U(NDIM) !|Dsll take only 1st col of U (:1st datum f d "solution")
         DOUBLE PRECISION, INTENT(INOUT) :: PAR(*)
         DOUBLE PRECISION, ALLOCATABLE :: UU(:,:),R2(:),R(:)
         DOUBLE PRECISION, EXTERNAL :: GETP, GETU
@@ -135,11 +135,12 @@
         INTEGER :: NDX,NCOL,NTST,i,j,k
         !|SEE the explanation of demo pvl.f90 : 
         !|:"For algebraic problems the argument U is, as usual, the state vector.
-        !|:For differential equations the argument U represents the approximate 
-        !|:solution on the entire interval [0,1]. In this case its values can
-        !|:be accessed indirectly by calls to GETP, as illustrated below, or
-        !|:by obtaining NDIM, NCOL, NTST via GETP and then dimensioning U as
-        !|:U(NDIM,0:NCOL*NTST) in a seperate subroutine that is called by PVLS. "
+        !|...For differential equations the argument U represents the approximate 
+        !|...solution on the entire interval [0,1]. In this case its values can
+        !|...be accessed indirectly by calls to GETP, as illustrated below, or
+        !|...by obtaining NDIM, NCOL, NTST via GETP and then dimensioning U as
+        !|...U(NDIM,0:NCOL*NTST) in a seperate subroutine that is called by PVLS. "
+        !|::See Keep #fortran "fortran assumed dimensions and how it is interpreted."
 
         NDX  = NINT(GETP('NDX',0,U))
         NTST = NINT(GETP('NTST',0,U))
