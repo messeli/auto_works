@@ -1,0 +1,108 @@
+# parnames={
+# 1:'gamma',
+# 2:'Omeg',
+# 3:'mH',
+# 4:'JpH',
+# 5:'epsH',
+# 6:'zeta',
+# 7:'OmegP',
+# 8:'kappa',
+# 9:'Amplitude',
+# 10:"beta",
+# 13:'K',
+# 14:'KSI',
+# 15:'RHO'}
+
+#|>>|IPS2_SL|>> 
+
+###<CONTROLS>###
+isOnCubic = True
+################
+
+l_sLoop_dat = load(
+	e="eqs/ZilliCubic11_datFileContin_zeta_1e-2",     # .f90
+	dat="dats/onePeriodCycle_ISO_rot_4p05_zeta_1e-2",  #
+	c="ZilliCubic11",
+	IPS=2, ICP=[2,11,9,6], #Print par6 = zeta |#par5=epsH 
+	UZR={2:[4,5,6,7,8,9]},RL0=0,RL1=10.01,NMX=10000, # UZR={2:np.append(3.6,np.arange(2,7,0.25))},  
+	NTST=200,DS=+0.01,DSMAX=0.01,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-4);
+sLoop_dat = merge( run(l_sLoop_dat) + run(l_sLoop_dat,DS="-") ) #|Solution family from .dat
+sLoop_cubic = sLoop_dat #|Change name for clarity
+IPS2 = sLoop_cubic #|Start Populating the bifurcation plot.
+plot(sLoop_cubic,top_title="sLoop_cubic",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+
+
+
+if isOnCubic:
+
+	#| SL_cubic epsH-zeta plane 
+	for L in sLoop_cubic("LP"):
+		
+		l_sLoop_cubic_zetaEpsH = run(L,
+			IPS=2,ICP=[5,6,11,9],ISW=2,
+			UZSTOP={5:0.01},RL0=0.0,RL1=2.5,NMX=10000,NPR=5)
+		sLoop_cubic_zetaEpsH = run(l_sLoop_cubic_zetaEpsH)+run(l_sLoop_cubic_zetaEpsH,DS="-") 
+		
+		plot(sLoop_cubic_zetaEpsH)
+
+
+else: #if isOnTanhContact:
+
+	#| Homotopy to newNonlin(:tanh) with kappa=0>1
+	count = 0 
+	size = len(sLoop_cubic("UZ"))
+	for Z in sLoop_cubic("UZ"):
+		count+=1
+		print("===DIAGNOSTIC===IPS2_A_KAPPA_SL===Homotopy2newNonlin=",count,"/",size,)
+		# if count>=2: break
+		
+		sLoop_homot = []
+		try:
+		
+			l_sLoop_homot = load(Z,
+				IPS=2, ICP=[8,11,9,2], # In d case of RHO(quintic): IPS=2, ICP=[15,11,9],
+				UZR={8:[1.0]},RL1=1.01,NMX=5000, #|NMX=60000 | UZR={8:[1.0,0.985]} | UZR={15:[0.987]}, | UZSTOP={15:[1.0]}
+				NTST=200,DS=0.001,DSMAX=0.01) 
+			sLoop_homot += merge( run(l_sLoop_homot) + run(l_sLoop_homot,DS="-") )
+		
+			if len(sLoop_homot("UZ")): 
+				break
+		except:
+				continue
+	plot(sLoop_homot,top_title="sLoop_homot",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+
+	#| SolFam of sLoop with newNonlin
+	count = 0
+	size = len(sLoop_homot('UZ'))
+	sLoop_newNonlin = []
+	for X in sLoop_homot("UZ"):
+		count+=1 
+		print("===DIAGNOSTIC===IPS2_A_KAPPA_SL===newNonlinSolFam=",count,"/",size,)
+		if count>=2: break
+
+		try: #|this try could be unnecessary
+		
+			l_sLoop_newNonlin = load(X,  #'UZ1'
+				IPS=2,ICP=[2,11,9,8],NPR=1000,
+				UZR={2:9.5},RL0=0,RL1=10.1,NMX=60000,
+				NTST=300,DS=-0.001,DSMAX=0.01) #|NEW SAMPLING FOR CONTACT STEEPNESS INCREASE, K.
+			sLoop_newNonlin += merge(run(l_sLoop_newNonlin)+run(l_sLoop_newNonlin,DS="-"))
+		
+			if len(sLoop_newNonlin):
+				break
+		
+		except: 
+			continue
+	
+	plot(sLoop_newNonlin,top_title="sLoop_newNonlin before epsH change",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	#save(sLoop_newNonlin, "sLoop_newNonlin") 
+
+	#| SL_newNonlin epsH-zeta plane 
+	for L in sLoop_newNonlin("LP"):
+		
+		l_sLoop_newNonlin_zetaEpsH = run(L,
+			IPS=2,ICP=[5,6,11,9],ISW=2,
+			UZSTOP={5:0.01},RL0=0.0,RL1=3.5,NMX=10000,NPR=5)
+		sLoop_newNonlin_zetaEpsH = run(l_sLoop_newNonlin_zetaEpsH,DS="-")+run(l_sLoop_newNonlin_zetaEpsH) 
+
+		plot(sLoop_newNonlin_zetaEpsH)
