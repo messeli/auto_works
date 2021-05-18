@@ -43,7 +43,7 @@
       IMPLICIT NONE
       INTEGER, INTENT(IN) :: NDIM
       DOUBLE PRECISION, INTENT(INOUT) :: U(NDIM),PAR(*)
-      DOUBLE PRECISION, INTENT(IN) :: T
+      DOUBLE PRECISION, INTENT(IN) :: T !|Why is T scalar?? it is actually a vector of NCOL*NTST length.
 
       DOUBLE PRECISION A,B,R,EPS,BET,D,TPI
 

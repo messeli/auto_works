@@ -1,0 +1,91 @@
+# parnames={
+# 1:'gamma',
+# 2:'Omeg',
+# 3:'mH',
+# 4:'JpH',
+# 5:'epsH',
+# 6:'zeta',
+# 7:'OmegP',
+# 8:'kappa', 
+# 9:'Amplitude',
+# 10:"beta",
+# 13:'K',
+# 14:'KSI',
+# 15:'RHO'}
+
+########IMPORTS###########
+import time
+import numpy as np
+import re 
+########CONTROLS##########
+isKappaContin  = True
+isFoldContin   = False
+##########################
+
+startTime = time.time()
+#|>>|IPS1|>>>IPS1
+#|>>|IPS1_FORW|>> FORWARD: Cont mH:0-0.9>>gamma:0-0.25>>Omeg:0-7 >> Kappa:0-1>>beta:0-10>>K:0-100>>Omeg:0-7
+if True:
+	mH       = run( "ZilliCubic22", UZSTOP={3:0.0001},RL1=1.0,DS=0.00005,DSMAX=0.0005,NMX=100000) 
+	print(mH[0][1]) #|the 1st branch's 2nd solution point data is printed (see Doc AUTO p44)
+	# UNNECESSARY plot(mH,top_title="mH",bifurcation_x="mH",bifurcation_y="Amplitude",stability=True)
+	#gamma run is not needed as it is already 0.25, the value we want it to be at. 
+	forward1 = run( mH("UZ1"), ICP=[ 2,11,9], UZSTOP={2:0.1},NMX=100000, DS=0.01,DSMAX=0.1 ) #|neeD fr tanh-contact
+	print(forward1[0][0],forward1[0][1])
+	wait()
+	# kappa    = run( forward1("UZ1"), ICP=[ 8,9,2], UZSTOP={8:1.0} ) #|neeD fr tanh-contact
+	# beta     = run( kappa("UZ1"), ICP=[10,9,8], UZSTOP={10:10},NMX=2000 ) #|neeD fr tanh-contact 
+	# K        = run( beta("UZ1"), ICP=[13,9,10], UZSTOP={13:100},NMX=5000, DSMAX=0.05 ) #|neeD fr tanh-contact 
+	#| Change epsH ? 
+	# forw     = [] 
+	# for epsH_val in [1.5]: #epsH_val in [0.8,0.9,1.5] | epsH=0.353 is left to the backward cont just below.
+	# 	print("======================================IPS1_FORW===> epsH_val is ",epsH_val)
+	# 	new   = run( forward1("UZ1"), ICP=[ 5,9,13], UZSTOP={5:epsH_val} ) # OPT(IPS1_FORW) Increase epsH | UZSTOP={5:10e-1 })
+	# 	forw += run( new("UZ1"), ICP=[ 2,9,6], UZSTOP={2:10},NMX=900, 
+	# 		NTST=200,DS=0.01,DSMAX=0.05,EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4,ITMX=8,ITNW=7,NWTN=6 ) #NMX=200000
+	forw = run(forward1("UZ1"), ICP=[2,11,9,6], UZSTOP={2:10}, NMX=10000, 
+		NTST=200,DS=0.01,DSMAX=0.05, EPSL=1e-6,EPSU=1e-6,EPSS=1e-4, ITMX=8,ITNW=7,NWTN=3)
+	#save(forw,"forw") 
+plot(forw,top_title="forw",bifurcation_x="Omeg",bifurcation_y="Amplitude",stability=True)
+#|__|IPS1_FORW|__
+
+#|>>|IPS_BACK|>> FROM LAST POINT OF HIGH DAMPING FORW CALC ABOVE
+zeta = run(forw('UZ1'), ICP=[6,11,9,2],UZSTOP={6:1e-5},DS="-")
+back = run(zeta("UZ1"), ICP=[2,11,9,5],UZSTOP={2:[0.01,10.0]})
+plot(forw+zeta+back,top_title="forw+zeta+back",bifurcation_x="Omeg",bifurcation_y="Amplitude",stability=True)
+#|__|IPS_BACK|__
+
+
+
+#|>>|IPS1_BACK_B|>>  METHOD B: All-MATLAB startPoints (ONLY for smaller zeta)
+# if True : 
+# 	print("===DIAGNOSTIC===IPS1_BACK_B")
+# 	zetaList   = ["1e-2"] #,"8e-3","5e-3","1e-3","1e-4","1e-5"]
+# 	eqFileName = ["ZilliCubic11_givenBackwards_zeta_"+x for x in zetaList]
+# 	for i in range(0,len(zetaList)):
+# 		l_back = load(
+# 			e=eqFileName[i],
+# 			c="ZilliCubic11",
+# 			ICP=[2,9],
+# 			NMX=4000,RL0=0.01,RL1=10.0, #NMX=1000000
+# 			NTST=200,DS=-0.01,DSMAX=0.01,EPSL= 1e-06,EPSU = 1e-06,EPSS =1e-4)
+# 		back = merge( run(l_back) + run(l_back,DS='-') )
+# 	#save(back,"back")
+#|__|IPS1_BACK_B|__
+#|__|IPS1_BACK|__
+clean
+
+
+
+
+
+#| OLDER CODE 
+# ZILLI CUBIC STA (Independent stiffness)
+
+# FORWARD: Cont mH, gamma, thetaP in order.
+# r_mH = run("ZilliCubic2") # mH is PAR(3)
+# r_gamma = run(r_mH("UZ1"),ICP=[1,11,9],NMX=1000,DS=0.001,DSMAX=0.05,UZSTOP={1:0.25})
+# r_thetaP = run(r_gamma("UZ1"),ICP=[2,11,9],NMX=10000,DS=0.001,DSMAX=0.05,UZSTOP={2:2.0}) #,THL={11:0}
+# save(r_thetaP,"r_thetaP")
+
+
