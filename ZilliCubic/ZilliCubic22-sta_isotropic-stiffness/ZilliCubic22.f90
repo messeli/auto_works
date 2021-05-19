@@ -144,15 +144,15 @@
       DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,GAMMA,THETA,OMEG,OMEGP,MH,EPSH,JPH,X,Y,PI
 
         GAMMA = 0.25d0 !2nd continue gamma from 0 to 0.25 Or start it with 0.25 already
-        OMEG = 0.01d0 ! Continue OMEG from 0 to 7. !|IMPORTANT changing 0.0d0 to 0.01d0 solved the "0 of 1 lapack etc" problem.
-        MH = 0.0d0 !1st continue MH from 0 to 0.9
+        OMEG = 0.01d0 !|IMPORTANT changing 0.0d0 to 0.01d0 solved the "0 of 1 lapack etc" problem.
+        MH = 0.9d0 !1st continue MH from 0 to 0.9
         
-        EPSH =0.353d0
-        ZETA = 0.1d0 !0.01
+        EPSH =0.d0 !1d-10 !0.353d0 !first homotopy is for this.
+        ZETA = 0.0d0 !0.1d0 !0.01
         JPH  = 0.143d0
         OMEGP = 0.d0
  
-        PI=4*ATAN(1.0D0) !! = 2*pi 
+        PI=4*ATAN(1.0D0) !! = pi 
         PAR(11)=2.D0*PI/OMEG   !! PAR(11) is always reserved for period in AUTO. 
         !|:Period = 2*pi/OMEG
         !|::Period of oscillation is the same as the rotor speed as it's synchronous!!
