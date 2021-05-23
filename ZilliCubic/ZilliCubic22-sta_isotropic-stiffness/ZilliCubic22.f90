@@ -71,38 +71,6 @@
 
 
 
-        ! FSNUB_u  = -0.5D0*(tanh(K*(R-1))+1) *(1-1/R)*BETA*Q1  
-        ! FSNUB_v  = -0.5D0*(tanh(K*(R-1))+1) *(1-1/R)*BETA*Q2 
-        ! FCUBIC_u = -GAMMA*R2*Q1
-        ! FCUBIC_v = -GAMMA*R2*Q2
-        ! F5_u     = -KSI*R2**2*Q1
-        ! F5_v     = -KSI*R2**2*Q2
-  
-        ! F(1) = Q3
-        ! F(2) = Q4
-        ! F(3) = -OMEG*(JPH-2)*Q4          &
-        !        -2*ZETA*Q3                &
-        !        +((OMEG**2)*(1-JPH)-1)*Q1 &
-        !        +2*ZETA*OMEG*Q2           &
-        !        +MH*EPSH*(OMEG**2)        &
-        !        +KAPPA*FSNUB_u + RHO*F5_u + (1-KAPPA-RHO)*FCUBIC_u !|NONLINEARITY HOMOTOPY
-
-        ! F(4) = +OMEG*(JPH-2)*Q3          &
-        !        -2*ZETA*Q4                &
-        !        +((OMEG**2)*(1-JPH)-1)*Q2 &
-        !        -2*ZETA*OMEG*Q1           &
-        !        -MH*EPSH*OMEGP            &
-        !        +KAPPA*FSNUB_v + RHO*F5_v + (1-KAPPA-RHO)*FCUBIC_v !|NONLINEARITY HOMOTOPY
-
-
-
-
-
-
-
-
-
-
       ! IF (IJAC.EQ.1) RETURN
       !   DFDU(1,1)=0
       !   DFDU(1,2)=1
@@ -160,10 +128,10 @@
         
         EPSH =0.d0 !1d-10 !0.353d0 !first homotopy is for this.
         ZETA = 0.0d0 !0.1d0 !0.01
-        JPH  = 0.143d0
+        JPH  = 0.0143d0 !|for a TRIAL chaged from 0.143d0 to 0.0143d0
         OMEGP = 0.d0
  
-        PI=4*ATAN(1.0D0) !! = pi 
+        PI=4.D0*ATAN(1.0D0) !! = pi 
         PAR(11)=2.D0*PI/OMEG   !! PAR(11) is always reserved for period in AUTO. 
         !|:Period = 2*pi/OMEG
         !|::Period of oscillation is the same as the rotor speed as it's synchronous!!
