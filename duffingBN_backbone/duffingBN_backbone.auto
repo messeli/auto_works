@@ -12,3 +12,4 @@ save(rl(zeroLine + duffingBN_backbone), 'duffingBN_backbone')
 
 plot(zeroLine+duffingBN_backbone,stability=True,
 	bifurcation_y="MAX U(1)" )
+clean

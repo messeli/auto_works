@@ -39,7 +39,7 @@ SUBROUTINE STPNT(NDIM,U,PAR,T)
   PAR(3) = OMEG
 
   TPI=8*ATAN(1.0D0) ! = 2*pi 
-  PAR(11)= 0.0 !TPI/OMEG  ! Period = 2*pi/omeg
+  PAR(11)= 0.0 !|IPS=1 is selected !|=TPI/OMEG  ; Period = 2*pi/omeg 
   ! X = SIN(TPI*T) 
   ! Y = COS(TPI*T)
 
