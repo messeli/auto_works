@@ -30,23 +30,23 @@ SUBROUTINE STPNT(NDIM,U,PAR,T)
   DOUBLE PRECISION, INTENT(IN) :: T
   DOUBLE PRECISION WN,K3_M,U1,U2,TPI,X,Y,OMEG 
   
-  WN   = 1
-  K3_M = 1 
-  OMEG = 0.5 !|cant start at zero bf d PAR(11) def
+  WN   = 1.d0
+  K3_M = 1.d0
+  OMEG = 1.318d0 !|2pi/Per <<< from the Matlab dat file .
 
   PAR(1) = WN 
   PAR(2) = K3_M 
   PAR(3) = OMEG
 
   TPI=8*ATAN(1.0D0) ! = 2*pi 
-  PAR(11)=TPI/OMEG  ! Period = 2*pi/omeg
+  PAR(11)= 4.77d0  !TPI/OMEG  ! Period = 2*pi/omeg
   X = SIN(TPI*T) 
   Y = COS(TPI*T)
 
-  U(1) = 0 !Although we start from 0, we do IPS=2 periodic and sample at Omeg=1.
-  U(2) = 0 !Although we start from 0, we do IPS=2 periodic and sample at Omeg=1.
-  U(3) = X
-  U(4) = Y
+  ! U(1) = 0 !Leave this to the dat file    !Although we start from 0, we do IPS=2 periodic and sample at Omeg=1.
+  ! U(2) = 0 !Leave this to the dat file    !Although we start from 0, we do IPS=2 periodic and sample at Omeg=1.
+  ! U(3) = X
+  ! U(4) = Y
 END SUBROUTINE STPNT
 
 
