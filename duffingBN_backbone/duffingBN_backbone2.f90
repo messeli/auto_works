@@ -34,6 +34,12 @@ SUBROUTINE STPNT(NDIM,U,PAR,T)
 
   U(1) = 2.0  * COS(TPI*T) ! 2*cos(2pi * t/period)
   U(2) =-2.0*WR*SIN(TPI*T) ! 2*cos(2pi * t/period)
+  !|:Ds orbit s actually nt correct fr d duffing oscillator
+  !|...Ds might be d very reason why we cnt contin on d backbone branch.
+  !|:D orbit is more like a rounded rectangle 
+  !|::See a MATLAB ode45 sim of duffJ-Oscil zero dampJ and zero forcJ)
+  !|:Take a dat-file from this simulation and try with XY-oscillators as 
+  !|...in duffingBN_backbone.f90 . 
 END SUBROUTINE STPNT
 
 

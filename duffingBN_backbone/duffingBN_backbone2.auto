@@ -10,3 +10,4 @@ plot(k3_mCont)
 
 # save(rl(zeroLine + duffingBN_backbone), 'duffingBN_backbone')
 # plot(duffingBN_backbone)
+clean

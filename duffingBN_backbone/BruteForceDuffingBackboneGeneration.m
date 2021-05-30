@@ -1,12 +1,12 @@
 clc
 clear
-close all
+close all 
 
 N = 50 ;
 options = odeset("RelTol",1e-10) ;
 for k = 1:N
 % u0 = -3+6*rand(2,1) ;% This is working too, except for the colour grad.
-u0 = [k*5e-2;0] ;
+u0 = [k*0.05;0] ;%init cond ; amp 20th s 1.0.
 [T{k},U{k}] = ode45(@func,[0 100],u0,options) ;
 [~,peakLoc] = findpeaks(U{k}(:,1),T{k}) ; 
 PER{k} = mean(diff(peakLoc));

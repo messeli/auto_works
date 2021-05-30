@@ -1,0 +1,23 @@
+#zeroLine = run('duffingBN_backbone')
+#duffingBN_backbone = run(zeroLine("BP1"),NPR=100,ISW=-1,UZR={3:1.01},UZSTOP={3:3})
+#save(rl(zeroLine + duffingBN_backbone), 'duffingBN_backbone')
+#plot(zeroLine+duffingBN_backbone,stability=True,bifurcation_y="MAX U(1)" )
+
+datChoice = ["myDatFile_amp1_AUTO.dat", 'myDatFile_amp1_MATLAB.dat','myDatFile_amp1_MATLAB_XY.dat'] 
+#|:AUTO dat file is obtained in duffingBN_backbone.auto from the successful backbone. 
+#|:MATLAB dat file is obtained from the BruteForceDuffingBackboneGeneration.m
+#|:Orbits are the same with characteristics: Amplitute (ie MAX(U(1))) = 1.0 ; period = 4.77 ; Omeg (iePAR(3)) = 1.318
+
+
+l_datContin = load(
+	e="duffingBN_backbone4", 
+	c="duffingBN_backbone",
+	dat=datChoice[0], #| 0:AUTO (with XY autom); 1:MATLAB (wo XY); 2:MATLAB (w XY augmented)
+	NPR=200,UZR={3:1.01},UZSTOP={3:3},
+	NTST=1050, DSMAX=0.1, EPSL=1e-5,EPSU=1e-5,EPSS=1e-3, ITMX=10, NWTN=5, ITNW=7)
+datContin = run(l_datContin) + run(l_datContin,DS="-")
+
+plot(datContin,stability=True,bifurcation_y="MAX U(1)" )
+
+
+clean

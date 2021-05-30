@@ -32,7 +32,7 @@ SUBROUTINE STPNT(NDIM,U,PAR,T)
   
   WN   = 1
   K3_M = 1 
-  OMEG = 0.5
+  OMEG = 0.5 !|cant start at zero bf d PAR(11) def
 
   PAR(1) = WN 
   PAR(2) = K3_M 

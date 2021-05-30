@@ -135,7 +135,7 @@
         !|:by obtaining NDIM, NCOL, NTST via GETP and then dimensioning U as
         !|:U(NDIM,0:NCOL*NTST) in a seperate subroutine that is called by PVLS. "
 
-        NDX  = NINT(GETP('NDX',0,U))
+        NDX  = NINT(GETP('NDX',0,U)) !|SEE GETP subroutine IN support.f90
         NTST = NINT(GETP('NTST',0,U))
         NCOL = NINT(GETP('NCOL',0,U))
 

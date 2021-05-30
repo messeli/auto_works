@@ -10,3 +10,4 @@ SP=["BP0"],
 
 save(rl(zeroLine + duffingBN_backbone), 'duffingBN_backbone')
 plot(duffingBN_backbone)
+clean
