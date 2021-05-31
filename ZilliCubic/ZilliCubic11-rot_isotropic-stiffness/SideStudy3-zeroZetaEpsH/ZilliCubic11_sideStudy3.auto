@@ -10,16 +10,19 @@ startTime = time.time()
 #|>>|IPS2|>> IPS2 
 #|>>|IPS2_A|>> METHOD A : ~PURE AUTO 
 #|>>|IPS2_A_SL|>> Single-loop
-print("=====2A_FFF===CONTINUE_sLoop_MATLAB_ORBIT")
+print("========================================CONTINUE_sLoop_MATLAB_ORBIT")
 l_sLoop_dat = load(
-   e="SL-0zeta-0epsH", #make Omeg=3.32
-   dat="SS-SL-3p32-lin0zeta-lin0epsH",
+   # e="SL-0zeta-0epsH", #make Omeg=3.32
+   # dat="SS-SL-3p32-lin0zeta-lin0epsH",
+   # 
    # e="SL-0zeta-0epsH", #make Omeg=3.32
    # dat="SS-SL-3p32-lin0zeta-impacted0epsH",
+   # 
    # e="SL-0zeta-non0epsH", #make Omeg=3.46
    # dat="SS-SL-3p46-lin0zeta-non0epsH",
-   # e="SL-0zeta-non0epsH", #make Omeg=3.50
-   # dat="SL-3p50-lin0zeta-non0epsH",
+   # 
+   e="SL-0zeta-non0epsH", #make Omeg=3.50
+   dat="SL-3p50-lin0zeta-non0epsH",
    c="ZilliCubic11",
    NMX=10,
    IPS=2, ILP=1,ICP=[2,11,9],#2:Omeg, 5:epsH, 6:zeta
