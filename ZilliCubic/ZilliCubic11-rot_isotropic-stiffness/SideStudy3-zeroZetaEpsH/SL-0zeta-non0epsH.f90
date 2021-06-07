@@ -64,8 +64,8 @@
                -MH*EPSH*OMEGP            &
                +KAPPA*FSNUB_v + RHO*F5_v + (1-KAPPA-RHO)*FCUBIC_v !|NONLINEARITY HOMOTOPY
 
-        F(5) = X + TPI/PAR(11)*Y - X*(X**2 + Y**2) !|Omeg is replaced by 2pi/per, as the per of osc is not Omeg in this problem.
-        F(6) = Y - TPI/PAR(11)*X - Y*(X**2 + Y**2) !|Omeg is replaced by 2pi/per, as the per of osc is not Omeg in this problem.
+        F(5) = X + TPI/PAR(11)*Y - X*(X**2 + Y**2) !|Omeg is replaced by 2pi/per, as the per of osc is not Omeg in this problem: Asynchronous
+        F(6) = Y - TPI/PAR(11)*X - Y*(X**2 + Y**2) !|Omeg is replaced by 2pi/per, as the per of osc is not Omeg in this problem: Asynchronous
 
       ! IF (IJAC.EQ.1) RETURN
       !   DFDU(1,1)=0
@@ -78,11 +78,12 @@
         DOUBLE PRECISION, INTENT(INOUT) :: U(NDIM),PAR(*)
         DOUBLE PRECISION, INTENT(IN) :: T
         DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,S4,C4,R2,GAMMA,KAPPA,K,OMEG
-        DOUBLE PRECISION OMEGP,MH,EPSH,JPH,BETA,TPI,KSI,RHO, X,Y, TPI
+        DOUBLE PRECISION OMEGP,MH,EPSH,JPH,BETA,KSI,RHO, X,Y,TPI
 
         !| .DAT file data from MATLAB has gamma Omeg mh epsh zeta JpH OmegP as below:
         GAMMA = 0.25D0 !2nd continue gamma from 0 to 0.25 !|0-0.25: Cubic stiffness ratio, (k_3*r^2)/k_r
-        OMEG  = 3.50D0!3.50D0 3.46D0 3.40D0 3.32D0 !The speed the .dat file is generated at, in Matlab ode45
+        OMEG  = 3.46D0 !The speed the .dat file is generated at, in Matlab ode45
+        ! OMEG  = 3.50D0
         MH    = 0.9D0 !1st continue MH from 0 to 0.9
         EPSH  = 0.353D0 !was 0.353D0
         ZETA  = 0.0D0 !was 0.010D0
@@ -110,8 +111,9 @@
         PAR(15)=RHO
 
         TPI=8*ATAN(1.0D0) ! = 2*pi 
-        PAR(11)= 2.8172d0 !|Tkn frm autocorper.m function     !TPI/OMEG  ! Period = 2*pi/omeg
-        !|:What s d period f d system at internal resonance <<< 2pi/GCF(FW,BW) Greatest common factor ; 
+        PAR(11)= 2.9291d0  !|for Omeg=3.46d0
+        ! PAR(11)= 2.8906d0  !|for Omeg=3.50d0 |from the dat file: cd be more realistic as its peak based. Otherwise 2.8172d0 as tkn frm autocorper.m function  !TPI/OMEG  ! Period = 2*pi/omeg
+        ! |:What s d period f d system at internal resonance <<< 2pi/GCF(FW,BW) Greatest common factor ; 
         !|::For near-zero amp orbits (like 1e-5 amp) FW and BW correspond to Campbell plot values. 
         !|::Bt higher amp moves d freqs away frm Campbell, So Per s tb calcD w autocorper.m func fr d non0epsH dat orbits (amps like 0.5)
 
