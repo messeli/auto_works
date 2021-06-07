@@ -26,7 +26,7 @@ for ii=1:length(Omvals)
     %extract roots
     [ V, D]=eig(AA_);
     %pick the pair of modes where sign of om indicates whirling dir
-    flt = imag( V(2,:)./V(1,:) )<0;
+    flt = imag( V(2,:)./V(1,:) )<0;%|pick [1,-j] mode & judge dir by d sign f corrspJ eigval: BW if - , FW if +, and greater one is FW_mode evenif it is BW looking in rot frame
     s=diag(D);
     oms= imag(s(flt));
     ombw_(ii)=min(oms);
