@@ -13,7 +13,7 @@
         DOUBLE PRECISION, INTENT(IN) :: U(NDIM), PAR(*)
         DOUBLE PRECISION, INTENT(OUT) :: F(NDIM)
         DOUBLE PRECISION, INTENT(INOUT) :: DFDU(NDIM,NDIM), DFDP(NDIM,*)
-        DOUBLE PRECISION ZETA,C,Q1,Q3,Q2,Q4,R2,R,GAMMA,BETA,KAPPA,RHO,K
+        DOUBLE PRECISION ZETA,C,Q1,Q3,Q2,Q4,R2,R,GAMMA,BETA,KAPPA,RHO,K, X, Y, TPI
         DOUBLE PRECISION OMEG,OMEGP,MH,EPSH,JPH,FSNUB_u,FSNUB_v,FCUBIC_u,FCUBIC_v,F5_u,F5_v,KSI
       
         GAMMA = PAR(1) 
@@ -33,10 +33,13 @@
         Q2=U(2)
         Q3=U(3)
         Q4=U(4)
- 
+        X =U(5)
+        Y =U(6) 
+
         R2 = (Q1**2)+(Q2**2)
         R = R2**0.5D0
         C = 1 !|NondimD wrt c-clearance.
+        TPI=8*ATAN(1.0D0) ! = 2*pi 
 
         FSNUB_u  = -0.5D0*(tanh(K*(R-1))+1) *(1-1/R)*BETA*Q1  
         FSNUB_v  = -0.5D0*(tanh(K*(R-1))+1) *(1-1/R)*BETA*Q2 
@@ -61,6 +64,9 @@
                -MH*EPSH*OMEGP            &
                +KAPPA*FSNUB_v + RHO*F5_v + (1-KAPPA-RHO)*FCUBIC_v !|NONLINEARITY HOMOTOPY
 
+        F(5) = X + TPI/PAR(11)*Y - X*(X**2 + Y**2) !|Omeg is replaced by 2pi/per, as the per of osc is not Omeg in this problem: Asynchronous
+        F(6) = Y - TPI/PAR(11)*X - Y*(X**2 + Y**2) !|Omeg is replaced by 2pi/per, as the per of osc is not Omeg in this problem: Asynchronous
+
       ! IF (IJAC.EQ.1) RETURN
       !   DFDU(1,1)=0
       ! ... 
@@ -72,11 +78,11 @@
         DOUBLE PRECISION, INTENT(INOUT) :: U(NDIM),PAR(*)
         DOUBLE PRECISION, INTENT(IN) :: T
         DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,S4,C4,R2,GAMMA,KAPPA,K,OMEG
-        DOUBLE PRECISION OMEGP,MH,EPSH,JPH,BETA,TPI,KSI,RHO
+        DOUBLE PRECISION OMEGP,MH,EPSH,JPH,BETA,KSI,RHO, X,Y,TPI
 
         !| .DAT file data from MATLAB has gamma Omeg mh epsh zeta JpH OmegP as below:
         GAMMA = 0.25D0 !2nd continue gamma from 0 to 0.25 !|0-0.25: Cubic stiffness ratio, (k_3*r^2)/k_r
-        OMEG  = 3.32D0!3.40D0 !3.32D0 !The speed the .dat file is generated at, in Matlab ode45
+        OMEG  = 3.32D0! !The speed the .dat file is generated at, in Matlab ode45
         MH    = 0.9D0 !1st continue MH from 0 to 0.9
         EPSH  = 0.0D0 !was 0.353D0
         ZETA  = 0.0D0 !was 0.010D0
@@ -102,6 +108,16 @@
         PAR(13)=K  
         PAR(14)=KSI
         PAR(15)=RHO
+
+        TPI=8*ATAN(1.0D0) ! = 2*pi 
+        PAR(11)= 3.0459d0  !|for Omeg = 3.32d0 lin0epsH  ||from the dat file: cd be more realistic as its peak based. Otherwise 2.8172d0 as tkn frm autocorper.m function  !TPI/OMEG  ! Period = 2*pi/omeg
+        ! PAR(11)= 2.8906d0  !|for Omeg = 3.32d0 impacted0epsH 
+        !|:What s d period f d system at internal resonance <<< 2pi/GCF(FW,BW) Greatest common factor ; 
+        !|::For near-zero amp orbits (like 1e-5 amp) FW and BW correspond to Campbell plot values. 
+        !|::Bt higher amp moves d freqs away frm Campbell, So Per s tb calcD w autocorper.m func fr d non0epsH dat orbits (amps like 0.5)
+
+        X = SIN(TPI*T) 
+        Y = COS(TPI*T)
 
       END SUBROUTINE STPNT
 

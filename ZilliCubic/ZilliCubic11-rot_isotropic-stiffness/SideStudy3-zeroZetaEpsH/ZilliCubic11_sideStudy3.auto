@@ -10,27 +10,32 @@ startTime = time.time()
 #|>>|IPS2|>> IPS2 
 #|>>|IPS2_A|>> METHOD A : ~PURE AUTO 
 #|>>|IPS2_A_SL|>> Single-loop
-print("=====2A_FFF===CONTINUE_sLoop_MATLAB_ORBIT")
+print("========================================CONTINUE_sLoop_MATLAB_ORBIT")
 l_sLoop_dat = load(
-   e="SL-0zeta-0epsH", #make Omeg=3.32
-   dat="SS-SL-3p32-lin0zeta-lin0epsH",
    # e="SL-0zeta-0epsH", #make Omeg=3.32
-   # dat="SS-SL-3p32-lin0zeta-impacted0epsH",
-   # e="SL-0zeta-non0epsH", #make Omeg=3.46
-   # dat="SS-SL-3p46-lin0zeta-non0epsH",
+   # dat="SS-SL-3p32-lin0zeta-lin0epsH_XY", #SS-SL-3p32-lin0zeta-lin0epsH
+   #
+   # e="SL-0zeta-0epsH", #make Omeg=3.32
+   # dat="SS-SL-3p32-lin0zeta-impacted0epsH_XY", #SS-SL-3p32-lin0zeta-impacted0epsH
+   # 
+   e="SL-0zeta-non0epsH", #make Omeg=3.46
+   dat="SS-SL-3p46-lin0zeta-non0epsH_XY", #SS-SL-3p46-lin0zeta-non0epsH
+   # 
    # e="SL-0zeta-non0epsH", #make Omeg=3.50
-   # dat="SL-3p50-lin0zeta-non0epsH",
+   # dat="SL-3p50-lin0zeta-non0epsH_XY", #SL-3p50-lin0zeta-non0epsH
    c="ZilliCubic11",
-   NMX=10,
+   NMX=1000,
    IPS=2, ILP=1,ICP=[2,11,9],#2:Omeg, 5:epsH, 6:zeta
-   DS=+0.0001, DSMAX=0.001, #2: DS=+0.0001, DSMAX=0.0001, 
+   DS=+0.001, DSMAX=0.01, #2: DS=+0.0001, DSMAX=0.0001, 
    UZSTOP={2:[0.01,10.0],6:1e-2},  # 5:0.353,
-   EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-3,
-   NTST=500) # 200
+   EPSL= 2e-06, EPSU = 2e-06, EPSS =1e-2,
+   NTST=900) # 200
 sLoop_dat = run(l_sLoop_dat       )  +\
                    run(l_sLoop_dat,DS="-")  #|Solution family from .dat
-sLoop_cubic = sLoop_dat #|Change name for clarity
+sLoop_cubic = rl(sLoop_dat) #|Change name for clarity
 IPS2 = sLoop_cubic #|Start Populating the bifurcation plot.
+
+print(sLoop_cubic)
 plot(sLoop_cubic,
    stability=True, height=600, 
    bifurcation_y="Amplitude",

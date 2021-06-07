@@ -13,7 +13,7 @@
         DOUBLE PRECISION, INTENT(IN) :: U(NDIM), PAR(*)
         DOUBLE PRECISION, INTENT(OUT) :: F(NDIM)
         DOUBLE PRECISION, INTENT(INOUT) :: DFDU(NDIM,NDIM), DFDP(NDIM,*)
-        DOUBLE PRECISION ZETA,C,Q1,Q3,Q2,Q4,R2,R,GAMMA,BETA,KAPPA,RHO,K
+        DOUBLE PRECISION ZETA,C,Q1,Q3,Q2,Q4,R2,R,GAMMA,BETA,KAPPA,RHO,K , X, Y, TPI
         DOUBLE PRECISION OMEG,OMEGP,MH,EPSH,JPH,FSNUB_u,FSNUB_v,FCUBIC_u,FCUBIC_v,F5_u,F5_v,KSI
       
         GAMMA = PAR(1) 
@@ -33,18 +33,21 @@
         Q2=U(2)
         Q3=U(3)
         Q4=U(4)
- 
+        X =U(5)
+        Y =U(6)
+
         R2 = (Q1**2)+(Q2**2)
         R = R2**0.5D0
         C = 1 !|NondimD wrt c-clearance.
+        TPI=8*ATAN(1.0D0) ! = 2*pi 
 
-        FSNUB_u  = -0.5D0*(tanh(K*(R-1))+1) *(1-1/R)*BETA*Q1  
+        FSNUB_u  = -0.5D0*(tanh(K*(R-1))+1) *(1-1/R)*BETA*Q1 
         FSNUB_v  = -0.5D0*(tanh(K*(R-1))+1) *(1-1/R)*BETA*Q2 
         FCUBIC_u = -GAMMA*R2*Q1
         FCUBIC_v = -GAMMA*R2*Q2
         F5_u     = -KSI*R2**2*Q1
         F5_v     = -KSI*R2**2*Q2
-  
+
         F(1) = Q3
         F(2) = Q4
         F(3) = -OMEG*(JPH-2)*Q4          &
@@ -61,6 +64,9 @@
                -MH*EPSH*OMEGP            &
                +KAPPA*FSNUB_v + RHO*F5_v + (1-KAPPA-RHO)*FCUBIC_v !|NONLINEARITY HOMOTOPY
 
+        F(5) = X + TPI/PAR(11)*Y - X*(X**2 + Y**2) !|Omeg is replaced by 2pi/per, as the per of osc is not Omeg in this problem: Asynchronous
+        F(6) = Y - TPI/PAR(11)*X - Y*(X**2 + Y**2) !|Omeg is replaced by 2pi/per, as the per of osc is not Omeg in this problem: Asynchronous
+
       ! IF (IJAC.EQ.1) RETURN
       !   DFDU(1,1)=0
       ! ... 
@@ -72,11 +78,12 @@
         DOUBLE PRECISION, INTENT(INOUT) :: U(NDIM),PAR(*)
         DOUBLE PRECISION, INTENT(IN) :: T
         DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,S4,C4,R2,GAMMA,KAPPA,K,OMEG
-        DOUBLE PRECISION OMEGP,MH,EPSH,JPH,BETA,TPI,KSI,RHO
+        DOUBLE PRECISION OMEGP,MH,EPSH,JPH,BETA,KSI,RHO, X,Y,TPI
 
         !| .DAT file data from MATLAB has gamma Omeg mh epsh zeta JpH OmegP as below:
         GAMMA = 0.25D0 !2nd continue gamma from 0 to 0.25 !|0-0.25: Cubic stiffness ratio, (k_3*r^2)/k_r
-        OMEG  = 3.46D0!3.40D0 !3.32D0 !The speed the .dat file is generated at, in Matlab ode45
+        OMEG  = 3.46D0 !The speed the .dat file is generated at, in Matlab ode45
+        ! OMEG  = 3.50D0
         MH    = 0.9D0 !1st continue MH from 0 to 0.9
         EPSH  = 0.353D0 !was 0.353D0
         ZETA  = 0.0D0 !was 0.010D0
@@ -87,7 +94,7 @@
         BETA = 10.D0  ! 1.5 3 5  10  |btw 1.25 to 125 see explanation in func_ode45_tanh.m or betlek.31.01.2021
         K = 150.D0    ! 30 100  |see explanation in func_ode45_tanh.m or betlek.31.01.2021
 
-        RHO   = 0.0D0 ! 1.0D0 !|0-1: Cubic to Power5 homotopy parameter
+        RHO   = 0.0D0 ! 1.0D0 !|0-1: Cubic to Power5(quintic) homotopy parameter
         KSI   = 0.1D0 ! 0.1D0 !|0-0.2: Quintic stiffness ratio, (k_5*c^4)/k_r 
 
         PAR(1)=GAMMA 
@@ -102,6 +109,16 @@
         PAR(13)=K  
         PAR(14)=KSI
         PAR(15)=RHO
+
+        TPI=8*ATAN(1.0D0) ! = 2*pi 
+        PAR(11)= 2.9291d0  !|for Omeg=3.46d0
+        ! PAR(11)= 2.8906d0  !|for Omeg=3.50d0 |from the dat file: cd be more realistic as its peak based. Otherwise 2.8172d0 as tkn frm autocorper.m function  !TPI/OMEG  ! Period = 2*pi/omeg
+        ! |:What s d period f d system at internal resonance <<< 2pi/GCF(FW,BW) Greatest common factor ; 
+        !|::For near-zero amp orbits (like 1e-5 amp) FW and BW correspond to Campbell plot values. 
+        !|::Bt higher amp moves d freqs away frm Campbell, So Per s tb calcD w autocorper.m func fr d non0epsH dat orbits (amps like 0.5)
+
+        X = SIN(TPI*T) 
+        Y = COS(TPI*T)
 
       END SUBROUTINE STPNT
 
@@ -145,14 +162,14 @@
         NTST = NINT(GETP('NTST',0,U))
         NCOL = NINT(GETP('NCOL',0,U))
 
-        !|___METHOD-A/B> METHOD A/B  
+        !|>>|METHOD-A/B|>> METHOD A/B  
         !|:CORRECT AMPLITUDE FOR IPS=2
         DUMM = GETU(i,j,U,NDX,NTST,NCOL,PAR(2)) 
         !|:Will get amp and print the states to dummy_write_file.txt
         PAR(9) = DUMM 
-        !|___METHOD-A/B.
+        !|__|METHOD-A/B|__
         
-        !|___METHOD-C> METHOD C
+        !|..|METHOD-C|.. METHOD C
         ! DO i=1,NDX
         !   DO j=0,NCOL*NTST
         !     UU(i,j) = GETU(i,j,U,NDX,NTST,NCOL)
@@ -161,13 +178,13 @@
         ! R2(:) = UU(1,:)**2 + UU(2,:)**2  !El by El multip
         ! R(:) = R2**0.5 
         ! PAR(9) = MAXVAL(R)
-        !|___METHOD-C.
+        !|__|METHOD-C|__
 
-        !|___METHOD-D> DEFAULT METHOD - PHASED AMP
+        !|>>|METHOD-D|>> DEFAULT METHOD - PHASED AMP
         ! PAR(9) = (U(1)**2 + U(2)**2)**0.5 
         !|:The initial data of one period is sampled for amplitude.
         !|:See the qoute above.
-        !|___METHOD-D. 
+        !|__|METHOD-D|__
 
       END SUBROUTINE PVLS
 
