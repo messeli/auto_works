@@ -1,0 +1,31 @@
+# ZILLI CUBIC STA (Independent stiffness)
+parnames={
+1:'gamma',
+2:'Omeg',
+3:'mH',
+4:'JpH',
+5:'epsH',
+6:'zeta',
+7:'OmegP',
+9:'Amplitude'
+}
+# 8:'kappa', 
+# 9:'Amplitude',
+# 10:"beta",
+# 13:'K',
+# 14:'KSI',
+# 15:'RHO'
+
+
+
+NDIM= 6, IPS =   2, IRS =   0, ILP =   1
+ICP = [3, 11, 9]
+NTST= 200, NCOL= 4, IAD = 3, ISP = 2, ISW = 1, IPLT= 0, NBC= 0, NINT= 0
+NMX = 1000, 
+NPR = 200, MXBF=   5, IID = 2, ITMX= 8, ITNW= 5, NWTN= 3 #I used NWTN= 5 | Fr difficult problems ITNW cnb 7 (eg in demos chu, plp. )
+JAC= 0 #1
+EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-3 #0.0001
+DS  =  1e-3, DSMIN= 1e-4, DSMAX= 5e-1, IADS=   1
+NPAR = 36, THU =  {}, THL ={} # {11:0.0}
+UZSTOP = {3:0.9}
+#UZSTOP =  {3: 0.9}
