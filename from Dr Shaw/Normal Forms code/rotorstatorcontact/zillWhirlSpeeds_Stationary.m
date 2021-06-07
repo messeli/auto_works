@@ -26,7 +26,7 @@ for ii=1:length(Omvals)
         -M\( K + Omega*Kom )     -M\( C + Cint + Omega*G) ];
     [ V, D]=eig(AA);
     %pick the pair of modes where sign of om indicates whirling dir
-    flt = imag( V(2,:)./V(1,:) )<0;
+    flt = imag( V(2,:)./V(1,:) )<0; %|pick [1,-j] mode & judge dir by d sign f corrspJ eigval: BW if - , FW if +, and greater one is FW_mode 
     s=diag(D);
     oms= imag(s(flt));
     ombw(ii)=min(oms);
