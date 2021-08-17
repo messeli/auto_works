@@ -131,11 +131,13 @@
         JPH  = 0.0143d0 !|for a TRIAL chaged from 0.143d0 to 0.0143d0
         OMEGP = 0.d0
  
-        PI=4.D0*ATAN(1.0D0) !! = pi 
-        PAR(11)=2.D0*PI/OMEG   !! PAR(11) is always reserved for period in AUTO. 
+        PI = 4.D0*ATAN(1.0D0) !! = pi 
+        PAR(11) = 2 * ( 2.D0*PI/OMEG )   !! PAR(11) is always reserved for period in AUTO. 
         !|:Period = 2*pi/OMEG
-        !|::Period of oscillation is the same as the rotor speed as it's synchronous!!
-        !|:::In the rotating frame synch freq is 0; so here we have: w_sta=w_rot+Omeg = Omeg. 
+        !|::In the synchronous whirl the period of oscillation is the same as the rotor speed!!
+        !|::In the rotating frame synch freq is 0; so here we have: w_sta=w_rot+Omeg = Omeg. 
+        !|:In the sta-frame subharmonic response of order 1/2, the freq content has OMEG and OMEG/2. 
+        !|::So the EBOB of the freqs is OMEG/2. Therefore, the period is 2*(2.D0*PI/OMEG) !BN
         !|:Because we define the PAR(11) here explicitly, the time variable becomes 
         !|...scaled to time/period=T in range 0-1.
 
@@ -143,7 +145,8 @@
         Y = COS(2.D0*PI*T)
         
         ! THETA = OMEG*(TPI*T)
-        THETA = ATAN2(X,Y) !|ATAN2(Y,X) angle of X+jY in correct quadrant
+        THETA = ATAN2(X,Y) !|Position of eccentric mass (origY at x-axis) 
+        !|:ATAN2(Y,X) angle of X+jY in correct quadrant
         !|:We have X=sin ,Y=cos; so  ATAN2(X,Y) should be correct !BN  
 
  

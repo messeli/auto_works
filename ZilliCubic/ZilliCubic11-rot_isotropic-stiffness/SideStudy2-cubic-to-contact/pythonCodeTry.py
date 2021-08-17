@@ -3,7 +3,7 @@
 # to find the lines of mathing Omeg. All of the lines are printed in a 
 # file. Then the pattern for specific amplitude research is returned.
 #
-# For SublimeText3 Python3 building the below works : 
+# For SublimeText3 Python3 building, the below works : 
 # {
 #     "cmd": ["python3", "$file"],
 #     "selector": "source.python",
@@ -12,7 +12,7 @@
 
 
 import re 
-#| Method 1 : with open() as f : ...
+#| Method 1 : with open() as f : ... #as far as I remember this did not work in .auto file. In any case you will run the below .py code separately
 #| Method 2 : f = open() , f.close() 
 def writetofilematchingOmegpattern_generateAmppattern(Omeg,Amp):
 	f = open('b.all_sideStudy2','r')
