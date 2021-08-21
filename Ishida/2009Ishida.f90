@@ -15,8 +15,9 @@
         DOUBLE PRECISION, INTENT(IN) :: U(NDIM), PAR(*)
         DOUBLE PRECISION, INTENT(OUT) :: F(NDIM)
         DOUBLE PRECISION, INTENT(INOUT) :: DFDU(NDIM,NDIM), DFDP(NDIM,*)
-        DOUBLE PRECISION OMEG,DELT,BETA,IP,E
-        DOUBLE PRECISION OMEG,OMEGP,MH,EPSH,JPH,FSNUB_u,FSNUB_v,FCUBIC_u,FCUBIC_v,F5_u,F5_v,KSI
+        DOUBLE PRECISION OMEG,DELT,BETA,IP,E,F0,C1,C2,ALPH,REST,M_2,KB_N,CB_N,K
+        DOUBLE PRECISION Q1,Q2,Q3,Q4,Q5,Q6,Q7,Q8,X,Y
+        DOUBLE PRECISION R_2, CA, F_n
       
         OMEG = PAR(1)   
         DELT = PAR(2) 
@@ -74,8 +75,9 @@
         INTEGER, INTENT(IN) :: NDIM
         DOUBLE PRECISION, INTENT(INOUT) :: U(NDIM),PAR(*)
         DOUBLE PRECISION, INTENT(IN) :: T
-        DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,S4,C4,R2,GAMMA,KAPPA,K,OMEG
-        DOUBLE PRECISION OMEGP,MH,EPSH,JPH,BETA,TPI,KSI,RHO!WN,F_M,K3_M,OMEG,
+        DOUBLE PRECISION OMEG,DELT,BETA,IP,E,F0,C1,C2,ALPH,REST,M_2,KB_N,CB_N,K
+        DOUBLE PRECISION Q1,Q2,Q3,Q4,Q5,Q6,Q7,Q8,X,Y
+        DOUBLE PRECISION PI
 
 
         OMEG = 2.D19   !|was GAMMA
@@ -97,12 +99,12 @@
 
 
         PI = 4.D0*ATAN(1.0D0) !! = pi 
-        PAR(11) = 2 * ( 2.D0*PI/OMEG )   !! PAR(11) is always reserved for period in AUTO. 
-        !|:Period = 2*pi/OMEG
+        PAR(11) = 2.D0*PI / (OMEG/2.D0)   !! PAR(11) is always reserved for period in AUTO. 
+        !|:Period = 2*pi/GCF(OMEG,OMEG/2.D0)
         !|::In the synchronous whirl the period of oscillation is the same as the rotor speed!!
         !|::In the rotating frame synch freq is 0; so here we have: w_sta=w_rot+Omeg = Omeg. 
         !|:In the sta-frame subharmonic response of order 1/2, the freq content has OMEG and OMEG/2. 
-        !|::So the EBOB of the freqs is OMEG/2. Therefore, the period is 2*(2.D0*PI/OMEG) !BN
+        !|::So the EBOB of the freqs is OMEG/2. Therefore, the period is 2.D0*PI/(OMEG/2.D0) !BN
         !|:Because we define the PAR(11) here explicitly, the time variable becomes 
         !|...scaled to time/period=T in range 0-1.
 

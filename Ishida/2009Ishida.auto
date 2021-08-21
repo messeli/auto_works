@@ -34,43 +34,12 @@ l_SbH_dat = load(
 	UZR = {}, UZSTOP = {}, NMX = 10000, 
 	NTST = 500, DS = 0.001, DSMAX = 0.01, EPSL = 1e-6, EPSU = 1e-6, EPSS = 1e-4 )
 SbH_dat = run(l_SbH_dat) + run(l_SbH_dat, DS='-')
+
 p = plot(SbH_dat,top_title="SbH 1/2 response amp vs rotor speed", stability=True, bifurcation_x = "OMEG", bifurcation_y = "Amplitude", solution_x = "x1", solution_y = "y1")
 p.config(color_list="black red green blue violet orange gray brown teal turquoise purple")
-p.config(x_lable = "$\rm{Rotor Speed, }\Omega$")
+p.config(x_label = "$\rm{Rotor Speed, }\Omega$", y_label = "$\rm{Amplitude}$")
 save(SbH_dat,"SbH_dat")
-
-
-
-	#| SolFam of dLoop with newNonlin
-	count = 0
-	size = len(dLoop_homot('UZ'))
-	dLoop_newNonlin = []
-	for X in dLoop_homot("UZ"):
-		count+=1 
-		print("===DIAGNOSTIC===IPS2_A_KAPPA_DL===newNonlinSolFam=",count,"/",size,)
-		if count>=4: break
-		try: #|this try could be unnecessary
-			l_dLoop_newNonlin = load(X,  #'UZ1'
-				IPS=2,ICP=[2,11,9,8],NPR=1000,
-				UZR={2:6.5},RL0=0,RL1=10.1,NMX=3000,
-				NTST=300,DS=-0.001,DSMAX=0.01) #|NEW SAMPLING FOR CONTACT STEEPNESS INCREASE, K.
-			dLoop_newNonlin = dLoop_newNonlin + merge(run(l_dLoop_newNonlin)+run(l_dLoop_newNonlin,DS="-"))
-		except: 
-			continue
-	plot(dLoop_newNonlin,top_title="dLoop_newNonlin before epsH change",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
-	save(dLoop_newNonlin, "dLoop_newNonlin") 
 #|__|IPS2|__
-
-#|>>|PLOT|>> WHOLE DIAGRAM 
-# try:       all_sideStudy2 = rl( IPS1+IPS2 ) #+ Loop_newNonlin) this excluded part is already added into IPS2 
-# except:
-# 	 try:   all_sideStudy2 = rl(      IPS2 + Loop_newNonlin)
-# 	 except:all_sideStudy2 = rl(             Loop_newNonlin)
-# p=plot(all_sideStudy2,stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u", solution_y="v")
-# p.config(color_list="black red green blue orange purple gray brown teal turquoise violet")
-# #save(all_sideStudy2,"all_sideStudy2")
-# save(all_sideStudy2,"all_zeta1e-5_epsH1p5_DL")
-#|__|PLOT|__
 
 ########################################################################
 
@@ -82,7 +51,7 @@ print( "=====FINISH___elapsedTime: ",
 clean
 
 
-#| DEPOT
+####### DEPOT #########################################################
 # 1
 #|___WWW> Write some output at 'UZ' points to "myDummyWriteFile.txt" 
 #| FAIL IN AUTO: Cannot close file >>SO RUN d BELOW IN pythonCodeTry.py  
@@ -117,3 +86,15 @@ clean
 #   for r in myArray:
 #     for q in r:
 #       f.write(str(r)+"\n") 
+
+# 3 
+#|>>|PLOT|>> WHOLE DIAGRAM 
+# try:       all_sideStudy2 = rl( IPS1+IPS2 ) #+ Loop_newNonlin) this excluded part is already added into IPS2 
+# except:
+# 	 try:   all_sideStudy2 = rl(      IPS2 + Loop_newNonlin)
+# 	 except:all_sideStudy2 = rl(             Loop_newNonlin)
+# p=plot(all_sideStudy2,stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u", solution_y="v")
+# p.config(color_list="black red green blue orange purple gray brown teal turquoise violet")
+# #save(all_sideStudy2,"all_sideStudy2")
+# save(all_sideStudy2,"all_zeta1e-5_epsH1p5_DL")
+#|__|PLOT|__
