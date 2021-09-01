@@ -1,0 +1,42 @@
+# ZILLI CUBIC ROT (AUTONOMOUS - ISOTROPIC STIFFNESS)
+unames={1: 'x1', 2: 'y1',3:'x2' , 4:'y2', 5:'x1_dot', 6:'y1_dot', 7:'x2_dot', 8:'y2_dot', 9:'sin(Omeg*t)', 10:'cos(Omeg*t)'}
+parnames={1:'OMEG',
+2:'DELT',3:'BETA',4:'IP',5:'E',6:'F0',7:'C1',8:'C2',9:'ALPH',10:"REST",13:'M_2',14:"t",15:'KB_N',16:'CB_N',17:'tanh_steepness',18:'Amplitude'}
+
+NDIM= 10 #|Dimension of the indep var vector.
+
+IPS = -2 #|-2: time simulation using IMPLICIT EULER 
+ICP = [14]  # 14 is the time 
+IPLT= 0 #|Solution measure from the independent variables.  
+IRS = 0 #|has to be 0 when using "dat" constant (as done here in the .auto.)
+ILP = 0 #|0:no fold location detection, recomD ; 1: detect fold locus, recomD if subseq fold-contin is done. 
+ISW = 1 #|1:no branch switch ; -1:switch ; 2: switch to fold-, PD- contins. 
+ISP = 2 #|2: detect all special points
+UZSTOP = {}
+
+#btw steps
+NTST= 1  #| THIS IS SET TO "1" in the ivp demo. WHY ?? 
+DS  = 0.001, 
+DSMIN= 1e-5 
+DSMAX= 0.01, 
+IADS= 1
+EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4  # 1e-4
+NMX = 1000  # 100 
+ITMX= 8, ITNW= 7, NWTN= 5 # 3
+
+#instep discr
+NCOL= 4 
+IAD = 3 
+
+NBC = 0 
+NINT= 0
+
+#output
+NPR = 10000
+IID = 3
+
+MXBF= 10 
+JAC = 0  # 1
+NPAR= 36
+THU = {}
+THL = {}  # {11:0.0}
