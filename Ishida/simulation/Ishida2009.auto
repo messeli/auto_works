@@ -32,33 +32,76 @@ l_SbH_dat = load(
 	c = "Ishida2009",
 	dat = "SbH_1by2_tanh_ave",
 	IPS = -2, ICP = [14], #|IMPLICIT EULER TIME INTEGRATION
-	UZR = {}, UZSTOP = {14:3000}, NMX = int(15e5), 
-	NTST = 1, DS = 1e-6, DSMAX = 1e-2,DSMIN=1e-12, EPSL = 1e-6, EPSU = 1e-6, EPSS = 1e-4 )
+	UZR = {}, UZSTOP = {14:3000}, NMX = int(1.5e6), #15e5 , 1e3
+	NTST = 1, DS = 1e-6, DSMAX = 1e-2,DSMIN=1e-12, EPSL = 1e-6, EPSU = 1e-6, EPSS = 1e-4 ,
+	IPLT = 0) #7:x2_dot ; 8:y2_dot ; 9:X, 10:Y, in space of L2-norm col.
 SbH_dat = run(l_SbH_dat) #+ run(l_SbH_dat, DS='-')
 
 
-#| EXTRACT DATA
+#| EXTRACT DAT
 for D in ['x1','y1','x2','y2','x1_dot','y1_dot','x2_dot','y2_dot']: print( SbH_dat("UZ1")[D] ) ;# print( SbH_dat[0][-1][D] )  #SbH_dat[0][-1] is the last solPoint on the branch, #SbH_dat("EP2")[D]
-timeCol = SbH_dat["t"]   ; dumm = [abs(val - 0.9*timeCol[-1]) for val in timeCol]  ;  Ifrom = dumm.index(min(dumm)) #; Ito = len(t) ; 
+timeCol = SbH_dat["t"]  ;  dumm = [abs(val - 0.9*timeCol[-1]) for val in timeCol]  ;  Ifrom = dumm.index(min(dumm)) #; Ito = len(t) ; 
 x1 = SbH_dat["x1"]  
-y1 = SbH_dat["y1"]
-x2 = SbH_dat["x2"] 
-y2 = SbH_dat["y2"]
+y1 = SbH_dat["y1"]  
+x2 = SbH_dat["x2"]  
+y2 = SbH_dat["y2"]  
 x1_dot = SbH_dat["x1_dot"]  
-y1_dot = SbH_dat["y1_dot"]
-x2_dot = SbH_dat["x2_dot"] 
-y2_dot = SbH_dat["y2_dot"]
-X = SbH_dat["sin(Omeg*t)"]
-Y = SbH_dat["cos(Omeg*t)"]
+y1_dot = SbH_dat["y1_dot"]  
+x2_dot = SbH_dat["x2_dot"]  
+y2_dot = SbH_dat["y2_dot"]  
+X = SbH_dat["sin(Omeg*t)"]  
+Y = SbH_dat["cos(Omeg*t)"]  
+#|:Nt: I had to increase the maximum column count (see why in below Nts)(which was 7 for par+var+sol_meas + 1 for contin par)
+#|... I changed the subroutine WRLINE/io.f90 accordingly: I added a COLLIM = 15 integer to quickly alter max col count. Then 
+#|... I changed the numbers previously refering to "7 col limit" to COLLIM.
+#|... My changes can be followed by searching "from 7" str in io.f90 file.
+#|::Nt:The reason I need to change this number is that I need to record all 10 variables but this is impossible 
+#|...with the limit of 7 columns it was set previously. 
+#|:::Nt: A remedy was that I change the AUTO cnst IPLT to, say, 8 (for y_2), which is then going to be printed 
+#|...in the L2-norm column (ie. the first after the contin par). Then you change this cnst every time and record
+#|...the var in a different file, then to combine into a single dat file.
+#|...Other remedy was to create new parameters in the PVLS subroutine of eqs-file, which are then added to the ICP list.
+#|...E.g., you first run with ICP = [14] , then record the data of t,x1,y1,x2,y2,x1_dot,x2_dot. Then you'd run with ICP = [14,19,20,21,22] 
+#|...to get x2_dot, y2_dot, X, Y printed in the limited columns. Then record this. Then combine the two records for a dat file.
 
-print(" = = = = = = Time series length  is ", len(timeCol)) # 1437219
+# allsols = SbH_dat() #|This does not work, it only gives the labeled solutions which are 2 EPs.
+# allsols = SbH_dat[0][:] #|Gets only the data from the terminal print and some more if there is.  
+# print(" = = = = = = allsols length  is ", len(allsols), '.') #|=1437219
+# print("EP2 solution content \n")
+# print(SbH_dat("EP2"))#WORKS: All the states and indep vars, and all other info of the solution point is there. 
+# print("\nA REGULAR solution content \n")
+# print(SbH_dat[0][0])
+# print(SbH_dat[0][-1]) #the EP2 data accessed differently >> Only the 8 columns printed in terminal are given when you get the solution content this way.
+# for sol in allsols:
+	# t.append(sol[t])
+	# x1.append(sol["x1"])
+	# y1.append(sol["y1"])
+	# x2.append(sol["x2"])
+	# y2.append(sol["y2"])
+	# x1_dot.append(sol["x1_dot"])
+	# y1_dot.append(sol["y1_dot"])
+	# x2_dot.append(sol["x2_dot"])
+	# y2_dot.append(sol["y2_dot"])
+	# X.append(sol["sin(Omeg*t)"])
+	# Y.append(sol["cos(Omeg*t)"])
+	# print(sol) #|prints the printed content 
+#|:Nt: There is a fundamental difference in requesting sols by index with [] and requesting sols by label. 
+#|...For special sol points - or just the labeled sol points, all the var data and par data can be extracted.
+#|...So in that,  all_labeled_sols = SbH_dat()  gives a list of all labled solutions, which are the mere two ends in the simulations.
+#|...Also in these sols, you can get all of the variables (all 10 here) by requesting sol["col_name"] as usual.
+#|...However, if you request the sols by index like  allsols = SbH_dat[0][:] , This takes the col data that is printed to the terminal (and fort.7, or b.*).
 
+
+print(" = = = = = = Time series length  is ", len(timeCol), '.') # 1437219
 
 #| RECORD
-recF = open("TimeSeries_whole3000.txt", "w") 
+rec = open("SbH_1by2_tanh_wholeTraj.dat", "w") 
 for i in range(0,len(timeCol)):
-	recF.write([  timeCol[i] , x1[i] , y1[i] , x2[i] , y2[i] , x1_dot[i] , y1_dot[i] , x2_dot[i] , y2_dot[i] , X[i] , Y[i]  ])
-recF.close()	
+	rec.write(str(timeCol[i] )+"\t"+ \
+		str(x1[i])+"\t"+str(y1[i])+"\t"+str(x2[i])+"\t"+str(y2[i])+"\t"+\
+		str(x1_dot[i])+"\t"+str(y1_dot[i])+"\t"+str(x2_dot[i])+"\t"+str(y2_dot[i])+"\t"+\
+		str(X[i])+"\t"+str(Y[i])+"\n")
+rec.close()	
 
 
 #| ELAPSED TIME
@@ -75,19 +118,33 @@ ax1 = traj_fig.add_subplot(1,2,1) ; ax1.set_xlabel("x1") ; ax1.set_ylabel("y1") 
 ax2 = traj_fig.add_subplot(1,2,2) ; ax2.set_xlabel("x2") ; ax2.set_ylabel("y2") ;  ax2.set_title("Bear traj") 
 traj_plot = ax1.plot(x1[Ifrom:],y1[Ifrom:])
 bear_plot = ax2.plot(x2[Ifrom:],y2[Ifrom:])
-#matplotlib.pyplot.savefig("trajs.png")
+matplotlib.pyplot.savefig("trajs.png")
 matplotlib.pyplot.show()
 
 #| DAT FILE GEN:
-Ifrom = int(1437219 - 2800)
+Ifrom = int(1437219 - 2744) #hand pick numbers by trial-error
 traj_fig = matplotlib.pyplot.figure() #(figsize=(10.0,3.0))
 ax1 = traj_fig.add_subplot(1,2,1) ; ax1.set_xlabel("x1") ; ax1.set_ylabel("y1") ;  ax1.set_title("Disk traj")
 ax2 = traj_fig.add_subplot(1,2,2) ; ax2.set_xlabel("x2") ; ax2.set_ylabel("y2") ;  ax2.set_title("Bear traj") 
 traj_plot = ax1.plot(x1[Ifrom:],y1[Ifrom:])
 bear_plot = ax2.plot(x2[Ifrom:],y2[Ifrom:])
-#matplotlib.pyplot.savefig("trajs_in_datfile.png")
+matplotlib.pyplot.savefig("trajs_in_datfile.png")
 matplotlib.pyplot.show()
-#recordFile = open("","w")
+#| RECORD DAT
+datFile = open("SbH_1by2_tanh_AUTOgen.dat","w")
+for i in range(0,len(x1[Ifrom:])): #####}}}}}THIS PART IS WRONG , TO CORRECT 
+	datFile.write(	str(timeCol[Ifrom+i] - timeCol[Ifrom])  +"\t"+\
+					str(x1[Ifrom+i])       +"\t"+\
+					str(y1[Ifrom+i])       +"\t"+\
+					str(x2[Ifrom+i])       +"\t"+\
+					str(y2[Ifrom+i])       +"\t"+\
+					str(x1_dot[Ifrom+i])   +"\t"+\
+					str(y1_dot[Ifrom+i])   +"\t"+\
+					str(x2_dot[Ifrom+i])   +"\t"+\
+					str(y2_dot[Ifrom+i])   +"\t"+\
+					str(X[Ifrom+i])        +"\t"+\
+					str(Y[Ifrom+i])        +"\n"    )
+datFile.close()
 
 #p = plot(SbH_dat,top_title="SbH 1/2 response amp vs rotor speed", stability=True, bifurcation_x = "OMEG", bifurcation_y = "Amplitude", solution_x = "x1", solution_y = "y1")
 #p.config(color_list="black red green blue violet orange gray brown teal turquoise purple")

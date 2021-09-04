@@ -1,7 +1,7 @@
 # ZILLI CUBIC ROT (AUTONOMOUS - ISOTROPIC STIFFNESS)
 unames={1: 'x1', 2: 'y1',3:'x2' , 4:'y2', 5:'x1_dot', 6:'y1_dot', 7:'x2_dot', 8:'y2_dot', 9:'sin(Omeg*t)', 10:'cos(Omeg*t)'}
 parnames={1:'OMEG',
-2:'DELT',3:'BETA',4:'IP',5:'E',6:'F0',7:'C1',8:'C2',9:'ALPH',10:"REST",13:'M_2',14:"t",15:'KB_N',16:'CB_N',17:'tanh_steepness',18:'Amplitude'}
+2:'DELT',3:'BETA',4:'IP',5:'E',6:'F0',7:'C1',8:'C2',9:'ALPH',10:"REST",13:'M_2',14:"t",15:'KB_N',16:'CB_N',17:'tanh_steepness',18:'Amplitude' ,     19:'x2_dot_inPar', 20:'y2_dot_inPar' ,21:'X_inPar' ,22:'Y_inPar'}
 
 NDIM= 10 #|Dimension of the indep var vector.
 

@@ -209,6 +209,11 @@
         !|:See the qoute above.
         !|___METHOD-D. 
 
+        PAR(19) = GETP('MAX',7,U) !xdot
+        PAR(20) = GETP('MAX',8,U) !ydot
+        PAR(21) = GETP('MAX',9,U) !X (ie sin(Omeg*t))
+        PAR(22) = GETP('MAX',10,U)!Y (ie cos(Omeg*t))
+
       END SUBROUTINE PVLS
 
 
