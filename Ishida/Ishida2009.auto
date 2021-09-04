@@ -31,7 +31,7 @@ l_SbH_dat = load(
 	c = "Ishida2009",
 	dat = "SbH_1by2_tanh_AUTOgen",
 	IPS = 2, ICP = [1,11,18], 
-	UZR = {}, UZSTOP = {}, NMX = 10000, 
+	UZR = {}, UZSTOP = {}, NMX = 1000, 
 	NTST = 500, DS = 0.1, DSMAX = 0.05,DSMIN=1e-10, EPSL = 1e-4, EPSU = 1e-4, EPSS = 1e-3 )
 SbH_dat = run(l_SbH_dat) + run(l_SbH_dat, DS='-')
  

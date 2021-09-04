@@ -94,14 +94,14 @@ Y = SbH_dat["cos(Omeg*t)"]
 
 print(" = = = = = = Time series length  is ", len(timeCol), '.') # 1437219
 
-#| RECORD
-rec = open("SbH_1by2_tanh_wholeTraj.dat", "w") 
-for i in range(0,len(timeCol)):
-	rec.write(str(timeCol[i] )+"\t"+ \
-		str(x1[i])+"\t"+str(y1[i])+"\t"+str(x2[i])+"\t"+str(y2[i])+"\t"+\
-		str(x1_dot[i])+"\t"+str(y1_dot[i])+"\t"+str(x2_dot[i])+"\t"+str(y2_dot[i])+"\t"+\
-		str(X[i])+"\t"+str(Y[i])+"\n")
-rec.close()	
+#| RECORD - very large file 
+# rec = open("SbH_1by2_tanh_wholeTraj.dat", "w") 
+# for i in range(0,len(timeCol)):
+# 	rec.write(str(timeCol[i] )+"\t"+ \
+# 		str(x1[i])+"\t"+str(y1[i])+"\t"+str(x2[i])+"\t"+str(y2[i])+"\t"+\
+# 		str(x1_dot[i])+"\t"+str(y1_dot[i])+"\t"+str(x2_dot[i])+"\t"+str(y2_dot[i])+"\t"+\
+# 		str(X[i])+"\t"+str(Y[i])+"\n")
+# rec.close()	
 
 
 #| ELAPSED TIME
