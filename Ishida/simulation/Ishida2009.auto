@@ -121,8 +121,8 @@ bear_plot = ax2.plot(x2[Ifrom:],y2[Ifrom:])
 matplotlib.pyplot.savefig("trajs.png")
 matplotlib.pyplot.show()
 
-#| DAT FILE GEN:
-Ifrom = int(1437219 - 2744) #hand pick numbers by trial-error
+#| DAT FILE GEN:1435213
+Ifrom = int(1435213 - 1744) #hand pick numbers by trial-error #|"int(1437219 - 2744)" with "- Q4/R_2*F_n" term, i.e. not "- Q4/R_2*F_n/BETA" .  
 traj_fig = matplotlib.pyplot.figure() #(figsize=(10.0,3.0))
 ax1 = traj_fig.add_subplot(1,2,1) ; ax1.set_xlabel("x1") ; ax1.set_ylabel("y1") ;  ax1.set_title("Disk traj")
 ax2 = traj_fig.add_subplot(1,2,2) ; ax2.set_xlabel("x2") ; ax2.set_ylabel("y2") ;  ax2.set_title("Bear traj") 
@@ -132,7 +132,7 @@ matplotlib.pyplot.savefig("trajs_in_datfile.png")
 matplotlib.pyplot.show()
 #| RECORD DAT
 datFile = open("SbH_1by2_tanh_AUTOgen.dat","w")
-for i in range(0,len(x1[Ifrom:])): #####}}}}}THIS PART IS WRONG , TO CORRECT 
+for i in range(0,len(x1[Ifrom:])): 
 	datFile.write(	str(timeCol[Ifrom+i] - timeCol[Ifrom])  +"\t"+\
 					str(x1[Ifrom+i])       +"\t"+\
 					str(y1[Ifrom+i])       +"\t"+\

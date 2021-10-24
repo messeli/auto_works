@@ -60,8 +60,8 @@
         F(4) = + Q8
         F(5) = - IP*OMEG*Q6 - C1*Q5 - (Q1 - ALPH*Q3) + E*OMEG**2* Y
         F(6) = + IP*OMEG*Q5 - C1*Q6 - (Q2 - ALPH*Q4) + E*OMEG**2* X + F0 !X=sin(OMEG*T), Y=cos(OMEG*T)
-        F(7) = - C2/BETA*Q7 - ALPH/BETA*(ALPH*Q3 - Q1) - Q3/R_2*F_n 
-        F(8) = - C2/BETA*Q8 - ALPH/BETA*(ALPH*Q4 - Q2) - Q4/R_2*F_n 
+        F(7) = - C2/BETA*Q7 - ALPH/BETA*(ALPH*Q3 - Q1) - Q3/R_2*F_n/BETA
+        F(8) = - C2/BETA*Q8 - ALPH/BETA*(ALPH*Q4 - Q2) - Q4/R_2*F_n/BETA
         F(9) = + X + OMEG*Y - X*(X**2 + Y**2) !|To remember the nonlinear oscillator   | x = sin(OMEG*T) , y = cos(OMEG*T) 
         F(10)= + Y - OMEG*X - Y*(X**2 + Y**2) !|...remember 1st one, 2nd swaps x and y, and makes OMEG negative. 
 
