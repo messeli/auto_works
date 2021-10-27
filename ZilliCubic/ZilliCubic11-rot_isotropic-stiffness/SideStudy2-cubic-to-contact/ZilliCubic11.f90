@@ -80,12 +80,12 @@
         DOUBLE PRECISION ZETA,Q1,Q3,Q2,Q4,S4,C4,R2,R,GAMMA,KAPPA,K,OMEG,OMEGP,MH,EPSH,JPH,BETA,TPI!WN,F_M,K3_M,OMEG,
 
         ! FORWARDS (MATLAB SINE SWEEP GIVES THIS TOO)
-        GAMMA = 0.D0 !2nd continue gamma from 0 to 0.25
+        GAMMA = 0.25D0 !2nd continue gamma from 0 to 0.25
         OMEG = 0.01D0 ! Continue OMEG from 0 to 7. 
         MH = 0.D0 !1st continue MH from 0 to 0.9
 
         EPSH =0.353D0
-        ZETA = 1D-5 !0.01
+        ZETA = 1D-2 !1D-5
         JPH  = 0.143D0
         OMEGP = 0.0D0
         KAPPA = 0.0D0  ! 1.D0

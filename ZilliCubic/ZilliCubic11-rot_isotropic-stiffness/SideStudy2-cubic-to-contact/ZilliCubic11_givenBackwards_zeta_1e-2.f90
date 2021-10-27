@@ -73,11 +73,11 @@
         OMEG = 5.0D0 ! Continue OMEG from 0 to 7. 
         MH = 0.9D0 !1st continue MH from 0 to 0.9
         EPSH =0.353D0
-        ZETA = 1D-5 !0.01D0  !TRUE ONE IS 1e-2;BUT, TRY 0.05 for avoiding backward continuation from simulation datum
+        ZETA = 1D-2 !1D-5  !TRUE ONE IS 1e-2;BUT, TRY 0.05 for avoiding backward continuation from simulation datum
         JPH  = 0.143D0
         OMEGP = 0.D0
   
-        KAPPA = 1.D0  ! 1.D0
+        KAPPA = 0.D0  ! 1.D0
         BETA = 10.D0  ! 1.5 3 5 10  |btw 1.25 to 125 see explanation in func_ode45_tanh.m or betlek.31.01.2021
         K = 150.D0    ! 30 100  |see explanation in func_ode45_tanh.m or betlek.31.01.2021
 
@@ -93,10 +93,10 @@
         PAR(13)=K
 
         ! !| Orig one used for orig givenBackwards, where it was zeta=0.01 
-        ! ! U(1)=-0.380009000620448
-        ! ! U(2)= 0.000022150720618
-        ! ! U(3)=-0.001297860009550
-        ! ! U(4)= 0.000206860716715
+        U(1)=-0.380009000620448
+        U(2)= 0.000022150720618
+        U(3)=-0.001297860009550
+        U(4)= 0.000206860716715
 
         ! !| New ones from "Google Drive\PhD\Zilli ISO cubic stiffness\Resutls ISO cubic\
         ! !| ...7p0 end lowAmp datum, differentZeta for AUTO givenBackwards.txt"
@@ -110,11 +110,11 @@
         ! u(2) = -2.59377E-03
         ! U(3) = 0.00000E+00
         ! U(4) = 0.00000E+00
-        !| Take the stpnt below from matlab datum at Omeg=5.00 beta=1.5 K=30
-        U(1) = -3.88852349524439D-01
-        u(2) = -1.903803765019D-03
-        U(3) = 1.2420423D-8
-        U(4) = -1.06246196D-7
+        !| Take the stpnt below from matlab datum at Omeg=5.00 beta=1.5 K=30, zeta=1e-5
+        ! U(1) = -3.88852349524439D-01
+        ! u(2) = -1.903803765019D-03
+        ! U(3) = 1.2420423D-8
+        ! U(4) = -1.06246196D-7
 
       END SUBROUTINE STPNT
 
