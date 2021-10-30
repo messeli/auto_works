@@ -22,7 +22,7 @@ DSMAX= 0.01,
 IADS= 1
 EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4  # 1e-4
 NMX = 10000  # 100 
-ITMX= 8, ITNW= 7, NWTN= 5 # 3
+ITMX= 9, ITNW= 7, NWTN= 5 # 3
 
 #instep discr
 NCOL= 4 

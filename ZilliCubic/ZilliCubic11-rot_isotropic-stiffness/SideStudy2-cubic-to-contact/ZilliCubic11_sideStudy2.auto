@@ -25,8 +25,8 @@ isKappa1_fold0 = True #|Kappa or fold contin s tb performD if set t True or Fals
 #DEL isKappaContin  = True #|only affects IPS2; IPS1 already does the kappa homot. 
 #DEL isFoldContin   = False #|only affects IPS2; IPS1 already does the kappa homot. 
 
-isLowZetaInit = False
-isHighEpsH = False #|for now it is after the newNonlin solFam calc.
+isLowZetaInit = True
+isHighEpsH = True #|for now it is after the newNonlin solFam calc.
 ##########################
 
 startTime = time.time()
@@ -36,7 +36,7 @@ if isIPS1forw: #|Do the forward?
 	mH     = run( "ZilliCubic11" ) 
 	if isLowZetaInit: 
 		mH = run( mH("UZ1"), ICP=[6,9], RL0=0.0,UZSTOP={6:1e-5},NMX=10000, DS=-0.00001,DSMAX=0.00001 )
-	forw   = run( mH("UZ1"), ICP=[ 2,9], UZSTOP={2:10},NMX=10000, DS=0.01,DSMAX=0.01 ) 
+	forw   = run( mH("UZ1"), ICP=[ 2,9], UZSTOP={2:10},NMX=10000, DS=0.01,DSMAX=0.001 ) 
 	plot(forw,top_title="forw, cubic",bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v",height=600,stability=True)
 	
 	#| Homotopy kappa
@@ -71,7 +71,7 @@ if isIPS1back: #|Do the backward?
 	mH     = run( "ZilliCubic11" ) 
 	#| Increase zeta so that the forw and back are combined.
 	zeta = run(mH("UZ1"),ICP=[6,9], UZSTOP={6:0.1})
-	Omeg = run(zeta("UZ1"),ICP=[2,9,6], RL0=0.0, RL1=10.1,UZSTOP={2:10.0})
+	Omeg = run(zeta("UZ1"),ICP=[2,9,6], RL0=0.0, RL1=7.1,UZSTOP={2:10.0})
 	plot(Omeg,top_title="combined forw and back bmo high zeta",bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v",height=600,stability=True)
 	#| Decrease the zeta back to what is requested: low(1e-5) or normal(1e-2)
 	if isLowZetaInit: 
@@ -107,7 +107,7 @@ if isIPS1back: #|Do the backward?
 	else: 
 		l_back_nnl = load( 
 			K("UZ1"), ICP=[ 2,9,6], 
-			RL0=0.0, RL1=10.0, UZSTOP={2:10},NMX=900, 
+			RL0=0.0, RL1=7.0, UZSTOP={2:10},NMX=900, 
 			NTST=200,DS=0.01,DSMAX=0.05,EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4,ITMX=8,ITNW=7,NWTN=6 ) #NMX=200000
 		back_nnl += merge(run(l_back_nnl) + run(l_back_nnl,DS="-"))
 
@@ -132,7 +132,7 @@ except:
 	pass
 #|__|IPS1|__
 
-wait
+
 ########################################################################
 
 
@@ -145,70 +145,82 @@ if isKappa1_fold0: #True for kappa contin method
 	print("===DIAGNOSTIC===IPS2_KAPPA_SL")
 
 	starter = load(
-		    e="ZilliCubic11_datFileContin_zeta_1e-2",
-		    c="ZilliCubic11",
-		    dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2")
+	    e="ZilliCubic11_datFileContin_zeta_1e-2",
+	    c="ZilliCubic11",
+	    dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2")
 	#|:starter is the MATLAB-gen orbit where zeta=1e-2
+	l_Omeg = load(starter, IPS=2, ICP=[2,11,9],
+		RL0=0, RL1=10, UZR={2:[4,5,6,7,8,9]}, STOP="LP2", NMX=10000,
+		EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
+	Omeg = run(l_Omeg) + run(l_Omeg,DS="-")
+	plot(Omeg, top_title="Omeg, SL, bare", bifurcation_x="Omeg", bifurcation_y="Amplitude", stability=True)
 
 	#| OPT low zeta initial orbit.
 	if isLowZetaInit:  #| OPT: Decrease zeta first
-		l_SL = load(
-		    starter, #|SEE the load() of load() in Table 4.2 in doc. What you dou is change the problem definition, that's all.
-		    IPS=2,ICP=[6,11,9,2], # 2:'Omeg',5:'epsH',6:'zeta'
-		    UZR={6:[1e-5]},UZSTOP={5:2.0},NMX=2000, #|Pick a low zeta value. Typically 1e-4 or 1e-5. 
-		    NTST=200,DS=+0.001,DSMAX=0.005,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-4) # 6 6 3s
-		zeta = merge( run(l_SL) + run(l_SL,DS="-") )
-		plot(zeta,top_title="zeta, SL",stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+		for ORB in Omeg("UZ"):
+			l_SL = load(ORB,IPS=2,ICP=[6,11,9,2], # 2:'Omeg',5:'epsH',6:'zeta'
+			    RL0=0, RL1=1, UZR={6:[1e-5]}, UZSTOP={5:2.0},NMX=10000,STOP='LP100', #|Pick a low zeta value. Typically 1e-4 or 1e-5. 
+			    NTST=200, DS=+0.001, DSMAX=0.005, EPSL= 1e-06, EPSU=1e-06, EPSS=1e-4) # 6 6 3s
+			zeta = run(l_SL) + run(l_SL,DS="-")
+			plot(zeta,top_title="zeta, SL",stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
-		starter = zeta("UZ1") #|starter  is now low zeta orbit
-
-	#| solFam, cubic [ At thetaP = 2.91 (DL) / 4.05 (SL) ]
-	l_SL = load(
-		starter,
-		IPS=2, ICP=[2,11,9,6], #Print par6 = zeta |#par5=epsH 
-		UZR={2:[5]},RL0=0,RL1=7.0,NMX=10000, #{2:np.append(3.6,np.arange(2,7,0.25))}
-		NTST=200,DS=+0.001,DSMAX=0.05,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4);
-	SL = merge( run(l_SL) + run(l_SL,DS="-") ) #|Solution family from .dat
-	plot(SL,top_title="SL",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
-	orb = SL("EP1") #|Otherwise try  orb = SL("UZ1")
-
-	#| HOMOTOPY to newNonlin with kappa=0>1 OR rho=0>1 for tanh OR quintic, respectively (par8 OR par15)
-	l_kappa = load(
-		orb, IPS=2, ICP=[8,11,9,2], # In d case of RHO(quintic): IPS=2, ICP=[15,11,9],
-		UZR={8:[1.0]},RL1=1.01,NMX=5000, #|NMX=60000 | UZR={8:[1.0,0.985]} | UZR={15:[0.987]}, | UZSTOP={15:[1.0]}
-		NTST=200,DS=0.001,DSMAX=0.01) 
-	kappa = merge( run(l_kappa) + run(l_kappa,DS="-") )
-	plot(kappa,top_title="kappa, SL",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
-	orb = kappa("UZ1") #|orb with newNonlin (:nnl)
+			if zeta("UZ"): #|one zeta fam is enough if it has d desired samplG of 1e-5.
+				orb = zeta("UZ1")
+				break
+		
+		l_Omeg = load(orb,IPS=2,ICP=[2,11,9,6,5],
+			RL0=0,RL1=10,UZR={2:[5,6,7,8,9]},STOP="LP2", NMX=10000,
+			EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
+		Omeg = run(l_Omeg) + run(l_Omeg,DS="-")
+		plot(Omeg,top_title="Omeg, SL, new zeta",bifurcation_x="Omeg",bifurcation_y="Amplitude",stability=True)
 
 	#| OPT Increase epsH 
 	if isHighEpsH:
-		print("===DIAGNOSTIC===IPS2_KAPPA_SL===varyJepsH")
+		for orb in Omeg("UZ"):
+			l_epsH = load(orb, IPS=2, ICP=[5,11,9,2,6], 
+				UZR={5:[1.5]}, NMX=3500, RL0=0, RL1=2, STOP=["LP100"],
+				NTST=300, DSMAX=0.01)
+			epsH = run(l_epsH) + run(l_epsH,DS="-")
+			plot(epsH,top_title="epsH, SL",bifurcation_x="epsH",bifurcation_y="Amplitude",stability=True)
+			
+			if epsH("UZ"):
+				orb = epsH('UZ1') #|orb with changed epsH val
+				break
 
-		l_epsH = load(
-			orb, IPS=2,ICP=[5,11,9,2], 
-			UZR={5:[1.5]},NMX=3500,  
-			NTST=300, DSMAX=0.01)
-		epsH = run(l_epsH) + run(l_epsH,DS="-")
-		plot(epsH,top_title="epsH, SL",bifurcation_x="epsH",bifurcation_y="Amplitude",stability=True)
-		orb = epsH('UZ1') #|orb with changed epsH val
-		
-	#| solFam, nnl
-	l_SL_nnl = load(
-		orb, ICP=[2,11,9,5],
-		RL1=10, NMX=2000,	
-		DS=0.001, DSMAX=0.01)
-	SL_nnl = merge(run(l_SL_nnl) + run(l_SL_nnl,DS="-") ) 
-	plot(SL_nnl,top_title="SL_nnl",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+		l_Omeg = load(orb,IPS=2,ICP=[2,11,9,6,5],
+			RL0=0,RL1=10,UZR={2:[5,6,7,8,9]},STOP="LP2", NMX=10000,
+			EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
+		Omeg = run(l_Omeg) + run(l_Omeg,DS="-")
+		plot(Omeg,top_title="Omeg, SL, new epsH",bifurcation_x="Omeg",bifurcation_y="Amplitude",stability=True)
 	
+	#| HOMOTOPY to newNonlin with kappa=0>1 OR rho=0>1 for tanh OR quintic, respectively (par8 OR par15)
+	for ORB in Omeg("UZ"):
+		l_kappa = load(ORB, IPS=2, ICP=[8,11,9,2],
+			UZR={8:[1.0]}, RL0=0, RL1=2,NMX=5000,
+			NTST=200, DS=0.001, DSMAX=0.01) 
+		kappa = run(l_kappa)
+		plot(kappa,top_title="kappa, SL",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+		
+		if kappa("UZ"):
+			orb_nnl = kappa("UZ1") #|orb with newNonlin (:nnl)
+			break
+
+	print("THE KAPPA VALUE IN THE NNL RUN IS : ",orb_nnl["kappa"])
+	l_Omeg_SLnnl = load(orb_nnl, IPS=2, ICP=[2,11,9,6,8], #Print par6 = zeta |#par5=epsH 
+		RL0=0,RL1=10,NMX=100000, STOP=["LP2"], #{2:np.append(3.6,np.arange(2,7,0.25))}
+		NTST=300,DS=0.002,DSMAX=0.002,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4)
+	Omeg_SLnnl = run(l_Omeg_SLnnl) + run(l_Omeg_SLnnl,DS="-")
+	plot(Omeg_SLnnl,top_title="Omeg_SLnnl",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+
 	#| OPT Add fold contin line of (Omeg,epsH) 
 	if True: #|Make it optional 
 		print("===DIAGNOSTIC===IPS2_KAPPA_SL===newNonlinWvariedEpsH=ADDED FOLD LINE")
-		l_fold_SL = run(
-			SL_nnl("LP1"),
-			IPS=2,ICP=[5,2,11,9],ISW=2,
-			RL0=0, RL1=10)
-		fold_SL = merge( run(l_fold_SL) + run(l_fold_SL,DS="-") )
+		l_fold_SL = run(Omeg_SLnnl("LP1"), IPS=2, ICP=[2,5,11,9], ISW=2,
+			RL0=0, RL1=9 ,STOP="LP100",
+			NTST=300,DS=+0.001,DSMAX=0.002,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4)
+		fold_SL = run(l_fold_SL) + run(l_fold_SL,DS="-")
+		plot(Omeg_SLnnl + fold_SL,top_title="Omeg_SLnnl + fold_SL",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+
 	#|__|IPS2_KAPPA_SL|__
 
 	wait
@@ -226,23 +238,41 @@ if isKappa1_fold0: #True for kappa contin method
 	if isLowZetaInit:
 		l_DL = load(
 			starter, IPS=2,ICP=[6,11,9,2], # 2:'Omeg',5:'epsH',6:'zeta'
-		    UZR={6:[1e-2]},UZSTOP={5:2.0},NMX=2000, # was 1e-5 for epsH changing study.
-		    NTST=300,DS=+0.001,DSMAX=0.005,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-4) # 6 6 3s
+			UZR={6:[1e-5]}, RL0=0, RL1=1, UZSTOP={5:2.0},NMX=2000, # was 1e-5 for epsH changing study.
+			NTST=300,DS=+0.001,DSMAX=0.005,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-4) # 6 6 3s
 		zeta = merge( run(l_DL) + run(l_DL,DS="-") )
 
 		starter = zeta("UZ1") #|starter  is now low zeta orbit
 
 		plot(zeta,top_title="zeta, DL",stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
+
+	#| OPT Increase epsH , DL
+	if isHighEpsH:
+		print("===DIAGNOSTIC===IPS2_KAPPA_DL===varyJepsH")
+		l_epsH = load(
+			starter, IPS=2, ICP=[5,11,9,2], 
+			UZR={5:[1.5]},RL0=0, RL1=2,NMX=10000, STOP=["LP10"],
+			NTST=300, DSMAX=0.01)
+		epsH = run(l_epsH) + run(l_epsH,DS="-")
+		plot(epsH,top_title="epsH, DL",bifurcation_x="epsH",bifurcation_y="Amplitude",stability=True)
+		starter = epsH("UZ1") 
+
+
+
 	#| solFam, cubic [At thetaP=2.91(DL)/4.05(SL) ]
 	l_DL = load(
-		starter,
-		IPS=2, ICP=[2,11,9,6], #Print par6 = zeta |#par5=epsH 
-		UZR={2:[5]}, RL0=0, RL1=10.01, NMX=1000, 
-		NTST=300,DS=+0.001,DSMAX=0.05,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4);
+		starter, IPS=2, ICP=[2,11,9,6], #Print par6 = zeta |#par5=epsH 
+		UZR={2:[5,6]}, RL0=0, RL1=10, NMX=2000, STOP=["LP2"], 
+		NTST=300, DS=+0.001, DSMAX=0.05, EPSL=1e-06, EPSU=1e-06, EPSS=1e-4);
 	DL = merge( run(l_DL) + run(l_DL,DS="-") ) 
 	plot(DL,top_title="DL",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
-	orb = DL("EP1") #|Otherwise try  orb = DL("UZ1")
+	orb = DL("UZ1") #|orb = DL("EP1") failed to give  kappa=1
+	for X in DL('UZ1'):
+		# print("MYDIAGNOSTIcprinting",X["epsH"])
+		print("MYDIAGNOSTIcprinting",X)
+		# if float(X["epsH"]) == 9.0:
+		# 	orb = X
 
 	#| Homotopy to newNonlin with kappa=0>1 OR rho=0>1 for tanh OR quintic, respectively (par8 OR par15)
 	l_kappa = load(
@@ -253,32 +283,31 @@ if isKappa1_fold0: #True for kappa contin method
 	plot(kappa,top_title="kappa, DL",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 	orb = kappa("UZ1")
 
-	#| OPT Increase epsH , DL
-	if isHighEpsH:
-		print("===DIAGNOSTIC===IPS2_KAPPA_DL===varyJepsH")
-
-		l_epsH = load(
-			orb, IPS=2, ICP=[5,11,9,2], 
-			UZR={5:[1.5]},RL1=1.51,NMX=5000, 
-			NTST=300, DSMAX=0.01)
-		epsH = run(l_epsH) + run(l_epsH,DS="-")
-		plot(epsH,top_title="epsH, DL",bifurcation_x="epsH",bifurcation_y="Amplitude",stability=True)
-		orb = epsH("UZ1") 
+	# #| OPT Increase epsH , DL
+	# if isHighEpsH:
+	# 	print("===DIAGNOSTIC===IPS2_KAPPA_DL===varyJepsH")
+	# 	l_epsH = load(
+	# 		orb, IPS=2, ICP=[5,11,9,2], 
+	# 		UZR={5:[1.5]},RL0=0, RL1=2,NMX=10000, 
+	# 		NTST=300, DSMAX=0.01)
+	# 	epsH = run(l_epsH) + run(l_epsH,DS="-")
+	# 	plot(epsH,top_title="epsH, DL",bifurcation_x="epsH",bifurcation_y="Amplitude",stability=True)
+	# 	orb = epsH("UZ1") 
 
 	#| solFam, nnl
 	l_DL_nnl = load(
 		orb, ICP=[2,11,9,5],
-		RL1=10, NMX=1000, 
-		DS=-0.001, DSMAX=0.01)
+		RL0=0, RL1=7, NMX=20000, STOP=["LP2"],
+		DS=-0.001, DSMAX=0.002)
 	DL_nnl = merge(run(l_DL_nnl) + run(l_DL_nnl,DS="-") )
 	plot(DL_nnl,top_title="DL_nnl",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 	
 	#|OPT Add fold contin line of (Omeg,epsH) , DL
-	if True:
+	if False:
 		print("===DIAGNOSTIC===IPS2_KAPPA_DL===newNonlinWvariedEpsH=ADDED FOLD LINE")
 		l_fold_DL = run(
-			DL_nnl("LP1"), IPS=2, ICP=[5,2,11,9], ISW=2,
-			RL0=0, RL1=10)
+			DL_nnl("LP1"), IPS=2, ICP=[2,5,11,9], ISW=2,
+			RL0=0, RL1=7, STOP=["LP100"])
 		fold_DL = merge( run(l_fold_DL) + run(l_fold_DL, DS="-") )
 	#|__|IPS2_KAPPA_DL|__
 
@@ -298,7 +327,7 @@ else: #|Fold contin method (ie isKappa1_fold0 = False)
 	print("=====2A_FFF===CONTINUE_SL_MATLAB_ORBIT")
 	l_SL = load(
 		starter, IPS=2, ICP=[2,11,9], #|Problem definition constants.
-		RL0=0,RL1=10,NMX=10000,  #|Limit constants.
+		RL0=0,RL1=7,NMX=10000,  #|Limit constants.
 		NTST=200,DS=+0.001,DSMAX=0.05,EPSL=1e-06,EPSU=1e-06,EPSS=1e-3) #|Accuracy constants.
 	SL = merge( run(l_SL) + run(l_SL,DS="-") )
 
@@ -318,7 +347,7 @@ else: #|Fold contin method (ie isKappa1_fold0 = False)
 	#| solFam nnl , SL
 	l_SL_nnl = load(
 		orb, IPS=2, ICP=[2,11,8,9], ISW=1,
-		RL0=0.0, RL1=10.0,NMX=10000,
+		RL0=0.0, RL1=7.0,NMX=10000,
 		NTST=200,DS=0.001,DSMAX=0.005)
 	SL_nnl = merge( run(l_SL_nnl) + run(l_SL_nnl,DS='-') ) 
 	plot(SL_nnl,top_title="SL_nnl",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
@@ -354,7 +383,7 @@ else: #|Fold contin method (ie isKappa1_fold0 = False)
 	#| solFam nnl , DL
 	l_DL_nnl = load(
 		orb, IPS=2, ICP=[2,11,9], ISW=1,
-		RL0=0.0,RL1=10.0,NMX=5000,
+		RL0=0.0,RL1=7.0,NMX=5000,
 		NTST=200,DS=0.001,DSMAX=0.005)
 	DL_nnl = merge( run(l_DL_nnl) + run(l_DL_nnl,DS='-') ) 
 	plot(DL_nnl,top_title="DL_nnl",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
@@ -383,7 +412,7 @@ else: #|Fold contin method (ie isKappa1_fold0 = False)
 # 			print("===PD===",count,"/",size,"===")
 # 			l_PD_bd = load(P,
 # 				IPS=2,ICP=[2,11,9],ISW=-1, #|switch to the PD branch
-# 				UZR={2:1.0}, RL0=0.0,RL1=10, NMX=5000,
+# 				UZR={2:1.0}, RL0=0.0,RL1=7, NMX=5000,
 # 				DS=0.001, DSMAX=0.0025, NTST=300, EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-5 )
 # 			PD_bd = PD_bd + run(l_PD_bd)
 # 	save(PD_bd, "PD_bd" )
@@ -401,7 +430,7 @@ else: #|Fold contin method (ie isKappa1_fold0 = False)
 # 				print("HERE ------",count,"/",size,"------------ 2")
 # 				PD_bd_child = PD_bd_child + run(PP,
 # 					IPS=2,ICP=[2,11,9],ISW=-1,
-# 					RL0=0.0,RL1=10,NMX=5000,# UZR={2:4.10},
+# 					RL0=0.0,RL1=7,NMX=5000,# UZR={2:4.10},
 # 					NTST=500,DS=0.001,DSMAX=0.0025,EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-5 )
 # 			PD_bd = PD_bd + PD_bd_child #|secure the child PD bifur diags 
 # 			PD_bd_ = PD_bd_child #|handle now the child to find child's child 
