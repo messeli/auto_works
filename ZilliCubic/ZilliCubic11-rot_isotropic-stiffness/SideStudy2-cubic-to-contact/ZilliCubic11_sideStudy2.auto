@@ -370,9 +370,9 @@ else: #|Fold contin method (ie isKappa1_fold0 = False)
 	# l_kappa = run(orb, IPS=2, ISW=2, ICP=[8,2,11,9,6,5],
 	# 	UZSTOP={8:[1.0]}, RL0=-2, RL1=2,NMX=100000, STOP="HB10",
 	# 	NTST=800, DS=0.001, DSMAX=0.004, DSMIN=0.00001, EPSL= 3e-06, EPSU = 3e-06, EPSS =1e-3)
-	# kappa = run(l_kappa) #+ run(l_kappa,DS="-")
-	# plot(kappa,top_title="kappa, SL",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
-	# orb_nnl = kappa("UZ1") #|orb with newNonlin (:nnl)
+	# kappa_SL = run(l_kappa) #+ run(l_kappa,DS="-")
+	# plot(kappa_SL,top_title="kappa_SL",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	# orb_nnl = kappa_SL("UZ1") #|orb with newNonlin (:nnl)
 
 	# print("THE KAPPA VALUE IN THE NNL RUN IS : ",orb_nnl["kappa"])
 	# l_Omeg_SLnnl = load(orb_nnl, IPS=2, ISW=1, ICP=[2,11,9,5,6,8], #Print par6 = zeta |#par5=epsH 
@@ -394,34 +394,37 @@ else: #|Fold contin method (ie isKappa1_fold0 = False)
 	#| solFam , cubic
 	print("=====2A_FFF===CONTINUE_DL_MATLAB_ORBIT")
 	l_Omeg = load( starter, IPS=2, ISW=1, ICP=[2,11,9],
-		RL0=0, RL1=7, NMX=10000, 
-		NTST=200,DS=+0.001,DSMAX=0.05,EPSL=1e-06,EPSU=1e-06,EPSS=1e-3)
+		RL0=0, RL1=7, NMX=10000, STOP="LP2", 
+		NTST=200,DS=+0.001,DSMAX=0.05,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4)
 	Omeg = run(l_Omeg) + run(l_Omeg,DS="-")
 	plot(Omeg,top_title="Omeg, DL, bare",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
-	orb = Omeg("LP1")
+	orb = Omeg("LP2") #|Upper LP is problematic in amplitude (>70) when the zeta is down to zero (<1e-3).
+	print("HERERERERERER ER ER ER ER E RE RE RER ER ER E R",orb["Omeg"])
 
 	#| OPT Fold contin in (zeta,Omeg), DL
 	if isLowZetaInit:
 		l_fold = run(orb, IPS=2, ICP=[6,2,11,9], ISW=2,
-			RL0=0, RL1=1, NMX = 1000000, UZR={6:[1e-4,1e-5,1e-6,1e-7]},
-			NTST=200, DS=0.00001, DSMAX=0.00001, DSMIN=0.000001, EPSL=1e-6, EPSU=1e-6, EPSS=1e-3)
+			RL0=0, RL1=1, NMX = 1000000, UZR={6:[1e-5]}, STOP="LP2", NPR=1000,
+			NTST=300, DS=0.001, DSMAX=0.001, DSMIN=0.0001, EPSL=1e-6, EPSU=1e-6, EPSS=1e-3)
 		fold = run(l_fold,DS="-") #|you only decrease the zeta. 
 		plot(fold,top_title="fold, (zeta,Omeg), DL",stability=True,height=600,bifurcation_x="zeta",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
-		orb = fold("UZ2") #|will need revision. It might need a BP sample as in SL case.
+		orb = fold("UZ1") #|will need revision. It might need a BP sample as in SL case.
 
 		l_Omeg = load(orb, IPS=2, ISW=1, ICP=[2,11,9,6,5],
 			RL0=0, RL1=10, UZR={2:[5,6,7,8,9]}, STOP="LP2",NMX=10000,
-			NTSt=200, DS=0.001, DSMAX=0.05, EPSL=1e-6, EPSU=1e-6, EPSS=1e-4)
+			NTST=200, DS=0.001, DSMAX=0.05, EPSL=1e-6, EPSU=1e-6, EPSS=1e-4)
 		Omeg_short = run(l_Omeg, NMX = 300) #|To cirvumvent the problem of not having the initial point of LP in the bd obj. 
 		orb = Omeg_short("EP1")
-		Omeg = run(orb, NMX=10000) + run(orb, l_Omeg, NMX=10000,DS="-")
+		Omeg = run(orb, NMX=10000) + run(orb, NMX=10000,DS="-")
 		plot(Omeg, top_title="Omeg, DL, new zeta",bifurcation_x="Omeg",bifurcation_y="Amplitude",stability=True)
+		orb = Omeg("LP1")
+		print("HEREREREasdfasdfwefqrdfasefq sdf qwe fsfqwe fsdf areqw fRERE", orb['Omeg'])
 
 	#| OPT Fold contin in (epsH,Omeg), DL
 	if isHighEpsH:
 		l_fold = run(orb, IPS=2, ISW=2, ICP=[5,2,11,9,6],
 			RL0=0, RL1=2, NMX=1000000, UZR={5:[1.5]},
-			NTST=350, DS=1e-3, DSMZX=5e-3, DSMIN=1e-3, EPSL=1e-6, EPSU=1e-6, EPSS=1e-3)
+			NTST=350, DS=0.001, DSMAX=0.005, DSMIN=0.001, EPSL=1e-6, EPSU=1e-6, EPSS=1e-3)
 		fold_epsHOmeg = run (l_fold) + run(l_fold, DS="-")
 		orb = fold_epsHOmeg("UZ1")
 
@@ -430,29 +433,30 @@ else: #|Fold contin method (ie isKappa1_fold0 = False)
 			EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
 		Omeg_short = run(l_Omeg, NMX = 300) #|To cirvumvent the problem of not having the initial point of LP in the bd obj. 
 		orb = Omeg_short("EP1")
-		Omeg = run(orb, NMX=10000) + run(orb, l_Omeg, NMX=10000,DS="-")
+		Omeg = run(orb, NMX=10000) + run(orb, NMX=10000,DS="-")
 		plot(Omeg,top_title="Omeg, DL, new epsH",bifurcation_x="Omeg",bifurcation_y="Amplitude",stability=True)
+		orb = Omeg("LP1")
+		print("qweopfmadsofiqjpweofkmasdpiEORIGFMNPQODKVCMQWIEFMCPOQ;KM ", orb["Omeg"])
 
 	#| Homotopy of kappa from 0 to 1. 
-	l_fold = run(orb, IPS=2, ICP=[8,2,11,9], ISW=2,
-		UZR={8:1.0}, RL0=0.0, RL1=1.01, NMX=5000,
-		NTST=200, DS=0.001, DSMAX=0.005)
-	fold_DL =run(l_fold) #|Forward dir is enough
+	l_kappa = run(orb, IPS=2, ICP=[8,2,11,9], ISW=2,
+		UZR={8:1.0}, RL0=0.0, RL1=1.01, NMX=40000,STOP="HB10",
+		NTST=3000, DS=0.001, DSMAX=0.001, DSMIN=0.00001, EPSL= 10e-06, EPSU = 10e-06, EPSS =1e-3, ITNW=10)
+		#|Ds ddnt work(if only worked): NTST=3000, DS=0.001, DSMAX=0.0001, DSMIN=0.000001, EPSL= 5e-06, EPSU = 5e-06, EPSS =1e-3, ITNW=10)
+	kappa_DL =run(l_kappa) #|Forward dir is enough
+	plot(kappa_DL,top_title="kappa_DL",stability=True,bifurcation_x="kappa",bifurcation_y="Amplitude", height=600)
+	orb = kappa_DL("UZ1")
 
-	plot(fold_DL,top_title="fold_DL",stability=True,bifurcation_x="kappa",bifurcation_y="Amplitude")
-
-	orb = fold_DL("UZ1")
-	
 	#| solFam nnl , DL
 	l_Omeg_DLnnl = load(
 		orb, IPS=2, ICP=[2,11,9], ISW=1,
-		RL0=0.0,RL1=7.0,NMX=5000,
-		NTST=200,DS=0.001,DSMAX=0.005)
+		RL0=0.0,RL1=7.0,NMX=15000, STOP="LP3",
+		NTST=500,DS=0.001,DSMAX=0.005, DSMIN=0.0001,EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-3, ITNW=7)
 	Omeg_DLnnl = merge( run(l_Omeg_DLnnl) + run(l_Omeg_DLnnl,DS='-') ) 
 	plot(Omeg_DLnnl,top_title="Omeg_DLnnl",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 	#|__|IPS2_FOLD_DL|__
 
-	IPS2 = (SL + SL_nnl + fold_SL) + (DL + DL_nnl + fold_DL)
+	IPS2 = (Omeg_SL + Omeg_SLnnl + fold_SL) + (Omeg_DL + Omeg_DLnnl + fold_DL)
 #|__|IPS2_FOLD|__
 #|__|IPS2|__
 
