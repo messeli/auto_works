@@ -25,7 +25,7 @@ isKappa1_fold0 = True #False #|Kappa or fold contin s tb performD if set t True 
 #DEL isKappaContin  = True #|only affects IPS2; IPS1 already does the kappa homot. 
 #DEL isFoldContin   = False #|only affects IPS2; IPS1 already does the kappa homot. 
 
-isLowZetaInit = False
+isLowZetaInit = True
 isHighEpsH = True #|for now it is after the newNonlinsolFam calc.
 ##########################
 
@@ -43,8 +43,9 @@ if isIPS1forw: #|Do the forward?
 		epsH = run(point, ICP=[5,9,6],UZSTOP={5:1.5}, DS=0.001, DSMAX=0.01)
 		point = epsH("UZ1")		
 
-	forw = run( point, ICP=[ 2,9], UZSTOP={2:10},NMX=10000, DS=0.01,DSMAX=0.001 ) 
+	forw = run( point, ICP=[ 2,9,5,6], UZR={2:0.1}, UZSTOP={2:10},NMX=10000, DS=0.01,DSMAX=0.001 ) 
 	plot(forw,top_title="forw, cubic",bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v",height=600,stability=True)
+	point = forw("UZ1")
 	if not isLowZetaInit and not isHighEpsH:
 		save(forw,"forw")	
 	if isLowZetaInit and not isHighEpsH:
@@ -55,18 +56,19 @@ if isIPS1forw: #|Do the forward?
 		save(forw,"forw-nze")
 
 	#| Homotopy kappa
-	forw_dumm = run( mH("UZ1"), ICP=[ 2,9], UZSTOP={2:0.1},NMX=10000, DS=0.01,DSMAX=0.01 ) 
-	kappa  = run( forw_dumm("UZ1"), ICP=[ 8,9,2], UZSTOP={8:1.0}, DS=0.01, DSMAX=0.03, NMX=15000) 
-	beta   = run( kappa("UZ1"), ICP=[10,9,8], UZSTOP={10:10},NMX=2000) 
-	K      = run( beta("UZ1"), ICP=[13,9,10], UZSTOP={13:150},NMX=15000, DSMAX=0.05 )
+	forw_dumm = run( point, ICP=[ 2,9,5,6], UZSTOP={2:0.2},NMX=10000, DS=0.01,DSMAX=0.01 ) 
+	kappa  = run( forw_dumm("UZ1"), ICP=[ 8,9,2,5,6], UZSTOP={8:1.0}, DS=0.01, DSMAX=0.03, NMX=15000) 
+	beta   = run( kappa("UZ1"), ICP=[10,9,8,5,6], UZSTOP={10:10},NMX=2000) 
+	K      = run( beta("UZ1"), ICP=[13,9,10,5,6], UZSTOP={13:150},NMX=15000, DSMAX=0.05 )
 	point = K("UZ1")
 	
 	l_forw_nnl = load( 
-		point, ICP=[ 2,9,6], 
-		RL0=0.0, UZSTOP={2:10},NMX=10000, 
+		point, ICP=[ 2,9,6,5], 
+		RL0=0.0, UZSTOP={2:10},NMX=40000, 
 		NTST=200,DS=0.01,DSMAX=0.05,EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4,ITMX=8,ITNW=7,NWTN=6 ) #NMX=200000
 	forw_nnl = merge(run(l_forw_nnl) + run(l_forw_nnl,DS="-"))
 	plot(forw_nnl,top_title="forw_nnl, tanh",bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v",height=600,stability=True)
+	
 	if not isLowZetaInit and not isHighEpsH:
 		save(forw_nnl,"forw-nk")
 	if isLowZetaInit and not isHighEpsH:
@@ -93,12 +95,13 @@ if isIPS1back: #|Do the backward?
 		zeta = run(Omeg("UZ1"),ICP=[6,9,2], UZSTOP={6:1e-5}, NMX = 20000, DS=-0.00001, DSMAX=0.00001)
 	else:
 		zeta = run(Omeg("UZ1"),ICP=[6,9,2], UZSTOP={6:1e-2}, DS=-0.001, DSMAX=0.001)
+	point = zeta("UZ1")
 
 	if isHighEpsH: 
 		epsH = run(point, ICP=[5,9], UZSTOP={5:1.5}, DS=0.001, DSMAX=0.01)
 		point = epsH("UZ1")
 
-	back = run(zeta("UZ1"), ICP=[ 2,9], UZR={2:6.0},NMX=10000, DS=-0.001,DSMAX=0.01)
+	back = run(point, ICP=[ 2,9], UZR={2:6.0},NMX=40000, DS=-0.001,DSMAX=0.05)
 	plot(back,top_title="back, cubic",bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v",height=600,stability=True)
 	point = back("UZ1")
 
@@ -124,7 +127,7 @@ if isIPS1back: #|Do the backward?
 
 	l_back_nnl = load( 
 		K("UZ1"), ICP=[ 2,9,6], 
-		RL0=0.0, RL1=7.0, UZSTOP={2:10},NMX=900, 
+		RL0=0.0, RL1=7.0, UZSTOP={2:10},NMX=40000, 
 		NTST=200,DS=0.01,DSMAX=0.05,EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4,ITMX=8,ITNW=7,NWTN=6 ) #NMX=200000
 	back_nnl = merge(run(l_back_nnl) + run(l_back_nnl,DS="-"))
 	plot(back_nnl,top_title="back_nnl",bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v",height=600,stability=True)
