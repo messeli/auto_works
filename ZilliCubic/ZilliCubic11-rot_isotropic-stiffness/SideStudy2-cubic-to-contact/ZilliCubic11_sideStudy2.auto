@@ -18,10 +18,10 @@ import time
 import numpy as np
 import re 
 ########CONTROLS##########
-isIPS1forw = True 
-isIPS1back = True
+isIPS1forw = False 
+isIPS1back = False
 
-isKappa1_fold0 = True #False #|Kappa or fold contin s tb performD if set t True or False, respY.
+isKappa1_fold0 = False #False #|Kappa or fold contin s tb performD if set t True or False, respY.
 #DEL isKappaContin  = True #|only affects IPS2; IPS1 already does the kappa homot. 
 #DEL isFoldContin   = False #|only affects IPS2; IPS1 already does the kappa homot. 
 
@@ -140,25 +140,25 @@ if isIPS1back: #|Do the backward?
 		save(back_nnl,"back-nek")
 	if isLowZetaInit and isHighEpsH:
 		save(back_nnl,"back-nzek")
-wait
-# #|__|IPS1_BACK|__
-# IPS1 = []
-# try: 
-# 	try:    
-# 		IPS1 = merge(forw + back)
-# 	except: 
-# 		try:	IPS1 = forw
-# 		except:	IPS1 = back  
-# 	try:  
-# 		IPS1 += merge(forw_nnl + back_nnl)
-# 	except: 
-# 		try:	IPS1 += forw_nnl
-# 		except:	IPS1 += back_nnl
 
-# 	plot(IPS1,top_title="IPS1",bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v",height=600,stability=True) 
-# 	save(IPS1,"IPS1")	
-# except:
-# 	pass
+#|__|IPS1_BACK|__
+IPS1 = []
+try: 
+	try:    
+		IPS1 = merge(forw + back)
+	except: 
+		try:	IPS1 = forw
+		except:	IPS1 = back  
+	try:  
+		IPS1 += merge(forw_nnl + back_nnl)
+	except: 
+		try:	IPS1 += forw_nnl
+		except:	IPS1 += back_nnl
+
+	plot(IPS1,top_title="IPS1",bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v",height=600,stability=True) 
+	save(IPS1,"IPS1")	
+except:
+	pass
 #|__|IPS1|__
  
 # wait
@@ -167,449 +167,449 @@ wait
 
 
 #|>>|IPS2|>> IPS2 
-# #|>>|IPS2_KAPPA|>> Only kappa continuation
-# if isKappa1_fold0: #True for kappa contin method
+#|>>|IPS2_KAPPA|>> Only kappa continuation
+if isKappa1_fold0: #True for kappa contin method
 
-# 	#|>>|IPS2_KAPPA_SL|>>
-# 	print("===DIAGNOSTIC===IPS2_KAPPA_SL")
+	#|>>|IPS2_KAPPA_SL|>>
+	print("===DIAGNOSTIC===IPS2_KAPPA_SL")
 
-# 	starter = load(
-# 	    e="ZilliCubic11_datFileContin_zeta_1e-2",
-# 	    c="ZilliCubic11",
-# 	    dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2")
-# 	#|:starter is the MATLAB-gen orbit where zeta=1e-2
-# 	l_Omeg = load(starter, IPS=2, ICP=[2,11,9],
-# 		RL0=0, RL1=10, UZR={2:[4,5,6,7,8,9]}, STOP="LP2", NMX=10000,
-# 		EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
-# 	Omeg = run(l_Omeg) + run(l_Omeg,DS="-")
-# 	plot(Omeg, top_title="Omeg, SL, bare", bifurcation_x="Omeg", bifurcation_y="Amplitude", stability=True)
-# 	Omeg_SL = Omeg
-# 	save(Omeg_SL,"O-bare-SL")
+	starter = load(
+	    e="ZilliCubic11_datFileContin_zeta_1e-2",
+	    c="ZilliCubic11",
+	    dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2")
+	#|:starter is the MATLAB-gen orbit where zeta=1e-2
+	l_Omeg = load(starter, IPS=2, ICP=[2,11,9],
+		RL0=0, RL1=10, UZR={2:[4,5,6,7,8,9]}, STOP="LP2", NMX=10000,
+		EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
+	Omeg = run(l_Omeg) + run(l_Omeg,DS="-")
+	plot(Omeg, top_title="Omeg, SL, bare", bifurcation_x="Omeg", bifurcation_y="Amplitude", stability=True)
+	Omeg_SL = Omeg
+	save(Omeg_SL,"O-bare-SL")
 
-# 	#| OPT low zeta initial orbit.
-# 	if isLowZetaInit:  #| OPT: Decrease zeta first
-# 		for ORB in Omeg("UZ"):
-# 			l_SL = load(ORB,IPS=2,ICP=[6,11,9,2], # 2:'Omeg',5:'epsH',6:'zeta'
-# 			    RL0=0, RL1=1, UZR={6:[1e-5]}, UZSTOP={5:2.0},NMX=10000,STOP='LP100', #|Pick a low zeta value. Typically 1e-4 or 1e-5. 
-# 			    NTST=200, DS=+0.001, DSMAX=0.005, EPSL= 1e-06, EPSU=1e-06, EPSS=1e-4) # 6 6 3s
-# 			zeta = run(l_SL) + run(l_SL,DS="-")
-# 			plot(zeta,top_title="zeta, SL",stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	#| OPT low zeta initial orbit.
+	if isLowZetaInit:  #| OPT: Decrease zeta first
+		for ORB in Omeg("UZ"):
+			l_SL = load(ORB,IPS=2,ICP=[6,11,9,2], # 2:'Omeg',5:'epsH',6:'zeta'
+			    RL0=0, RL1=1, UZR={6:[1e-5]}, UZSTOP={5:2.0},NMX=10000,STOP='LP100', #|Pick a low zeta value. Typically 1e-4 or 1e-5. 
+			    NTST=200, DS=+0.001, DSMAX=0.005, EPSL= 1e-06, EPSU=1e-06, EPSS=1e-4) # 6 6 3s
+			zeta = run(l_SL) + run(l_SL,DS="-")
+			plot(zeta,top_title="zeta, SL",stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
-# 			if zeta("UZ"): #|one zeta fam is enough if it has d desired samplG of 1e-5.
-# 				orb = zeta("UZ1")
-# 				break
-# 		save(zeta,"z-SL")
+			if zeta("UZ"): #|one zeta fam is enough if it has d desired samplG of 1e-5.
+				orb = zeta("UZ1")
+				break
+		save(zeta,"z-SL")
 
-# 		l_Omeg = load(orb,IPS=2,ICP=[2,11,9,6,5],
-# 			RL0=0,RL1=10,UZR={2:[5,6,7,8,9]},STOP="LP2", NMX=10000,
-# 			EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
-# 		Omeg = run(l_Omeg) + run(l_Omeg,DS="-")
-# 		plot(Omeg,top_title="Omeg, SL, new zeta",bifurcation_x="Omeg",bifurcation_y="Amplitude",stability=True)
-# 		save(Omeg,"O-nz-SL")
+		l_Omeg = load(orb,IPS=2,ICP=[2,11,9,6,5],
+			RL0=0,RL1=10,UZR={2:[5,6,7,8,9]},STOP="LP2", NMX=10000,
+			EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
+		Omeg = run(l_Omeg) + run(l_Omeg,DS="-")
+		plot(Omeg,top_title="Omeg, SL, new zeta",bifurcation_x="Omeg",bifurcation_y="Amplitude",stability=True)
+		save(Omeg,"O-nz-SL")
 
-# 	#| OPT Increase epsH 
-# 	if isHighEpsH:
-# 		for ORB in Omeg("UZ"):
-# 			l_epsH = load(ORB, IPS=2, ICP=[5,11,9,2,6], 
-# 				UZR={5:[1.5]}, NMX=3500, RL0=0, RL1=2, STOP=["LP100"],
-# 				NTST=300, DSMAX=0.01)
-# 			epsH = run(l_epsH) + run(l_epsH,DS="-")
-# 			plot(epsH,top_title="epsH, SL",bifurcation_x="epsH",bifurcation_y="Amplitude",stability=True)
+	#| OPT Increase epsH 
+	if isHighEpsH:
+		for ORB in Omeg("UZ"):
+			l_epsH = load(ORB, IPS=2, ICP=[5,11,9,2,6], 
+				UZR={5:[1.5]}, NMX=3500, RL0=0, RL1=2, STOP=["LP100"],
+				NTST=300, DSMAX=0.01)
+			epsH = run(l_epsH) + run(l_epsH,DS="-")
+			plot(epsH,top_title="epsH, SL",bifurcation_x="epsH",bifurcation_y="Amplitude",stability=True)
 			
-# 			if epsH("UZ"):
-# 				orb = epsH('UZ1') #|orb with changed epsH val
-# 				break
-# 		if not isLowZetaInit: 
-# 			save(epsH,"e-SL")
-# 		else:
-# 			save(epsH,"e-nz-SL")
+			if epsH("UZ"):
+				orb = epsH('UZ1') #|orb with changed epsH val
+				break
+		if not isLowZetaInit: 
+			save(epsH,"e-SL")
+		else:
+			save(epsH,"e-nz-SL")
 
-# 		l_Omeg = load(orb,IPS=2,ICP=[2,11,9,6,5],
-# 			RL0=0,RL1=10,UZR={2:[5,6,7,8,9]},STOP="LP2", NMX=10000,
-# 			EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
-# 		Omeg = run(l_Omeg) + run(l_Omeg,DS="-")
-# 		plot(Omeg,top_title="Omeg, SL, new epsH",bifurcation_x="Omeg",bifurcation_y="Amplitude",stability=True)
+		l_Omeg = load(orb,IPS=2,ICP=[2,11,9,6,5],
+			RL0=0,RL1=10,UZR={2:[5,6,7,8,9]},STOP="LP2", NMX=10000,
+			EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
+		Omeg = run(l_Omeg) + run(l_Omeg,DS="-")
+		plot(Omeg,top_title="Omeg, SL, new epsH",bifurcation_x="Omeg",bifurcation_y="Amplitude",stability=True)
 		
-# 		if not isLowZetaInit: 
-# 			save(Omeg,"O-ne-SL")
-# 		else:
-# 			save(epsH,"e-nze-SL")
+		if not isLowZetaInit: 
+			save(Omeg,"O-ne-SL")
+		else:
+			save(epsH,"e-nze-SL")
 			
 
-# 	#| HOMOTOPY to newNonlin with kappa=0>1 OR rho=0>1 for tanh OR quintic, respectively (par8 OR par15)
-# 	for ORB in Omeg("UZ"):
-# 		l_kappa = load(ORB, IPS=2, ICP=[8,11,9,2],
-# 			UZR={8:[1.0]}, RL0=0, RL1=2,NMX=5000,
-# 			NTST=200, DS=0.001, DSMAX=0.01) 
-# 		kappa = run(l_kappa)
-# 		plot(kappa,top_title="kappa, SL",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	#| HOMOTOPY to newNonlin with kappa=0>1 OR rho=0>1 for tanh OR quintic, respectively (par8 OR par15)
+	for ORB in Omeg("UZ"):
+		l_kappa = load(ORB, IPS=2, ICP=[8,11,9,2],
+			UZR={8:[1.0]}, RL0=0, RL1=2,NMX=5000,
+			NTST=200, DS=0.001, DSMAX=0.01) 
+		kappa = run(l_kappa)
+		plot(kappa,top_title="kappa, SL",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 		
-# 		if kappa("UZ"):
-# 			orb_nnl = kappa("UZ1") #|orb with newNonlin (:nnl)
-# 			break
+		if kappa("UZ"):
+			orb_nnl = kappa("UZ1") #|orb with newNonlin (:nnl)
+			break
 
-# 	if not isLowZetaInit and not isHighEpsH:
-# 		save(kappa,"k-SL")
-# 	elif isLowZetaInit and not isHighEpsH:
-# 		save(kappa,"k-nz-SL")
-# 	elif not isLowZetaInit and isHighEpsH:
-# 		save(kappa,"k-ne-SL")
-# 	elif isLowZetaInit and isHighEpsH:
-# 		save(kappa,"k-nze-SL")
+	if not isLowZetaInit and not isHighEpsH:
+		save(kappa,"k-SL")
+	elif isLowZetaInit and not isHighEpsH:
+		save(kappa,"k-nz-SL")
+	elif not isLowZetaInit and isHighEpsH:
+		save(kappa,"k-ne-SL")
+	elif isLowZetaInit and isHighEpsH:
+		save(kappa,"k-nze-SL")
 	
 
-# 	print("THE KAPPA VALUE IN THE NNL RUN IS : ",orb_nnl["kappa"])
-# 	l_Omeg_SLnnl = load(orb_nnl, IPS=2, ICP=[2,11,9,6,8], #Print par6 = zeta |#par5=epsH 
-# 		RL0=0, RL1=10, NMX=100000, STOP=["LP10"], #{2:np.append(3.6,np.arange(2,7,0.25))}
-# 		NTST=400, DS=0.001, DSMAX=0.001, EPSL=1e-04, EPSU=1e-04, EPSS=1e-3)
-# 	#|default: RL0=0,RL1=10,NMX=100000, STOP=["LP10"], #{2:np.append(3.6,np.arange(2,7,0.25))}
-# 	#|default: NTST=400,DS=0.001,DSMAX=0.001,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4)
-# 	#|tried: NTST=4000 ,DS=0.0001,DSMAX=0.0001,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4) 
-# 	#|worked for the MX point at the bottom: NTST=400, DS=0.001, DSMAX=0.001, EPSL=1e-04, EPSU=1e-04, EPSS=1e-3)
-# 	Omeg_SLnnl = run(l_Omeg_SLnnl) + run(l_Omeg_SLnnl,DS="-")
-# 	plot(Omeg_SLnnl,top_title="Omeg_SLnnl",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	print("THE KAPPA VALUE IN THE NNL RUN IS : ",orb_nnl["kappa"])
+	l_Omeg_SLnnl = load(orb_nnl, IPS=2, ICP=[2,11,9,6,8], #Print par6 = zeta |#par5=epsH 
+		RL0=0, RL1=10, NMX=100000, STOP=["LP10"], #{2:np.append(3.6,np.arange(2,7,0.25))}
+		NTST=400, DS=0.001, DSMAX=0.001, EPSL=1e-04, EPSU=1e-04, EPSS=1e-3)
+	#|default: RL0=0,RL1=10,NMX=100000, STOP=["LP10"], #{2:np.append(3.6,np.arange(2,7,0.25))}
+	#|default: NTST=400,DS=0.001,DSMAX=0.001,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4)
+	#|tried: NTST=4000 ,DS=0.0001,DSMAX=0.0001,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4) 
+	#|worked for the MX point at the bottom: NTST=400, DS=0.001, DSMAX=0.001, EPSL=1e-04, EPSU=1e-04, EPSS=1e-3)
+	Omeg_SLnnl = run(l_Omeg_SLnnl) + run(l_Omeg_SLnnl,DS="-")
+	plot(Omeg_SLnnl,top_title="Omeg_SLnnl",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
-# 	if not isLowZetaInit and not isHighEpsH:
-# 		save(Omeg_SLnnl,"O-nk-SL")
-# 	elif isLowZetaInit and not isHighEpsH:
-# 		save(Omeg_SLnnl,"O-nzk-SL")
-# 	elif not isLowZetaInit and isHighEpsH:
-# 		save(Omeg_SLnnl,"O-nek-SL")
-# 	elif isLowZetaInit and isHighEpsH:
-# 		save(Omeg_SLnnl,"O-nzek-SL")
+	if not isLowZetaInit and not isHighEpsH:
+		save(Omeg_SLnnl,"O-nk-SL")
+	elif isLowZetaInit and not isHighEpsH:
+		save(Omeg_SLnnl,"O-nzk-SL")
+	elif not isLowZetaInit and isHighEpsH:
+		save(Omeg_SLnnl,"O-nek-SL")
+	elif isLowZetaInit and isHighEpsH:
+		save(Omeg_SLnnl,"O-nzek-SL")
 
 
-# 	#| OPT Add fold contin line of (Omeg,epsH) 
-# 	if True: #|Make it optional 
-# 		print("===DIAGNOSTIC===IPS2_KAPPA_SL===newNonlinWvariedEpsH=ADDED FOLD LINE")
-# 		l_fold_SL = run(Omeg_SLnnl("LP1"), IPS=2, ICP=[2,5,11,9], ISW=2,
-# 			RL0=0, RL1=9 ,STOP="LP100",
-# 			NTST=500,DS=+0.001,DSMAX=0.002,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4)
-# 		fold_SL = run(l_fold_SL) + run(l_fold_SL,DS="-")
-# 		plot(Omeg_SLnnl + fold_SL,top_title="Omeg_SLnnl + fold_SL",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	#| OPT Add fold contin line of (Omeg,epsH) 
+	if True: #|Make it optional 
+		print("===DIAGNOSTIC===IPS2_KAPPA_SL===newNonlinWvariedEpsH=ADDED FOLD LINE")
+		l_fold_SL = run(Omeg_SLnnl("LP1"), IPS=2, ICP=[2,5,11,9], ISW=2,
+			RL0=0, RL1=9 ,STOP="LP100",
+			NTST=500,DS=+0.001,DSMAX=0.002,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4)
+		fold_SL = run(l_fold_SL) + run(l_fold_SL,DS="-")
+		plot(Omeg_SLnnl + fold_SL,top_title="Omeg_SLnnl + fold_SL",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
-# 		if not isLowZetaInit and not isHighEpsH:
-# 			save(fold_SL,"eO-nk-SL")
-# 		elif isLowZetaInit and not isHighEpsH:
-# 			save(fold_SL,"eO-nzk-SL")
-# 		elif not isLowZetaInit and isHighEpsH:
-# 			save(fold_SL,"eO-nek-SL")
-# 		elif isLowZetaInit and isHighEpsH:
-# 			save(fold_SL,"eO-nzek-SL")
+		if not isLowZetaInit and not isHighEpsH:
+			save(fold_SL,"eO-nk-SL")
+		elif isLowZetaInit and not isHighEpsH:
+			save(fold_SL,"eO-nzk-SL")
+		elif not isLowZetaInit and isHighEpsH:
+			save(fold_SL,"eO-nek-SL")
+		elif isLowZetaInit and isHighEpsH:
+			save(fold_SL,"eO-nzek-SL")
 
-# 	#|__|IPS2_KAPPA_SL|__
+	#|__|IPS2_KAPPA_SL|__
 
-# 	# wait
+	# wait
 
-# 	#|>>|IPS2_KAPPA_DL|>>
-# 	print("===DIAGNOSTIC===IPS2_KAPPA_DL")
+	#|>>|IPS2_KAPPA_DL|>>
+	print("===DIAGNOSTIC===IPS2_KAPPA_DL")
 
-# 	starter = load(
-# 	    e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
-# 	    c="ZilliCubic11",
-# 	    dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop")
-# 	#|:starter is the MATLAB-gen orbit where zeta=1e-2
-# 	l_Omeg = load(starter, IPS=2, ICP=[2,11,9],
-# 		RL0=0, RL1=10, UZR={2:[4,5,6,7,8,9]}, STOP="LP2", NMX=10000,
-# 		EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
-# 	Omeg = run(l_Omeg,STOP="LP1") + run(l_Omeg,STOP="LP2",DS="-")
-# 	plot(Omeg, top_title="Omeg, DL, bare", bifurcation_x="Omeg", bifurcation_y="Amplitude", stability=True)
-# 	Omeg_DL = Omeg
-# 	save(Omeg_DL,"O-bare-DL")
+	starter = load(
+	    e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
+	    c="ZilliCubic11",
+	    dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop")
+	#|:starter is the MATLAB-gen orbit where zeta=1e-2
+	l_Omeg = load(starter, IPS=2, ICP=[2,11,9],
+		RL0=0, RL1=10, UZR={2:[4,5,6,7,8,9]}, STOP="LP2", NMX=10000,
+		EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
+	Omeg = run(l_Omeg,STOP="LP1") + run(l_Omeg,STOP="LP2",DS="-")
+	plot(Omeg, top_title="Omeg, DL, bare", bifurcation_x="Omeg", bifurcation_y="Amplitude", stability=True)
+	Omeg_DL = Omeg
+	save(Omeg_DL,"O-bare-DL")
 
-# 	#| OPT low zeta initial orbit.
-# 	if isLowZetaInit:
-# 		for ORB in Omeg("UZ"):
-# 			l_DL = load(ORB, IPS=2,ICP=[6,11,9,2], # 2:'Omeg',5:'epsH',6:'zeta'
-# 				UZR={6:[1e-5]}, RL0=0, RL1=1, UZSTOP={5:2.0},NMX=2000,STOP=["LP10"], # was 1e-5 for epsH changing study.
-# 				NTST=300,DS=+0.001,DSMAX=0.005,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-4) # 6 6 3s
-# 			zeta = merge( run(l_DL) + run(l_DL,DS="-") )
-# 			plot(zeta,top_title="zeta, DL",stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	#| OPT low zeta initial orbit.
+	if isLowZetaInit:
+		for ORB in Omeg("UZ"):
+			l_DL = load(ORB, IPS=2,ICP=[6,11,9,2], # 2:'Omeg',5:'epsH',6:'zeta'
+				UZR={6:[1e-5]}, RL0=0, RL1=1, UZSTOP={5:2.0},NMX=2000,STOP=["LP10"], # was 1e-5 for epsH changing study.
+				NTST=300,DS=+0.001,DSMAX=0.005,EPSL= 1e-06,EPSU=1e-06,EPSS=1e-4) # 6 6 3s
+			zeta = merge( run(l_DL) + run(l_DL,DS="-") )
+			plot(zeta,top_title="zeta, DL",stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
-# 			if zeta("UZ"):
-# 				orb = zeta("UZ1") #|starter  is now low zeta orbit
-# 				break
-# 		save(zeta,"z-DL")
+			if zeta("UZ"):
+				orb = zeta("UZ1") #|starter  is now low zeta orbit
+				break
+		save(zeta,"z-DL")
 
-# 		l_Omeg = load(orb, IPS=2, ICP=[2,11,9],
-# 			RL0=0, RL1=10, UZR={2:[4,5,6,7,8,9]}, STOP="LP2", NMX=10000,
-# 			EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
-# 		Omeg = run(l_Omeg) + run(l_Omeg,DS="-")
-# 		plot(Omeg, top_title="Omeg, DL, new zeta", bifurcation_x="Omeg", bifurcation_y="Amplitude", stability=True)
-# 		save(Omeg,"O-nz-DL")
+		l_Omeg = load(orb, IPS=2, ICP=[2,11,9],
+			RL0=0, RL1=10, UZR={2:[4,5,6,7,8,9]}, STOP="LP2", NMX=10000,
+			EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
+		Omeg = run(l_Omeg) + run(l_Omeg,DS="-")
+		plot(Omeg, top_title="Omeg, DL, new zeta", bifurcation_x="Omeg", bifurcation_y="Amplitude", stability=True)
+		save(Omeg,"O-nz-DL")
 
-# 	#| OPT Increase epsH , DL
-# 	if isHighEpsH:
-# 		for ORB in Omeg("UZ"):
-# 			l_epsH = load(ORB, IPS=2, ICP=[5,11,9,2], 
-# 				UZR={5:[1.5]},RL0=0, RL1=2,NMX=10000, STOP=["LP10"],
-# 				NTST=300, DSMAX=0.01)
-# 			epsH = run(l_epsH) + run(l_epsH,DS="-")
-# 			plot(epsH,top_title="epsH, DL",bifurcation_x="epsH",bifurcation_y="Amplitude",stability=True)
+	#| OPT Increase epsH , DL
+	if isHighEpsH:
+		for ORB in Omeg("UZ"):
+			l_epsH = load(ORB, IPS=2, ICP=[5,11,9,2], 
+				UZR={5:[1.5]},RL0=0, RL1=2,NMX=10000, STOP=["LP10"],
+				NTST=300, DSMAX=0.01)
+			epsH = run(l_epsH) + run(l_epsH,DS="-")
+			plot(epsH,top_title="epsH, DL",bifurcation_x="epsH",bifurcation_y="Amplitude",stability=True)
 			
-# 			if epsH("UZ"):
-# 				orb = epsH("UZ1") 
-# 				break
-# 		if not isLowZetaInit:
-# 			save(epsH,"e-DL")
-# 		else:
-# 			save(epsH,"e-nz-DL")
+			if epsH("UZ"):
+				orb = epsH("UZ1") 
+				break
+		if not isLowZetaInit:
+			save(epsH,"e-DL")
+		else:
+			save(epsH,"e-nz-DL")
 
-# 		l_Omeg = load(orb, IPS=2, ICP=[2,11,9,6,5],
-# 			RL0=0, RL1=10, UZR={2:[6.0]}, STOP="LP2", NMX=10000, #[3,4,]
-# 			EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
-# 		Omeg = run(l_Omeg) + run(l_Omeg,DS="-")
-# 		plot(Omeg, top_title="Omeg, DL, new epsH", bifurcation_x="Omeg", bifurcation_y="Amplitude", stability=True)
+		l_Omeg = load(orb, IPS=2, ICP=[2,11,9,6,5],
+			RL0=0, RL1=10, UZR={2:[6.0]}, STOP="LP2", NMX=10000, #[3,4,]
+			EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
+		Omeg = run(l_Omeg) + run(l_Omeg,DS="-")
+		plot(Omeg, top_title="Omeg, DL, new epsH", bifurcation_x="Omeg", bifurcation_y="Amplitude", stability=True)
 
-# 		if not isLowZetaInit:
-# 			save(Omeg,"O-ne-DL")
-# 		else:
-# 			save(epsH,"O-nze-DL")
+		if not isLowZetaInit:
+			save(Omeg,"O-ne-DL")
+		else:
+			save(epsH,"O-nze-DL")
 
 
-# 	#| HOMOTOPY to newNonlin with kappa=0>1 OR rho=0>1 for tanh OR quintic, respectively (par8 OR par15)
-# 	for ORB in Omeg("UZ"):
-# 		l_kappa = load(ORB, IPS=2, ICP=[8,11,9,2], # In d case of RHO(quintic): IPS=2, ICP=[15,11,9],
-# 			UZR={8:[1.0]},RL0=-2,RL1=2,NMX=15000, 
-# 			NTST=300,DS=0.001,DSMAX=0.01) 
-# 		kappa = merge( run(l_kappa) + run(l_kappa,DS="-") )
-# 		plot(kappa,top_title="kappa, DL",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	#| HOMOTOPY to newNonlin with kappa=0>1 OR rho=0>1 for tanh OR quintic, respectively (par8 OR par15)
+	for ORB in Omeg("UZ"):
+		l_kappa = load(ORB, IPS=2, ICP=[8,11,9,2], # In d case of RHO(quintic): IPS=2, ICP=[15,11,9],
+			UZR={8:[1.0]},RL0=-2,RL1=2,NMX=15000, 
+			NTST=300,DS=0.001,DSMAX=0.01) 
+		kappa = merge( run(l_kappa) + run(l_kappa,DS="-") )
+		plot(kappa,top_title="kappa, DL",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 		
-# 		if kappa("UZ"):
-# 			orb_nnl = kappa("UZ1")
-# 			break
+		if kappa("UZ"):
+			orb_nnl = kappa("UZ1")
+			break
 
-# 	if not isLowZetaInit and not isHighEpsH:
-# 		save(kappa,"k-DL")
-# 	elif isLowZetaInit and not isHighEpsH:
-# 		save(kappa,"k-nz-DL")
-# 	elif not isLowZetaInit and isHighEpsH:
-# 		save(kappa,"k-ne-DL")
-# 	elif isLowZetaInit and isHighEpsH:
-# 		save(kappa,"k-nze-DL")
+	if not isLowZetaInit and not isHighEpsH:
+		save(kappa,"k-DL")
+	elif isLowZetaInit and not isHighEpsH:
+		save(kappa,"k-nz-DL")
+	elif not isLowZetaInit and isHighEpsH:
+		save(kappa,"k-ne-DL")
+	elif isLowZetaInit and isHighEpsH:
+		save(kappa,"k-nze-DL")
 	
 
-# 	print("THE KAPPA VALUE IN THE NNL RUN IS : ", orb_nnl["kappa"])
-# 	l_Omeg_DLnnl = load(orb_nnl, IPS=2, ICP=[2,11,9,6], #Print par6 = zeta |#par5=epsH 
-# 		UZR={2:[5,6]}, RL0=0, RL1=10, NMX=60000, STOP=["LP20"], 
-# 		NTST=350, DS=+0.001, DSMAX=0.001, EPSL=1e-06, EPSU=1e-06, EPSS=1e-4);
-# 	Omeg_DLnnl = run(l_Omeg_DLnnl) + run(l_Omeg_DLnnl,DS="-") 
-# 	plot(Omeg_DLnnl,top_title="DL_nnl",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	print("THE KAPPA VALUE IN THE NNL RUN IS : ", orb_nnl["kappa"])
+	l_Omeg_DLnnl = load(orb_nnl, IPS=2, ICP=[2,11,9,6], #Print par6 = zeta |#par5=epsH 
+		UZR={2:[5,6]}, RL0=0, RL1=10, NMX=60000, STOP=["LP20"], 
+		NTST=350, DS=+0.001, DSMAX=0.001, EPSL=1e-06, EPSU=1e-06, EPSS=1e-4);
+	Omeg_DLnnl = run(l_Omeg_DLnnl) + run(l_Omeg_DLnnl,DS="-") 
+	plot(Omeg_DLnnl,top_title="DL_nnl",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 	
-# 	if not isLowZetaInit and not isHighEpsH:
-# 		print("||1|| isLowZetaInit:",isLowZetaInit,"; isHighEpsH:",isHighEpsH)
-# 		save(Omeg_DLnnl,"O-nk-DL")
-# 	if isLowZetaInit and  not isHighEpsH: 
-# 		print("||2|| isLowZetaInit:",isLowZetaInit,"; isHighEpsH:",isHighEpsH)
-# 		save(Omeg_DLnnl,"O-nzk-DL")
-# 	if not isLowZetaInit and isHighEpsH:
-# 		print("||3|| isLowZetaInit:",isLowZetaInit,"; isHighEpsH:",isHighEpsH)
-# 		save(Omeg_DLnnl,"O-nek-DL")
-# 	if isLowZetaInit and isHighEpsH:
-# 		print("||4|| isLowZetaInit:",isLowZetaInit,"; isHighEpsH:",isHighEpsH)
-# 		save(Omeg_DLnnl,"O-nzek-DL")
+	if not isLowZetaInit and not isHighEpsH:
+		print("||1|| isLowZetaInit:",isLowZetaInit,"; isHighEpsH:",isHighEpsH)
+		save(Omeg_DLnnl,"O-nk-DL")
+	if isLowZetaInit and  not isHighEpsH: 
+		print("||2|| isLowZetaInit:",isLowZetaInit,"; isHighEpsH:",isHighEpsH)
+		save(Omeg_DLnnl,"O-nzk-DL")
+	if not isLowZetaInit and isHighEpsH:
+		print("||3|| isLowZetaInit:",isLowZetaInit,"; isHighEpsH:",isHighEpsH)
+		save(Omeg_DLnnl,"O-nek-DL")
+	if isLowZetaInit and isHighEpsH:
+		print("||4|| isLowZetaInit:",isLowZetaInit,"; isHighEpsH:",isHighEpsH)
+		save(Omeg_DLnnl,"O-nzek-DL")
 
 
-# 	#|OPT Add fold contin line of (Omeg,epsH) , DL
-# 	if True:
-# 		print("===DIAGNOSTIC===IPS2_KAPPA_DL===newNonlinWvariedEpsH=ADDED FOLD LINE")
-# 		l_fold_DL = run(Omeg_DLnnl("LP1"), IPS=2, ICP=[2,5,11,9], ISW=2,
-# 			RL0=0, RL1=7, STOP=["LP100"],
-# 			NTST=300,DS=+0.001,DSMAX=0.002,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4)
-# 		fold_DL = merge( run(l_fold_DL) + run(l_fold_DL, DS="-") )
-# 		plot(Omeg_DLnnl + fold_DL, top_title="Omeg_DLnnl + fold_DL",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	#|OPT Add fold contin line of (Omeg,epsH) , DL
+	if True:
+		print("===DIAGNOSTIC===IPS2_KAPPA_DL===newNonlinWvariedEpsH=ADDED FOLD LINE")
+		l_fold_DL = run(Omeg_DLnnl("LP1"), IPS=2, ICP=[2,5,11,9], ISW=2,
+			RL0=0, RL1=7, STOP=["LP100"],
+			NTST=300,DS=+0.001,DSMAX=0.002,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4)
+		fold_DL = merge( run(l_fold_DL) + run(l_fold_DL, DS="-") )
+		plot(Omeg_DLnnl + fold_DL, top_title="Omeg_DLnnl + fold_DL",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 	
-# 		if not isLowZetaInit and not isHighEpsH:
-# 			save(fold_DL,"eO-nk-DL")
-# 		elif isLowZetaInit and not isHighEpsH:
-# 			save(fold_DL,"eO-nzk-DL")
-# 		elif not isLowZetaInit and isHighEpsH:
-# 			save(fold_DL,"eO-nek-DL")
-# 		elif isLowZetaInit and isHighEpsH:
-# 			save(fold_DL,"eO-nzek-DL")
+		if not isLowZetaInit and not isHighEpsH:
+			save(fold_DL,"eO-nk-DL")
+		elif isLowZetaInit and not isHighEpsH:
+			save(fold_DL,"eO-nzk-DL")
+		elif not isLowZetaInit and isHighEpsH:
+			save(fold_DL,"eO-nek-DL")
+		elif isLowZetaInit and isHighEpsH:
+			save(fold_DL,"eO-nzek-DL")
 
-# 	#|__|IPS2_KAPPA_DL|__
+	#|__|IPS2_KAPPA_DL|__
 
-# 	#| Populate IPS2
-# 	try:    IPS2 = (Omeg_SL + Omeg_SLnnl + fold_SL) + (Omeg_DL + Omeg_DLnnl + fold_DL)
-# 	except: IPS2 = (Omeg_SL + Omeg_SLnnl          ) + (Omeg_DL + Omeg_DLnnl          )
-# #|__|IPS2_KAPPA|__
+	#| Populate IPS2
+	try:    IPS2 = (Omeg_SL + Omeg_SLnnl + fold_SL) + (Omeg_DL + Omeg_DLnnl + fold_DL)
+	except: IPS2 = (Omeg_SL + Omeg_SLnnl          ) + (Omeg_DL + Omeg_DLnnl          )
+#|__|IPS2_KAPPA|__
 
-# else: #|Fold contin method (ie isKappa1_fold0 = False)
+else: #|Fold contin method (ie isKappa1_fold0 = False)
 
-# #|>>|IPS2_FOLD|>> Fold of OMEG is fold-contin versions D in kappa and Omeg (Nt:Comment 2AL_KKK)
-	# #|>>|IPS2_FOLD_SL|>> 
-	# starter = load(
-	#    e="ZilliCubic11_datFileContin_zeta_1e-2",
-	#    dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
-	#    c="ZilliCubic11")
+#|>>|IPS2_FOLD|>> Fold of OMEG is fold-contin versions D in kappa and Omeg (Nt:Comment 2AL_KKK)
+	#|>>|IPS2_FOLD_SL|>> 
+	starter = load(
+	   e="ZilliCubic11_datFileContin_zeta_1e-2",
+	   dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
+	   c="ZilliCubic11")
 
-	# #| solFam , cubic
-	# print("=====2A_FFF===CONTINUE_SL_MATLAB_ORBIT")
-	# l_Omeg = load(starter, IPS=2, ISW=1, ICP=[2,11,9], #|Problem definition constants.
-	# 	RL0=0,RL1=7,NMX=10000,  #|Limit constants.
-	# 	NTST=200,DS=+0.001,DSMAX=0.05,EPSL=1e-06,EPSU=1e-06,EPSS=1e-3) #|Accuracy constants.
-	# Omeg = run(l_Omeg) + run(l_Omeg,DS="-")
-	# plot(Omeg,top_title="Omeg, SL, bare",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
-	# orb = Omeg("LP1")
+	#| solFam , cubic
+	print("=====2A_FFF===CONTINUE_SL_MATLAB_ORBIT")
+	l_Omeg = load(starter, IPS=2, ISW=1, ICP=[2,11,9], #|Problem definition constants.
+		RL0=0,RL1=7,NMX=10000,  #|Limit constants.
+		NTST=200,DS=+0.001,DSMAX=0.05,EPSL=1e-06,EPSU=1e-06,EPSS=1e-3) #|Accuracy constants.
+	Omeg = run(l_Omeg) + run(l_Omeg,DS="-")
+	plot(Omeg,top_title="Omeg, SL, bare",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	orb = Omeg("LP1")
 
-	# #| OPT Fold contin in (zeta,Omeg) , SL
-	# if isLowZetaInit:
-	# 	l_fold = run( orb, IPS=2, ICP=[6,2,11,9], ISW=2,
-	# 		RL0=0, RL1=1, NMX = 1000000, UZR={6:[1e-5]}, #|do not use NMX=1e6 as this needs to be an integer.
-	# 		NTST=200, DS=0.00001, DSMAX=0.00001, DSMIN=0.000001, EPSL=1e-6, EPSU=1e-6, EPSS=1e-3) 
-	# 	fold =  run(l_fold,DS="-") # run(l_fold) +
-	# 	plot(fold,top_title="fold, (zeta,Omeg), SL",stability=True,height=600,bifurcation_x="zeta",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
-	# 	orb = fold("BP1") #|orb = fold("LP1")  does not work, but BP1 is about the 9.94986E-05, BP2 is 9.94986E-05... . So, BPs are close to the UZR points. 
-	# 	save(fold,"zO-SL")
+	#| OPT Fold contin in (zeta,Omeg) , SL
+	if isLowZetaInit:
+		l_fold = run( orb, IPS=2, ICP=[6,2,11,9], ISW=2,
+			RL0=0, RL1=1, NMX = 1000000, UZR={6:[1e-5]}, #|do not use NMX=1e6 as this needs to be an integer.
+			NTST=200, DS=0.00001, DSMAX=0.00001, DSMIN=0.000001, EPSL=1e-6, EPSU=1e-6, EPSS=1e-3) 
+		fold =  run(l_fold,DS="-") # run(l_fold) +
+		plot(fold,top_title="fold, (zeta,Omeg), SL",stability=True,height=600,bifurcation_x="zeta",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+		orb = fold("BP1") #|orb = fold("LP1")  does not work, but BP1 is about the 9.94986E-05, BP2 is 9.94986E-05... . So, BPs are close to the UZR points. 
+		save(fold,"zO-SL")
 
-	# 	l_Omeg = load(orb, IPS=2, ISW=1, ICP=[2,11,9,6,5],
-	# 		RL0=0,RL1=10,UZR={2:[5,6,7,8,9]},STOP="LP2", NMX=10000,
-	# 		NTST=250, DS=+0.001, DSMAX=0.05, EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
-	# 	Omeg_short = run(l_Omeg, NMX = 300) #|To circumvent the problem of not having the initial point of LP in the bd object.
-	# 	orb = Omeg_short("EP1") #|An orbit slightly away from the LP point, so that the LP point is generated in the following runs. 
-	# 	Omeg = run(orb,NMX=10000) + run(orb,NMX=10000,DS="-")
-	# 	plot(Omeg,top_title="Omeg, SL, new zeta",bifurcation_x="Omeg",bifurcation_y="Amplitude",stability=True)
-	# 	orb = Omeg("LP1") #|This does not work The start of the Omeg run is not given a label LP (it is never given a label for that matter. it does not exists in the bd object BN)
+		l_Omeg = load(orb, IPS=2, ISW=1, ICP=[2,11,9,6,5],
+			RL0=0,RL1=10,UZR={2:[5,6,7,8,9]},STOP="LP2", NMX=10000,
+			NTST=250, DS=+0.001, DSMAX=0.05, EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
+		Omeg_short = run(l_Omeg, NMX = 300) #|To circumvent the problem of not having the initial point of LP in the bd object.
+		orb = Omeg_short("EP1") #|An orbit slightly away from the LP point, so that the LP point is generated in the following runs. 
+		Omeg = run(orb,NMX=10000) + run(orb,NMX=10000,DS="-")
+		plot(Omeg,top_title="Omeg, SL, new zeta",bifurcation_x="Omeg",bifurcation_y="Amplitude",stability=True)
+		orb = Omeg("LP1") #|This does not work The start of the Omeg run is not given a label LP (it is never given a label for that matter. it does not exists in the bd object BN)
 	
-	# #| OPT Fold contin in (epsH,Omeg) , SL
-	# if isHighEpsH:
-	# 	l_fold = run(orb, IPS=2, ISW=2, ICP=[5,2,11,9,6],
-	# 		RL0=0, RL1=2, NMX=1000000, UZSTOP={5:[1.5]},STOP="HB10",
-	# 		NTST=2000, DS=0.001, DSMAX=0.004, DSMIN=0.001, EPSL=1e-6, EPSU=1e-6, EPSS=1e-3) 
-	# 	fold_epsHOmeg = run(l_fold) #+ run(l_fold, DS='-')
-	# 	plot(fold_epsHOmeg,top_title="fold_epsHOmeg, SL",bifurcation_x="epsH",bifurcation_y="Amplitude",stability=True)
-	# 	orb = fold_epsHOmeg("UZ1")
-	# 	if not isLowZetaInit:
-	# 		save(fold_epsHOmeg,"eO-SL")
-	# 	else:
-	# 		save(fold_epsHOmeg,"eO-nz-SL")
+	#| OPT Fold contin in (epsH,Omeg) , SL
+	if isHighEpsH:
+		l_fold = run(orb, IPS=2, ISW=2, ICP=[5,2,11,9,6],
+			RL0=0, RL1=2, NMX=1000000, UZSTOP={5:[1.5]},STOP="HB10",
+			NTST=2000, DS=0.001, DSMAX=0.004, DSMIN=0.001, EPSL=1e-6, EPSU=1e-6, EPSS=1e-3) 
+		fold_epsHOmeg = run(l_fold) #+ run(l_fold, DS='-')
+		plot(fold_epsHOmeg,top_title="fold_epsHOmeg, SL",bifurcation_x="epsH",bifurcation_y="Amplitude",stability=True)
+		orb = fold_epsHOmeg("UZ1")
+		if not isLowZetaInit:
+			save(fold_epsHOmeg,"eO-SL")
+		else:
+			save(fold_epsHOmeg,"eO-nz-SL")
 
-	# 	l_Omeg = load(orb, IPS=2, ISW=1, ICP=[2,11,9,6,5],
-	# 		RL0=0,RL1=10,UZR={2:[5,6,7,8,9]},STOP="LP2", NMX=10000,
-	# 		NTST=300,EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
-	# 	Omeg_short = run(l_Omeg, NMX = 300) #|To circumvent the problem of not having the initial point of LP in the bd object.
-	# 	orb = Omeg_short("EP1") #|An orbit slightly away from the LP point, so that the LP point is generated in the following runs. 
-	# 	Omeg = run(orb,NMX=10000) + run(orb,NMX=10000,DS="-")
-	# 	plot(Omeg,top_title="Omeg, SL, new epsH",bifurcation_x="Omeg",bifurcation_y="Amplitude",stability=True)
-	# 	orb = Omeg("LP1")
+		l_Omeg = load(orb, IPS=2, ISW=1, ICP=[2,11,9,6,5],
+			RL0=0,RL1=10,UZR={2:[5,6,7,8,9]},STOP="LP2", NMX=10000,
+			NTST=300,EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
+		Omeg_short = run(l_Omeg, NMX = 300) #|To circumvent the problem of not having the initial point of LP in the bd object.
+		orb = Omeg_short("EP1") #|An orbit slightly away from the LP point, so that the LP point is generated in the following runs. 
+		Omeg = run(orb,NMX=10000) + run(orb,NMX=10000,DS="-")
+		plot(Omeg,top_title="Omeg, SL, new epsH",bifurcation_x="Omeg",bifurcation_y="Amplitude",stability=True)
+		orb = Omeg("LP1")
 	
-	# #| HOMOTOPY to newNonlin with kappa=0>1 OR rho=0>1 for tanh OR quintic, respectively (par8 OR par15)
-	# l_kappa = run(orb, IPS=2, ISW=2, ICP=[8,2,11,9,6,5],
-	# 	UZSTOP={8:[1.0]}, RL0=-2, RL1=2,NMX=100000, STOP="HB10",
-	# 	NTST=800, DS=0.001, DSMAX=0.004, DSMIN=0.00001, EPSL= 3e-06, EPSU = 3e-06, EPSS =1e-3)
-	# kappa_SL = run(l_kappa) #+ run(l_kappa,DS="-")
-	# plot(kappa_SL,top_title="kappa_SL",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
-	# orb_nnl = kappa_SL("UZ1") #|orb with newNonlin (:nnl)
+	#| HOMOTOPY to newNonlin with kappa=0>1 OR rho=0>1 for tanh OR quintic, respectively (par8 OR par15)
+	l_kappa = run(orb, IPS=2, ISW=2, ICP=[8,2,11,9,6,5],
+		UZSTOP={8:[1.0]}, RL0=-2, RL1=2,NMX=100000, STOP="HB10",
+		NTST=800, DS=0.001, DSMAX=0.004, DSMIN=0.00001, EPSL= 3e-06, EPSU = 3e-06, EPSS =1e-3)
+	kappa_SL = run(l_kappa) #+ run(l_kappa,DS="-")
+	plot(kappa_SL,top_title="kappa_SL",stability=True,height=600,bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	orb_nnl = kappa_SL("UZ1") #|orb with newNonlin (:nnl)
 
-	# if not isLowZetaInit and not isHighEpsH:
-	# 	save(kappa_SL,"kO-SL")
-	# elif isLowZetaInit and not isHighEpsH:
-	# 	save(kappa_SL,"kO-nz-SL")
-	# elif not isLowZetaInit and isHighEpsH:
-	# 	save(kappa_SL,"kO-ne-SL")
-	# elif isLowZetaInit and isHighEpsH:
-	# 	save(kappa_SL,"kO-nze-SL")
+	if not isLowZetaInit and not isHighEpsH:
+		save(kappa_SL,"kO-SL")
+	elif isLowZetaInit and not isHighEpsH:
+		save(kappa_SL,"kO-nz-SL")
+	elif not isLowZetaInit and isHighEpsH:
+		save(kappa_SL,"kO-ne-SL")
+	elif isLowZetaInit and isHighEpsH:
+		save(kappa_SL,"kO-nze-SL")
 
 
-	# print("THE KAPPA VALUE IN THE NNL RUN IS : ",orb_nnl["kappa"])
-	# l_Omeg_SLnnl = load(orb_nnl, IPS=2, ISW=1, ICP=[2,11,9,5,6,8], #Print par6 = zeta |#par5=epsH 
-	# 	RL0=0,RL1=10,NMX=100000, STOP=["LP2"], #{2:np.append(3.6,np.arange(2,7,0.25))}
-	# 	NTST=200,DS=0.002,DSMAX=0.002,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4)
-	# Omeg_SLnnl = run(l_Omeg_SLnnl) + run(l_Omeg_SLnnl,DS="-")
-	# plot(Omeg_SLnnl,top_title="Omeg_SLnnl",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	print("THE KAPPA VALUE IN THE NNL RUN IS : ",orb_nnl["kappa"])
+	l_Omeg_SLnnl = load(orb_nnl, IPS=2, ISW=1, ICP=[2,11,9,5,6,8], #Print par6 = zeta |#par5=epsH 
+		RL0=0,RL1=10,NMX=100000, STOP=["LP2"], #{2:np.append(3.6,np.arange(2,7,0.25))}
+		NTST=200,DS=0.002,DSMAX=0.002,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4)
+	Omeg_SLnnl = run(l_Omeg_SLnnl) + run(l_Omeg_SLnnl,DS="-")
+	plot(Omeg_SLnnl,top_title="Omeg_SLnnl",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
 
-	# #|__|IPS2_FOLD_SL|__
+	#|__|IPS2_FOLD_SL|__
 	
 	# wait
 
-	# #|>>|IPS2_FOLD_DL|>>
-	# starter = load(
-	# 	e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
-	# 	dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
-	# 	c="ZilliCubic11")
+	#|>>|IPS2_FOLD_DL|>>
+	starter = load(
+		e="ZilliCubic11_datFileContin_zeta_1e-2_doubleLoop",
+		dat="onePeriodCycle_ISO_rot_2p91_zeta_1e-2_doubleLoop",
+		c="ZilliCubic11")
 
-	# #| solFam , cubic
-	# print("=====2A_FFF===CONTINUE_DL_MATLAB_ORBIT")
-	# l_Omeg = load( starter, IPS=2, ISW=1, ICP=[2,11,9],
-	# 	RL0=0, RL1=7, NMX=10000, STOP="LP2", 
-	# 	NTST=200,DS=+0.001,DSMAX=0.05,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4)
-	# Omeg = run(l_Omeg) + run(l_Omeg,DS="-")
-	# plot(Omeg,top_title="Omeg, DL, bare",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
-	# orb = Omeg("LP2") #|Upper LP is problematic in amplitude (>70) when the zeta is down to zero (<1e-3).
-	# print("HERERERERERER ER ER ER ER E RE RE RER ER ER E R",orb["Omeg"])
+	#| solFam , cubic
+	print("=====2A_FFF===CONTINUE_DL_MATLAB_ORBIT")
+	l_Omeg = load( starter, IPS=2, ISW=1, ICP=[2,11,9],
+		RL0=0, RL1=7, NMX=10000, STOP="LP2", 
+		NTST=200,DS=+0.001,DSMAX=0.05,EPSL=1e-06,EPSU=1e-06,EPSS=1e-4)
+	Omeg = run(l_Omeg) + run(l_Omeg,DS="-")
+	plot(Omeg,top_title="Omeg, DL, bare",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	orb = Omeg("LP2") #|Upper LP is problematic in amplitude (>70) when the zeta is down to zero (<1e-3).
+	print("HERERERERERER ER ER ER ER E RE RE RER ER ER E R",orb["Omeg"])
 
-	# #| OPT Fold contin in (zeta,Omeg), DL
-	# if isLowZetaInit:
-	# 	l_fold = run(orb, IPS=2, ICP=[6,2,11,9], ISW=2,
-	# 		RL0=0, RL1=1, NMX = 1000000, UZR={6:[1e-5]}, STOP="LP2", NPR=1000,
-	# 		NTST=300, DS=0.001, DSMAX=0.001, DSMIN=0.0001, EPSL=1e-6, EPSU=1e-6, EPSS=1e-3)
-	# 	fold = run(l_fold,DS="-") #|you only decrease the zeta. 
-	# 	plot(fold,top_title="fold, (zeta,Omeg), DL",stability=True,height=600,bifurcation_x="zeta",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
-	# 	orb = fold("UZ1") #|will need revision. It might need a BP sample as in SL case.
-	# 	save(fold,"zO-DL")
+	#| OPT Fold contin in (zeta,Omeg), DL
+	if isLowZetaInit:
+		l_fold = run(orb, IPS=2, ICP=[6,2,11,9], ISW=2,
+			RL0=0, RL1=1, NMX = 1000000, UZR={6:[1e-5]}, STOP="LP2", NPR=1000,
+			NTST=300, DS=0.001, DSMAX=0.001, DSMIN=0.0001, EPSL=1e-6, EPSU=1e-6, EPSS=1e-3)
+		fold = run(l_fold,DS="-") #|you only decrease the zeta. 
+		plot(fold,top_title="fold, (zeta,Omeg), DL",stability=True,height=600,bifurcation_x="zeta",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+		orb = fold("UZ1") #|will need revision. It might need a BP sample as in SL case.
+		save(fold,"zO-DL")
 
-	# 	l_Omeg = load(orb, IPS=2, ISW=1, ICP=[2,11,9,6,5],
-	# 		RL0=0, RL1=10, UZR={2:[5,6,7,8,9]}, STOP="LP2",NMX=10000,
-	# 		NTST=200, DS=0.001, DSMAX=0.05, EPSL=1e-6, EPSU=1e-6, EPSS=1e-4)
-	# 	Omeg_short = run(l_Omeg, NMX = 300) #|To cirvumvent the problem of not having the initial point of LP in the bd obj. 
-	# 	orb = Omeg_short("EP1")
-	# 	Omeg = run(orb, NMX=10000) + run(orb, NMX=10000,DS="-")
-	# 	plot(Omeg, top_title="Omeg, DL, new zeta",bifurcation_x="Omeg",bifurcation_y="Amplitude",stability=True)
-	# 	orb = Omeg("LP1")
-	# 	print("HEREREREasdfasdfwefqrdfasefq sdf qwe fsfqwe fsdf areqw fRERE", orb['Omeg'])
+		l_Omeg = load(orb, IPS=2, ISW=1, ICP=[2,11,9,6,5],
+			RL0=0, RL1=10, UZR={2:[5,6,7,8,9]}, STOP="LP2",NMX=10000,
+			NTST=200, DS=0.001, DSMAX=0.05, EPSL=1e-6, EPSU=1e-6, EPSS=1e-4)
+		Omeg_short = run(l_Omeg, NMX = 300) #|To cirvumvent the problem of not having the initial point of LP in the bd obj. 
+		orb = Omeg_short("EP1")
+		Omeg = run(orb, NMX=10000) + run(orb, NMX=10000,DS="-")
+		plot(Omeg, top_title="Omeg, DL, new zeta",bifurcation_x="Omeg",bifurcation_y="Amplitude",stability=True)
+		orb = Omeg("LP1")
+		print("HEREREREasdfasdfwefqrdfasefq sdf qwe fsfqwe fsdf areqw fRERE", orb['Omeg'])
 
-	# #| OPT Fold contin in (epsH,Omeg), DL
-	# if isHighEpsH:
-	# 	l_fold = run(orb, IPS=2, ISW=2, ICP=[5,2,11,9,6],
-	# 		RL0=0, RL1=2, NMX=1000000, UZR={5:[1.5]},
-	# 		NTST=350, DS=0.001, DSMAX=0.005, DSMIN=0.001, EPSL=1e-6, EPSU=1e-6, EPSS=1e-3)
-	# 	fold_epsHOmeg = run (l_fold) + run(l_fold, DS="-")
-	# 	orb = fold_epsHOmeg("UZ1")
-	# 	if not isLowZetaInit:
-	# 		save(fold_epsHOmeg,"eO-DL")
-	# 	elif isLowZetaInit:
-	# 		save(fold_epsHOmeg,"eO-nz-DL")
+	#| OPT Fold contin in (epsH,Omeg), DL
+	if isHighEpsH:
+		l_fold = run(orb, IPS=2, ISW=2, ICP=[5,2,11,9,6],
+			RL0=0, RL1=2, NMX=1000000, UZR={5:[1.5]},
+			NTST=350, DS=0.001, DSMAX=0.005, DSMIN=0.001, EPSL=1e-6, EPSU=1e-6, EPSS=1e-3)
+		fold_epsHOmeg = run (l_fold) + run(l_fold, DS="-")
+		orb = fold_epsHOmeg("UZ1")
+		if not isLowZetaInit:
+			save(fold_epsHOmeg,"eO-DL")
+		elif isLowZetaInit:
+			save(fold_epsHOmeg,"eO-nz-DL")
 
-	# 	l_Omeg = load(orb, IPS=2, ISW=1, ICP=[2,11,9,6,5],
-	# 		RL0=0, RL1=10, UZR={2:[5,6,7,8,9]}, STOP="LP2", NMX=10000,
-	# 		EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
-	# 	Omeg_short = run(l_Omeg, NMX = 300) #|To cirvumvent the problem of not having the initial point of LP in the bd obj. 
-	# 	orb = Omeg_short("EP1")
-	# 	Omeg = run(orb, NMX=10000) + run(orb, NMX=10000,DS="-")
-	# 	plot(Omeg,top_title="Omeg, DL, new epsH",bifurcation_x="Omeg",bifurcation_y="Amplitude",stability=True)
-	# 	orb = Omeg("LP1")
-	# 	print("qweopfmadsofiqjpweofkmasdpiEORIGFMNPQODKVCMQWIEFMCPOQ;KM ", orb["Omeg"])
+		l_Omeg = load(orb, IPS=2, ISW=1, ICP=[2,11,9,6,5],
+			RL0=0, RL1=10, UZR={2:[5,6,7,8,9]}, STOP="LP2", NMX=10000,
+			EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-4)
+		Omeg_short = run(l_Omeg, NMX = 300) #|To cirvumvent the problem of not having the initial point of LP in the bd obj. 
+		orb = Omeg_short("EP1")
+		Omeg = run(orb, NMX=10000) + run(orb, NMX=10000,DS="-")
+		plot(Omeg,top_title="Omeg, DL, new epsH",bifurcation_x="Omeg",bifurcation_y="Amplitude",stability=True)
+		orb = Omeg("LP1")
+		print("qweopfmadsofiqjpweofkmasdpiEORIGFMNPQODKVCMQWIEFMCPOQ;KM ", orb["Omeg"])
 
-	# #| Homotopy of kappa from 0 to 1. 
-	# l_kappa = run(orb, IPS=2, ICP=[8,2,11,9], ISW=2,
-	# 	UZR={8:1.0}, RL0=0.0, RL1=1.01, NMX=40000,STOP="HB10",
-	# 	NTST=3000, DS=0.001, DSMAX=0.001, DSMIN=0.00001, EPSL= 10e-06, EPSU = 10e-06, EPSS =1e-3, ITNW=10)
-	# 	#|Ds ddnt work(if only worked): NTST=3000, DS=0.001, DSMAX=0.0001, DSMIN=0.000001, EPSL= 5e-06, EPSU = 5e-06, EPSS =1e-3, ITNW=10)
-	# kappa_DL =run(l_kappa) #|Forward dir is enough
-	# plot(kappa_DL,top_title="kappa_DL",stability=True,bifurcation_x="kappa",bifurcation_y="Amplitude", height=600)
-	# orb = kappa_DL("UZ1")
+	#| Homotopy of kappa from 0 to 1. 
+	l_kappa = run(orb, IPS=2, ICP=[8,2,11,9], ISW=2,
+		UZR={8:1.0}, RL0=0.0, RL1=1.01, NMX=40000,STOP="HB10",
+		NTST=3000, DS=0.001, DSMAX=0.001, DSMIN=0.00001, EPSL= 10e-06, EPSU = 10e-06, EPSS =1e-3, ITNW=10)
+		#|Ds ddnt work(if only worked): NTST=3000, DS=0.001, DSMAX=0.0001, DSMIN=0.000001, EPSL= 5e-06, EPSU = 5e-06, EPSS =1e-3, ITNW=10)
+	kappa_DL =run(l_kappa) #|Forward dir is enough
+	orb = kappa_DL("UZ1")
 
-	# if not isLowZetaInit and not isHighEpsH:
-	# 	save(kappa_DL,"kO-DL")
-	# elif isLowZetaInit and not isHighEpsH:
-	# 	save(kappa_DL,"kO-nz-DL")
-	# elif not isLowZetaInit and isHighEpsH:
-	# 	save(kappa_DL,"kO-ne-DL")
-	# elif isLowZetaInit and isHighEpsH:
-	# 	save(kappa_DL,"kO-nze-DL")
+	if not isLowZetaInit and not isHighEpsH:
+		save(kappa_DL,"kO-DL")
+	elif isLowZetaInit and not isHighEpsH:
+		save(kappa_DL,"kO-nz-DL")
+	elif not isLowZetaInit and isHighEpsH:
+		save(kappa_DL,"kO-ne-DL")
+	elif isLowZetaInit and isHighEpsH:
+		save(kappa_DL,"kO-nze-DL")
 
+	plot(kappa_DL,top_title="kappa_DL",stability=True,bifurcation_x="kappa",bifurcation_y="Amplitude", height=600)
 
-	# #| solFam nnl , DL
-	# l_Omeg_DLnnl = load(orb, IPS=2, ICP=[2,11,9], ISW=1,
-	# 	RL0=0.0,RL1=7.0,NMX=15000, STOP="LP3",
-	# 	NTST=500,DS=0.001,DSMAX=0.005, DSMIN=0.0001,EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-3, ITNW=7)
-	# Omeg_DLnnl = merge( run(l_Omeg_DLnnl) + run(l_Omeg_DLnnl,DS='-') ) 
-	# plot(Omeg_DLnnl,top_title="Omeg_DLnnl",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
-	# #|__|IPS2_FOLD_DL|__
+	#| solFam nnl , DL
+	l_Omeg_DLnnl = load(orb, IPS=2, ICP=[2,11,9], ISW=1,
+		RL0=0.0,RL1=7.0,NMX=15000, STOP="LP3",
+		NTST=500,DS=0.001,DSMAX=0.005, DSMIN=0.0001,EPSL= 1e-06, EPSU = 1e-06, EPSS =1e-3, ITNW=7)
+	Omeg_DLnnl = merge( run(l_Omeg_DLnnl) + run(l_Omeg_DLnnl,DS='-') ) 
+	plot(Omeg_DLnnl,top_title="Omeg_DLnnl",stability=True,height=600,bifurcation_x="Omeg",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+	#|__|IPS2_FOLD_DL|__
 
-	# IPS2 = (Omeg_SL + Omeg_SLnnl + fold_SL) + (Omeg_DL + Omeg_DLnnl + fold_DL)
-# #|__|IPS2_FOLD|__
+	IPS2 = (Omeg_SL + Omeg_SLnnl + fold_SL) + (Omeg_DL + Omeg_DLnnl + fold_DL)
+#|__|IPS2_FOLD|__
 #|__|IPS2|__
 
 
