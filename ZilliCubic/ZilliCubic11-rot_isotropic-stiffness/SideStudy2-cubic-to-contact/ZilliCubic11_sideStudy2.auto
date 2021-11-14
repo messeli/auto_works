@@ -25,7 +25,7 @@ isKappa1_fold0 = False #False #|Kappa or fold contin s tb performD if set t True
 #DEL isKappaContin  = True #|only affects IPS2; IPS1 already does the kappa homot. 
 #DEL isFoldContin   = False #|only affects IPS2; IPS1 already does the kappa homot. 
 
-isLowZetaInit = True
+isLowZetaInit = False
 isHighEpsH = True #|for now it is after the newNonlinsolFam calc.
 ##########################
 
@@ -233,7 +233,7 @@ if isKappa1_fold0: #True for kappa contin method
 		if not isLowZetaInit: 
 			save(Omeg,"O-ne-SL")
 		else:
-			save(epsH,"e-nze-SL")
+			save(Omeg,"O-nze-SL")
 			
 
 	#| HOMOTOPY to newNonlin with kappa=0>1 OR rho=0>1 for tanh OR quintic, respectively (par8 OR par15)
@@ -299,7 +299,7 @@ if isKappa1_fold0: #True for kappa contin method
 
 	#|__|IPS2_KAPPA_SL|__
 
-	# wait
+	wait
 
 	#|>>|IPS2_KAPPA_DL|>>
 	print("===DIAGNOSTIC===IPS2_KAPPA_DL")
@@ -364,7 +364,7 @@ if isKappa1_fold0: #True for kappa contin method
 		if not isLowZetaInit:
 			save(Omeg,"O-ne-DL")
 		else:
-			save(epsH,"O-nze-DL")
+			save(Omeg,"O-nze-DL")
 
 
 	#| HOMOTOPY to newNonlin with kappa=0>1 OR rho=0>1 for tanh OR quintic, respectively (par8 OR par15)
@@ -583,7 +583,7 @@ else: #|Fold contin method (ie isKappa1_fold0 = False)
 
 	#| Homotopy of kappa from 0 to 1. 
 	l_kappa = run(orb, IPS=2, ICP=[8,2,11,9], ISW=2,
-		UZR={8:1.0}, RL0=0.0, RL1=1.01, NMX=40000,STOP="HB10",
+		UZR={8:1.0}, RL0=0.0, RL1=1.01, NMX=100000,STOP="HB10",
 		NTST=3000, DS=0.001, DSMAX=0.001, DSMIN=0.00001, EPSL= 10e-06, EPSU = 10e-06, EPSS =1e-3, ITNW=10)
 		#|:worked for (T zeta, T epsH): NTST=3000, DS=0.001, DSMAX=0.001, DSMIN=0.00001, EPSL= 10e-06, EPSU = 10e-06, EPSS =1e-3, ITNW=10)
 		#|Ds ddnt work(if only worked): NTST=3000, DS=0.001, DSMAX=0.0001, DSMIN=0.000001, EPSL= 5e-06, EPSU = 5e-06, EPSS =1e-3, ITNW=10)

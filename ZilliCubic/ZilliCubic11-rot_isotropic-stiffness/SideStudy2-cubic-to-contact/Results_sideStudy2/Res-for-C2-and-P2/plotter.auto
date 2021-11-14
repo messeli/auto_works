@@ -1,14 +1,16 @@
-isBare = 0 
-is_nz = 0
-is_ne = 0
-is_nze = 0
+#bools_cubic = [0,1,0,0]
+isBare = 1 #bools_cubic[0]
+is_nz = 1 #bools_cubic[1]
+is_ne = 1 #bools_cubic[2]
+is_nze = 1 #bools_cubic[3]
 
-is_nk = 0
-is_nzk = 0
-is_nek = 0
-is_nzek = 1
+#bools_nk = [0,1,0,1]
+is_nk = 1 #bools_nk[0]
+is_nzk = 1 #bools_nk[1]
+is_nek = 1 #bools_nk[2]
+is_nzek = 1 #bools_nk[3]
 
-#| kappa = 0 , cubic
+#| kappa = 0 , cubic   (maxx=7, maxy=9, minx=0, miny=0)
 if isBare:
 	# IPS1, bare
 	f = loadbd("forw")
@@ -19,8 +21,10 @@ if isBare:
 	SL= loadbd("O-bare-SL")
 	DL= loadbd("O-bare-DL")
 	IPS2 = SL + DL
-
-	plot(IPS1 + IPS2, top_title="isBare = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600)
+	
+	all = IPS1 + IPS2
+	plot(all,top_title="isBare = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=7, maxy=9, minx=0, miny=0)
+	save(all,"all_bare")
 
 if is_nz:
 	# IPS1
@@ -31,10 +35,11 @@ if is_nz:
 	# IPS2
 	SL= loadbd("O-nz-SL")
 	DL= loadbd("O-nz-DL")
-	IPS2 = SL + DL + PD
+	IPS2 = SL + DL 
 	
-	plot(IPS1 + IPS2, top_title="is_nz = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600)
-
+	all = IPS1 + IPS2
+	plot(all, top_title="is_nz = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=7, maxy=9, minx=0, miny=0)
+	save(all,"all_nz")
 
 if is_ne:
 	# IPS1
@@ -45,10 +50,11 @@ if is_ne:
 	# IPS2
 	SL= loadbd("O-ne-SL")
 	DL= loadbd("O-ne-DL")
-	IPS2 = SL + DL + PD
+	IPS2 = SL + DL 
 	
-	plot(IPS1 + IPS2, top_title="is_ne = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600)
-
+	all = IPS1 + IPS2
+	plot(all, top_title="is_ne = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=7, maxy=9, minx=0, miny=0)
+	save(all,"all_ne")
 
 if is_nze:
 	# IPS1
@@ -59,15 +65,16 @@ if is_nze:
 	# IPS2
 	SL= loadbd("O-nze-SL")
 	DL= loadbd("O-nze-DL")
-	IPS2 = SL + DL + PD
+	IPS2 = SL + DL
 	
-	plot(IPS1 + IPS2, top_title="is_nze = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600)
+	all = IPS1 + IPS2
+	plot(all, top_title="is_nze = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=7, maxy=9, minx=0, miny=0)
+	save(all,"all_nze")
 
 
 
 
-
-#| kappa=1 , nnl (:tanh contact)
+#| kappa=1 , nnl (:tanh contact) (maxx=10, maxy=14, minx=0, miny=0)
 
 if is_nk:
 	# IPS1
@@ -81,8 +88,9 @@ if is_nk:
 	PD = loadbd("PD-nk-SLDL")
 	IPS2 = SL + DL + PD
 	
-	plot(IPS1 + IPS2, top_title="is_nk = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600)
-
+	all = IPS1 + IPS2 
+	plot(all, top_title="is_nk = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=10, maxy=14, minx=0, miny=0)
+	save(all,"all_nk")
 
 if is_nzk:
 	# IPS1
@@ -95,8 +103,9 @@ if is_nzk:
 	DL= loadbd("O-nzk-DL")
 	IPS2 = SL + DL 
 	
-	plot(IPS1 + IPS2, top_title="is_nzk = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600)
-
+	all = IPS1 + IPS2
+	plot(all, top_title="is_nzk = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=10, maxy=14, minx=0, miny=0)
+	save(all,"all_nzk")
 
 if is_nek:
 	# IPS1
@@ -109,8 +118,9 @@ if is_nek:
 	DL= loadbd("O-nek-DL")
 	IPS2 = SL + DL 
 	
-	plot(IPS1 + IPS2, top_title="is_nek = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600)
-
+	all = IPS1 + IPS2
+	plot(all, top_title="is_nek = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=10, maxy=14, minx=0, miny=0)
+	save(all,"all_nek")
 
 if is_nzek:
 	# IPS1
@@ -120,23 +130,17 @@ if is_nzek:
 	
 	# IPS2
 	SL= loadbd("O-nzek-SL")
-	kO_nze_SL = loadbd("kO-nze-SL")
-	SL += kO_nze_SL
+	#kO_nze_SL = loadbd("kO-nze-SL")
+	#SL += kO_nze_SL
 
 	DL= loadbd("O-nzek-DL")
 
 
 	IPS2 = SL + DL 
 	
-	plot(IPS1 + IPS2, top_title="is_nzek = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600)
-
-
-
-
-
-
-
-
+	all = IPS1 + IPS2
+	plot(all, top_title="is_nzek = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=10, maxy=14, minx=0, miny=0)
+	save(all, "all_nzek")
 
 
 
