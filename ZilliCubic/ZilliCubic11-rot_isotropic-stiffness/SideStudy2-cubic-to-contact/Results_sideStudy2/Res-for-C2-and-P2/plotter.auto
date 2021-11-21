@@ -1,11 +1,11 @@
 #bools_cubic = [0,1,0,0]
-isBare = 1 #bools_cubic[0]
+isBare = 0 #bools_cubic[0]
 is_nz = 0 #bools_cubic[1]
 is_ne = 0 #bools_cubic[2]
 is_nze = 0 #bools_cubic[3]
 
 #bools_nk = [0,1,0,1]
-is_nk = 0 #bools_nk[0]
+is_nk = 1 #bools_nk[0]
 is_nzk = 0 #bools_nk[1]
 is_nek = 0 #bools_nk[2]
 is_nzek = 0 #bools_nk[3]
@@ -23,7 +23,7 @@ if isBare:
 	IPS2 = SL + DL
 	
 	all = IPS1 + IPS2
-	plot(all,top_title="isBare = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=7, maxy=9, minx=0, miny=0)
+	plot(all,top_title="isBare = 1", use_symbols=False, color_list="black", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=7, maxy=9, minx=0, miny=0)
 	save(all,"all_bare")
 
 	#| Extra
@@ -101,7 +101,7 @@ if is_nk:
 	IPS2 = SL + DL + PD
 	
 	all = IPS1 + IPS2 
-	plot(all, top_title="is_nk = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=10, maxy=14, minx=0, miny=0)
+	plot(all, top_title="is_nk = 1", use_symbols=False, color_list="black", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=10, maxy=14, minx=0, miny=0)
 	save(all,"all_nk")
 
 if is_nzk:
