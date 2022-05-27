@@ -26,7 +26,7 @@ isKappa1_fold0 = False #False #|Kappa or fold contin s tb performD if set t True
 #DEL isFoldContin   = False #|only affects IPS2; IPS1 already does the kappa homot. 
 
 isLowZetaInit = False
-isHighEpsH = False #|for now it is after the newNonlinsolFam calc.
+isHighEpsH = True #|for now it is after the newNonlinsolFam calc.
 ##########################
 
 startTime = time.time()

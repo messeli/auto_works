@@ -1,5 +1,5 @@
 #bools_cubic = [0,1,0,0]
-isBare = 0 #bools_cubic[0]
+isBare = 1 #bools_cubic[0]
 is_nz = 0 #bools_cubic[1]
 is_ne = 0 #bools_cubic[2]
 is_nze = 0 #bools_cubic[3]
@@ -18,25 +18,17 @@ if isBare:
 	IPS1 = f+ b
 	
 	# IPS2, bare
-	SL= loadbd("O-bare-SL")
-	DL= loadbd("O-bare-DL")
+	SL= rl(loadbd("O-bare-SL"))
+	save(SL,"O-bare-SL-relabeled")
+	plot(SL,top_title="isBare = 1, only SL", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=7, maxy=9, minx=0, miny=0)
+	DL= rl(loadbd("O-bare-DL"))
+	save(DL,"O-bare-DL-relabeled")
+	#plot(DL,top_title="isBare = 1, only DL", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=7, maxy=9, minx=0, miny=0)
 	IPS2 = SL + DL
 	
 	all = IPS1 + IPS2
-	plot(all,top_title="isBare = 1", use_symbols=False, color_list="black", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=7, maxy=9, minx=0, miny=0)
-	save(all,"all_bare")
-
-	#| Extra
-	k_SL = loadbd("k-SL")
-	k_DL = loadbd("k-DL")
-	O_nk_SL= loadbd("O-nk-SL")
-	O_nk_DL= loadbd("O-nk-DL")
-	PD_nk_SLDL = loadbd("PD-nk-SLDL")
-	together_SL = SL+ k_SL + O_nk_SL
-	together_DL = DL + k_DL  + O_nk_DL
-	plot(together_SL ,top_title="isBare = 1", color_list="black", use_symbols=False, bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=7, maxy=9, minx=0, miny=0)
-	plot(together_DL ,top_title="isBare = 1", color_list="black", use_symbols=False, bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=7, maxy=9, minx=0, miny=0)
-
+	plot(all,top_title="isBare = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=7, maxy=9, minx=0, miny=0)
+	#save(all,"all_bare")
 
 if is_nz:
 	# IPS1
@@ -95,14 +87,18 @@ if is_nk:
 	IPS1 = f + b
 	
 	# IPS2
-	SL= loadbd("O-nk-SL")
-	DL= loadbd("O-nk-DL")
+	SL= rl(loadbd("O-nk-SL"))
+	save(SL,"O-nk-SL-relabeled")
+	plot(SL,top_title="is_nk = 1, only SL", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=10, maxy=14, minx=0, miny=0)
+	DL= rl(loadbd("O-nk-DL"))
+	save(DL,"O-nk-DL-relabeled")
+	#plot(DL,top_title="is_nk = 1, only DL", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=10, maxy=14, minx=0, miny=0)
 	PD = loadbd("PD-nk-SLDL")
 	IPS2 = SL + DL + PD
 	
 	all = IPS1 + IPS2 
-	plot(all, top_title="is_nk = 1", use_symbols=False, color_list="black", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=10, maxy=14, minx=0, miny=0)
-	save(all,"all_nk")
+	plot(all, top_title="is_nk = 1", bifurcation_x="Omeg", bifurcation_y="Amplitude", solution_x="u", solution_y="v", stability=True, height=600,maxx=10, maxy=14, minx=0, miny=0)
+	#save(all,"all_nk")
 
 if is_nzk:
 	# IPS1
