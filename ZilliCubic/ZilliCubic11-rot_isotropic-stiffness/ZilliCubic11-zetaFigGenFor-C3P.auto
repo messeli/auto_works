@@ -1,0 +1,75 @@
+# The Figs,
+# - SLzeta-at4.0.svg
+# - SLzeta-at4.0-v2.svg
+# - SLzeta-at4.0-v3.svg
+# are genD from the code below:
+
+#|>>|IPS2|>> IPS=2 
+print("============================================================ IPS2")
+
+
+#|>>|IPS2_A|>> METHOD A : ~PURE AUTO:Once Matlab dat, dn zeta contin 
+
+#|>>|IPS2_A_SL|>> SingleLoop periodic solutions
+print("============================================================ IPS2_A")
+
+
+#| OPT y3dn1 Bfr anything, Inc epsH to see if it makes the IPS2 sols join in a way !?
+is_y3dn1 = False
+if is_y3dn1: 
+    print("============================================================ IPS2_A_SL : Matlab orbit > epsH(y3dn1 ON)")
+
+    l_sLoop_dat_initHomotInEpsH = load(
+        e="ZilliCubic11_datFileContin_zeta_1e-2",
+        c="ZilliCubic11",
+        dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
+        IPS=2,ICP=[5,11,9,6], # 2:'Omeg',5:'epsH',6:'zeta'
+        UZR={5:0.899},UZSTOP={5:[8*0.353]},NMX=5000,
+        NTST=200,DS=+0.001,DSMAX=0.005,EPSL=1e-07,EPSU=1e-07,EPSS=1e-4) # 6 6 3
+        
+    IPS2_sLoop = merge( run(l_sLoop_dat_initHomotInEpsH) + run(l_sLoop_dat_initHomotInEpsH,DS="-") )
+
+    plot(IPS2_sLoop,stability=True,bifurcation_x="epsH",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+else:
+    print("============================================================ IPS2_A_SL : Matlab orbit > epsH(y3dn1 is OFF)")
+
+
+#| Now Cont from where u left in epsH contin.
+print("============================================================ IPS2_A_SL : Matlab >" + " epsH(y3dn1) >"*is_y3dn1 + " Omeg ")
+
+
+l_sLoop_dat = load(
+    #IPS2_sLoop("LP1"),                           #  OPT y3dn1
+    e="ZilliCubic11_datFileContin_zeta_1e-2",  # ~OPT y3dn1
+    c="ZilliCubic11",                          # ~OPT y3dn1
+    dat="onePeriodCycle_ISO_rot_4p05_zeta_1e-2",
+    IPS=2,ICP=[2,11,9,6,5],
+    DS=+0.005,DSMAX=0.005, 
+    UZSTOP={2:[4.0,7.01]}, #UZSTOP={2:[0.01,7.01]}, #
+    EPSL= 1e-07, EPSU = 1e-07, EPSS =1e-4, # 6 6 3
+    NTST=200)
+
+if not is_y3dn1 : IPS2_sLoop = []
+IPS2_sLoop = IPS2_sLoop + merge( run(l_sLoop_dat) + 
+              run(l_sLoop_dat,DS="-") )
+
+#plot(IPS2_sLoop,stability=True,bifurcation_x="epsH",bifurcation_y="Amplitude",solution_x="u",solution_y="v")
+
+
+
+#| Sample orbits at diff zeta in a contin frm a tip f d periodic orbit
+print("============================================================ IPS2_A_SL : Matlab >" + " epsH(y3dn1) >"*is_y3dn1 + " Omeg >" + " zeta ")
+l_sLoop_zeta = load(IPS2_sLoop('UZ1'),
+    NMX=20000,
+    IPS=2, ICP=[6,11,9,2,5],
+    UZR={6:[8e-3,5e-3,1e-3,1e-5,0.00, 0.05,0.075,0.082,0.10,0.15,0.2]},RL0=-1e-5, 
+    NTST=200,DS=+0.0005,DSMAX=0.0005) #|Continuation in zeta !!!)
+    #|:(-) zetas give the same branches as positive ones.
+    #|:Contin par6: zeta  #|1e-5 and 0.0 not sampled ??
+
+sLoop_zeta = merge( run(l_sLoop_zeta) + run(l_sLoop_zeta,DS="-") )
+
+save(sLoop_zeta,"sLoop_zeta")
+p = plot(sLoop_zeta,stability=True,bifurcation_x="zeta",bifurcation_y="Amplitude",height=600)
+p.config(title="sLoop_zeta",label="all",xlabel_fontsize=11,ylabel_fontsize=11)
+
