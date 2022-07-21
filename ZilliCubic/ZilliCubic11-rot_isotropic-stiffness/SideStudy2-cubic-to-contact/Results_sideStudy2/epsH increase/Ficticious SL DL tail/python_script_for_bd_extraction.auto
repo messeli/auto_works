@@ -1,0 +1,23 @@
+# Extract Omeg - Amplitude and write to a different file 
+import numpy as np
+import matplotlib.pyplot as plt
+
+back_nk = loadbd("back-nk")
+Omegs = back_nk["Omeg"]
+Amps = back_nk["Amplitude"]
+N = len(Omegs)
+
+mat = np.zeros((N,2)) 
+for i in range(0,N):
+	mat[i,:] = np.array(Omegs[i], Amps[i])
+
+np.savetxt("Omeg_Amps.txt",mat) #saves as ready to read
+#np.save("Omeg_Amps",mat) #saves as .npy hex file.
+
+#f = open("Omeg_Amps.txt","w")
+#f.write(mat)
+#f.close()
+
+plt.plot(Omegs,Amps)
+plt.axis([0.7,1.5,0.7,1.4])
+plt.show()
