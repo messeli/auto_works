@@ -1,8 +1,8 @@
 clc
 clear
-close all 
+%close all 
 
-N = 50 ;
+N = 100 ;
 options = odeset("RelTol",1e-10) ;
 for k = 1:N
 % u0 = -3+6*rand(2,1) ;% This is working too, except for the colour grad.
@@ -27,7 +27,7 @@ end
 
 function f = func(t,u)
   wn = 1;
-  k3_m = 1 ; 
+  k3_m = 0.5 ; 
   f = [u(2);-wn^2*u(1) - k3_m*u(1)^3] ;
 end
 
